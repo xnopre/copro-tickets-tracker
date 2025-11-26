@@ -26,8 +26,8 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [x] Créer une page d'accueil minimaliste
 - [x] Vérifier que `npm run build` fonctionne
 - [x] Créer un repository GitHub
-- [ ] Déployer sur Render.com
-- [ ] Vérifier que l'application est accessible en ligne
+- [x] Déployer sur Render.com
+- [x] Vérifier que l'application est accessible en ligne (https://copro-tickets-tracker.onrender.com/)
 
 ### Validation
 - ✅ L'URL Render.com affiche "CoTiTra"
