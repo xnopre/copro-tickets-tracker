@@ -143,3 +143,35 @@ Le projet est configuré pour être déployé sur Render.com :
 - Les entities du domain ne doivent jamais importer de code infrastructure
 - Utiliser TypeScript strict mode (pas de `any`, toujours typer)
 - Préférer les functional components et hooks React
+
+## Principes de Code Minimaliste
+
+### YAGNI (You Aren't Gonna Need It)
+- **Ne pas coder par anticipation** : N'ajoutez que ce qui est nécessaire pour l'étape en cours
+- **Pas de sur-ingénierie** : Évitez les abstractions prématurées
+- **Supprimez le code mort** : Retirez tout ce qui n'est pas utilisé
+
+### Configuration minimaliste
+- Ne pas ajouter de dépendances inutiles
+- Garder les fichiers de configuration simples et épurés
+- Supprimer les commentaires évidents ou les placeholders vides
+- Ne configurer que ce qui est actuellement utilisé dans le projet
+
+### Exemples à suivre
+✅ **BON** :
+```typescript
+const config: NextConfig = {};
+```
+
+❌ **MAUVAIS** :
+```typescript
+const config: NextConfig = {
+  /* config options here */  // Commentaire inutile
+  // future: true,             // Code commenté "pour plus tard"
+};
+```
+
+### Règle d'or
+**Chaque ligne de code doit avoir une raison d'exister maintenant, pas "au cas où" ou "pour plus tard".**
+
+Si quelque chose n'est pas utilisé dans l'étape actuelle, il ne doit pas être dans le code.
