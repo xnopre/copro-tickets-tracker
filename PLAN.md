@@ -22,10 +22,10 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Déploiement fonctionnel sur Render.com
 
 ### Tâches
-- [ ] Initialiser Next.js 15 avec TypeScript et Tailwind
-- [ ] Créer une page d'accueil minimaliste
-- [ ] Vérifier que `npm run build` fonctionne
-- [ ] Créer un repository GitHub
+- [x] Initialiser Next.js 16 avec TypeScript et Tailwind
+- [x] Créer une page d'accueil minimaliste
+- [x] Vérifier que `npm run build` fonctionne
+- [x] Créer un repository GitHub
 - [ ] Déployer sur Render.com
 - [ ] Vérifier que l'application est accessible en ligne
 
