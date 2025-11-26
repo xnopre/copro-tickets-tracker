@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Présentation du Projet
 
-**copro-tickets-tracker** - Application web de suivi de tickets pour la gestion de copropriété.
+**CoTiTra** (Copro Tickets Tracker) - Application web de suivi de tickets pour la gestion de copropriété.
 
 ### Stack Technique
 - **Framework**: Next.js 15+ (App Router)
@@ -70,9 +70,32 @@ npm run type-check
 
 Le projet utilise MongoDB via Mongoose. La connexion est configurée dans `src/infrastructure/database/`.
 
-Variables d'environnement requises :
-- `MONGODB_URI` - URL de connexion MongoDB (format: mongodb+srv://...)
-- `MONGODB_DB_NAME` - Nom de la base de données
+### Environnements
+
+**Développement local** : MongoDB installé localement
+```bash
+# .env.local
+MONGODB_URI=mongodb://localhost:27017/cotitra
+```
+
+**Production (Render.com)** : MongoDB Atlas (cloud)
+```bash
+# Variables d'environnement Render.com
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/cotitra
+```
+
+### Installation MongoDB en local
+
+**macOS** :
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+```
+
+**Windows** : Télécharger depuis [mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
+
+**Linux** : Suivre la doc officielle selon votre distribution
 
 ## Tests
 

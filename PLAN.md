@@ -1,224 +1,432 @@
-# Plan d'Action - Copro Tickets Tracker
+# Plan d'Action - CoTiTra
 
-Ce plan détaille les étapes de développement de l'application par petits pas incrémentaux.
+Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livre une version complète, testée, déployable et utilisable de l'application.
 
-## Phase 1 : Configuration Initiale
+## Principe
 
-### Étape 1.1 : Initialiser Next.js avec TypeScript
-- [ ] Créer le projet Next.js avec TypeScript
-- [ ] Configurer `tsconfig.json` en mode strict
-- [ ] Configurer ESLint et Prettier
-- [ ] Vérifier que l'application démarre correctement
-
-**Test** : `npm run dev` fonctionne et affiche la page d'accueil Next.js
-
-### Étape 1.2 : Configurer Vitest
-- [ ] Installer Vitest et React Testing Library
-- [ ] Créer `vitest.config.ts`
-- [ ] Créer un test simple pour valider la configuration
-- [ ] Ajouter les scripts de test dans `package.json`
-
-**Test** : `npm test` exécute les tests avec succès
-
-### Étape 1.3 : Configurer la structure hexagonale
-- [ ] Créer l'arborescence des dossiers (domain, application, infrastructure, presentation)
-- [ ] Créer des fichiers README.md dans chaque dossier pour expliquer leur rôle
-- [ ] Configurer les path aliases dans `tsconfig.json` (@domain, @application, etc.)
-
-**Test** : Les imports avec alias fonctionnent correctement
-
-## Phase 2 : Domain Layer (Cœur Métier)
-
-### Étape 2.1 : Créer l'entité Ticket
-- [ ] Créer `src/domain/entities/Ticket.ts`
-- [ ] Définir l'interface Ticket avec : id, titre, description, statut, dates
-- [ ] Créer l'enum TicketStatus (NEW, IN_PROGRESS, RESOLVED, CLOSED)
-- [ ] Écrire les tests unitaires pour l'entité
-
-**Test** : Tests unitaires de l'entité Ticket passent
-
-### Étape 2.2 : Créer l'entité Comment
-- [ ] Créer `src/domain/entities/Comment.ts`
-- [ ] Définir l'interface Comment avec : id, ticketId, contenu, auteur, date
-- [ ] Écrire les tests unitaires
-
-**Test** : Tests unitaires de l'entité Comment passent
-
-### Étape 2.3 : Créer les interfaces de repositories (ports)
-- [ ] Créer `src/domain/repositories/TicketRepository.ts` (interface)
-- [ ] Définir les méthodes : findAll, findById, create, update, delete
-- [ ] Créer `src/domain/repositories/CommentRepository.ts` (interface)
-- [ ] Définir les méthodes : findByTicketId, create, delete
-
-**Test** : Les interfaces TypeScript compilent sans erreur
-
-### Étape 2.4 : Créer les use cases pour les Tickets
-- [ ] Créer `src/domain/use-cases/CreateTicket.ts`
-- [ ] Créer `src/domain/use-cases/UpdateTicket.ts`
-- [ ] Créer `src/domain/use-cases/GetAllTickets.ts`
-- [ ] Créer `src/domain/use-cases/GetTicketById.ts`
-- [ ] Créer `src/domain/use-cases/DeleteTicket.ts`
-- [ ] Écrire les tests unitaires avec des mocks de repositories
-
-**Test** : Tests unitaires des use cases passent (avec repositories mockés)
-
-### Étape 2.5 : Créer les use cases pour les Comments
-- [ ] Créer `src/domain/use-cases/AddComment.ts`
-- [ ] Créer `src/domain/use-cases/GetTicketComments.ts`
-- [ ] Écrire les tests unitaires avec des mocks
-
-**Test** : Tests unitaires des use cases passent
-
-## Phase 3 : Infrastructure Layer (MongoDB)
-
-### Étape 3.1 : Configurer MongoDB
-- [ ] Installer mongoose
-- [ ] Créer `src/infrastructure/database/connection.ts`
-- [ ] Configurer la connexion MongoDB avec gestion d'erreurs
-- [ ] Créer un fichier `.env.local` avec MONGODB_URI
-- [ ] Ajouter `.env*.local` dans `.gitignore`
-
-**Test** : La connexion MongoDB s'établit correctement en local
-
-### Étape 3.2 : Créer les schémas Mongoose
-- [ ] Créer `src/infrastructure/database/schemas/TicketSchema.ts`
-- [ ] Créer `src/infrastructure/database/schemas/CommentSchema.ts`
-- [ ] Ajouter les index nécessaires
-
-**Test** : Les schémas Mongoose sont valides
-
-### Étape 3.3 : Implémenter TicketRepository
-- [ ] Créer `src/infrastructure/repositories/MongoTicketRepository.ts`
-- [ ] Implémenter l'interface TicketRepository
-- [ ] Mapper les documents Mongoose vers les entités Domain
-- [ ] Écrire les tests d'intégration (avec MongoDB en mémoire ou test DB)
-
-**Test** : Tests d'intégration du repository passent
-
-### Étape 3.4 : Implémenter CommentRepository
-- [ ] Créer `src/infrastructure/repositories/MongoCommentRepository.ts`
-- [ ] Implémenter l'interface CommentRepository
-- [ ] Écrire les tests d'intégration
-
-**Test** : Tests d'intégration du repository passent
-
-## Phase 4 : API Layer (Next.js API Routes)
-
-### Étape 4.1 : Créer les API Routes pour les Tickets
-- [ ] Créer `src/app/api/tickets/route.ts` (GET all, POST)
-- [ ] Créer `src/app/api/tickets/[id]/route.ts` (GET, PUT, DELETE)
-- [ ] Injecter les use cases et repositories
-- [ ] Gérer les erreurs et retourner les bons codes HTTP
-- [ ] Écrire les tests des API routes
-
-**Test** : Tester les endpoints avec curl ou Postman
-
-### Étape 4.2 : Créer les API Routes pour les Comments
-- [ ] Créer `src/app/api/tickets/[id]/comments/route.ts` (GET, POST)
-- [ ] Injecter les use cases
-- [ ] Écrire les tests
-
-**Test** : Tester les endpoints des commentaires
-
-## Phase 5 : Presentation Layer (UI)
-
-### Étape 5.1 : Créer la page d'accueil avec liste des tickets
-- [ ] Créer `src/app/page.tsx`
-- [ ] Créer le composant `TicketList.tsx`
-- [ ] Fetch des tickets depuis l'API
-- [ ] Afficher les tickets avec leur statut
-- [ ] Écrire les tests des composants
-
-**Test** : La page affiche la liste des tickets (peut être vide au début)
-
-### Étape 5.2 : Créer le formulaire de création de ticket
-- [ ] Créer le composant `CreateTicketForm.tsx`
-- [ ] Valider les champs (titre et description requis)
-- [ ] Gérer la soumission via POST à l'API
-- [ ] Rafraîchir la liste après création
-- [ ] Écrire les tests
-
-**Test** : On peut créer un nouveau ticket via l'UI
-
-### Étape 5.3 : Créer la page de détail d'un ticket
-- [ ] Créer `src/app/tickets/[id]/page.tsx`
-- [ ] Afficher tous les détails du ticket
-- [ ] Afficher les commentaires
-- [ ] Écrire les tests
-
-**Test** : Cliquer sur un ticket affiche sa page de détail
-
-### Étape 5.4 : Ajouter la modification du statut
-- [ ] Créer un composant `StatusSelector.tsx`
-- [ ] Permettre de changer le statut (dropdown ou boutons)
-- [ ] Mettre à jour via PUT à l'API
-- [ ] Écrire les tests
-
-**Test** : On peut changer le statut d'un ticket
-
-### Étape 5.5 : Ajouter la fonctionnalité de commentaires
-- [ ] Créer le composant `CommentList.tsx`
-- [ ] Créer le composant `AddCommentForm.tsx`
-- [ ] Gérer l'ajout de commentaires
-- [ ] Écrire les tests
-
-**Test** : On peut ajouter et voir les commentaires sur un ticket
-
-### Étape 5.6 : Ajouter la suppression de tickets
-- [ ] Ajouter un bouton de suppression dans la page de détail
-- [ ] Confirmer avant suppression (modal ou confirm)
-- [ ] Rediriger vers la liste après suppression
-- [ ] Écrire les tests
-
-**Test** : On peut supprimer un ticket
-
-### Étape 5.7 : Améliorer l'UI
-- [ ] Ajouter du style (Tailwind CSS ou CSS modules)
-- [ ] Ajouter des indicateurs de chargement
-- [ ] Ajouter des messages d'erreur utilisateur
-- [ ] Rendre l'UI responsive
-
-**Test** : L'application est utilisable et agréable visuellement
-
-## Phase 6 : Déploiement
-
-### Étape 6.1 : Préparer le déploiement
-- [ ] Créer un compte MongoDB Atlas et une database
-- [ ] Créer un compte Render.com
-- [ ] Vérifier que `npm run build` fonctionne en local
-
-**Test** : Build réussit sans erreurs
-
-### Étape 6.2 : Déployer sur Render.com
-- [ ] Créer un nouveau Web Service sur Render
-- [ ] Connecter le repository GitHub
-- [ ] Configurer les variables d'environnement (MONGODB_URI)
-- [ ] Lancer le déploiement
-
-**Test** : L'application est accessible en ligne et fonctionne
-
-### Étape 6.3 : Tests en production
-- [ ] Tester toutes les fonctionnalités en production
-- [ ] Vérifier les logs pour les erreurs
-- [ ] Tester sur mobile et desktop
-
-**Test** : Toutes les fonctionnalités marchent en production
-
-## Phase 7 : Améliorations Futures (Optionnel)
-
-- [ ] Ajouter l'authentification (NextAuth)
-- [ ] Ajouter des catégories pour les tickets (plomberie, électricité, etc.)
-- [ ] Ajouter des priorités (basse, moyenne, haute, urgente)
-- [ ] Ajouter la recherche et le filtrage
-- [ ] Ajouter la pagination pour les grandes listes
-- [ ] Ajouter l'upload de photos pour les tickets
-- [ ] Ajouter des notifications email
+À chaque étape :
+- ✅ L'application est **fonctionnelle** (pas de code incomplet)
+- 🧪 Les fonctionnalités sont **testées**
+- 🚀 L'application peut être **déployée** sur Render.com
+- 👤 L'application est **utilisable** par un utilisateur final
 
 ---
 
-## Notes
+## 📦 Étape 0 : Application Minimale Déployable
 
-- Chaque étape doit être testée avant de passer à la suivante
-- Commit après chaque étape réussie
-- Ne pas hésiter à décomposer une étape en sous-étapes si nécessaire
-- Les tests sont essentiels à chaque étape
+**Objectif** : Avoir une application Next.js qui tourne et qui est déployée sur Render.com
+
+### Ce qu'on livre
+- Une page d'accueil avec le titre "CoTiTra"
+- Build réussi
+- Déploiement fonctionnel sur Render.com
+
+### Tâches
+- [ ] Initialiser Next.js 15 avec TypeScript et Tailwind
+- [ ] Créer une page d'accueil minimaliste
+- [ ] Vérifier que `npm run build` fonctionne
+- [ ] Créer un repository GitHub
+- [ ] Déployer sur Render.com
+- [ ] Vérifier que l'application est accessible en ligne
+
+### Validation
+- ✅ L'URL Render.com affiche "CoTiTra"
+- ✅ Le build passe sans erreur
+
+---
+
+## 🎨 Étape 1 : Liste Statique de Tickets
+
+**Objectif** : Afficher une liste de tickets en dur dans l'interface
+
+### Ce qu'on livre
+- Une page qui affiche 3 tickets codés en dur
+- Chaque ticket montre : titre, statut, date
+- Interface stylée avec Tailwind
+- Tests des composants
+
+### Tâches
+- [ ] Créer le type TypeScript `Ticket` (id, titre, description, statut, dates)
+- [ ] Créer le composant `TicketCard` avec tests
+- [ ] Créer le composant `TicketList` avec tests
+- [ ] Afficher 3 tickets statiques dans la page d'accueil
+- [ ] Styler l'interface (responsive, couleurs par statut)
+- [ ] Déployer
+
+### Validation
+- ✅ On voit 3 tickets affichés joliment
+- ✅ Les tests passent (`npm test`)
+- ✅ Déployé et accessible en ligne
+
+---
+
+## 🗄️ Étape 2 : Tickets depuis MongoDB
+
+**Objectif** : Remplacer les données statiques par des vraies données venant de MongoDB
+
+### Ce qu'on livre
+- Connexion à MongoDB local en développement
+- Connexion à MongoDB Atlas en production
+- Les tickets sont stockés et récupérés depuis la base
+- Configuration des variables d'environnement
+
+### Tâches
+- [ ] Installer MongoDB localement (brew/apt/windows)
+- [ ] Démarrer MongoDB en local
+- [ ] Installer mongoose
+- [ ] Créer le schéma Mongoose pour Ticket
+- [ ] Créer la connexion MongoDB dans `lib/mongodb.ts`
+- [ ] Créer l'API route `GET /api/tickets`
+- [ ] Connecter la page d'accueil à l'API
+- [ ] Ajouter manuellement 3 tickets dans MongoDB local (via MongoDB Compass ou shell)
+- [ ] Tester en local
+- [ ] Créer un compte MongoDB Atlas (gratuit)
+- [ ] Créer un cluster et une database sur Atlas
+- [ ] Configurer MONGODB_URI dans les variables d'environnement Render.com
+- [ ] Tester en production
+
+### Validation
+- ✅ Les tickets affichés viennent de MongoDB local
+- ✅ Si on modifie un ticket dans MongoDB, il change dans l'app
+- ✅ Fonctionne en local (MongoDB local) ET en production (MongoDB Atlas)
+
+---
+
+## ➕ Étape 3 : Créer un Nouveau Ticket
+
+**Objectif** : Permettre de créer des tickets via l'interface
+
+### Ce qu'on livre
+- Un formulaire de création de ticket
+- Validation des champs (titre et description requis)
+- Le nouveau ticket apparaît immédiatement dans la liste
+
+### Tâches
+- [ ] Créer l'API route `POST /api/tickets`
+- [ ] Créer le composant `CreateTicketForm` avec tests
+- [ ] Valider les champs côté client et serveur
+- [ ] Rafraîchir la liste après création
+- [ ] Afficher un message de succès/erreur
+- [ ] Déployer
+
+### Validation
+- ✅ On peut créer un ticket avec titre + description
+- ✅ Le formulaire valide les champs vides
+- ✅ Le nouveau ticket apparaît dans la liste
+- ✅ Fonctionne en production
+
+---
+
+## 📄 Étape 4 : Voir le Détail d'un Ticket
+
+**Objectif** : Cliquer sur un ticket pour voir tous ses détails
+
+### Ce qu'on livre
+- Page de détail d'un ticket (`/tickets/[id]`)
+- Affiche titre, description complète, statut, dates
+- Bouton retour vers la liste
+
+### Tâches
+- [ ] Créer l'API route `GET /api/tickets/[id]`
+- [ ] Créer la page `/tickets/[id]/page.tsx`
+- [ ] Créer le composant `TicketDetail` avec tests
+- [ ] Rendre les tickets cliquables dans la liste
+- [ ] Gérer le cas "ticket non trouvé"
+- [ ] Déployer
+
+### Validation
+- ✅ Cliquer sur un ticket ouvre sa page de détail
+- ✅ Toutes les infos sont affichées
+- ✅ Le bouton retour fonctionne
+- ✅ URL avec mauvais ID affiche une erreur propre
+
+---
+
+## 🔄 Étape 5 : Changer le Statut et Assigner un Ticket
+
+**Objectif** : Modifier le statut d'un ticket (NEW → IN_PROGRESS → RESOLVED → CLOSED) avec assignation obligatoire de la personne en charge
+
+### Ce qu'on livre
+- Un formulaire pour changer le statut dans la page de détail
+- Un champ obligatoire pour saisir le nom de la personne assignée
+- Validation : impossible de changer le statut sans nom
+- Les changements de statut et d'assignation sont sauvegardés
+- Le statut et la personne assignée se reflètent dans la liste
+
+### Tâches
+- [ ] Ajouter le champ `assignedTo` (string, obligatoire) dans le type Ticket
+- [ ] Mettre à jour le schéma Mongoose avec le champ `assignedTo` (required)
+- [ ] Créer l'API route `PATCH /api/tickets/[id]` (pour statut + assignation)
+- [ ] Valider côté serveur : statut + assignedTo obligatoires
+- [ ] Créer le composant `UpdateTicketStatusForm` avec tests
+- [ ] Le formulaire contient : sélecteur de statut + champ texte pour le nom
+- [ ] Validation côté client : le nom est requis
+- [ ] Afficher les statuts avec des couleurs différentes
+- [ ] Afficher la personne assignée dans la carte ticket et le détail
+- [ ] Mettre à jour le statut et l'assignation via l'API
+- [ ] Revalider les données Next.js pour refresh
+- [ ] Déployer
+
+### Validation
+- ✅ On ne peut pas changer le statut sans saisir un nom
+- ✅ Le formulaire affiche une erreur si le nom est vide
+- ✅ On peut changer le statut ET saisir le nom en même temps
+- ✅ Les changements sont sauvegardés dans MongoDB
+- ✅ Le nouveau statut et la personne assignée apparaissent dans la liste et le détail
+- ✅ Les couleurs changent selon le statut
+
+---
+
+## 💬 Étape 6 : Ajouter des Commentaires
+
+**Objectif** : Permettre de commenter les tickets
+
+### Ce qu'on livre
+- Liste des commentaires sous le détail du ticket
+- Formulaire pour ajouter un commentaire
+- Les commentaires sont horodatés
+
+### Tâches
+- [ ] Créer le type TypeScript `Comment`
+- [ ] Créer le schéma Mongoose pour Comment
+- [ ] Créer l'API route `GET /api/tickets/[id]/comments`
+- [ ] Créer l'API route `POST /api/tickets/[id]/comments`
+- [ ] Créer le composant `CommentList` avec tests
+- [ ] Créer le composant `AddCommentForm` avec tests
+- [ ] Afficher les commentaires dans la page de détail
+- [ ] Déployer
+
+### Validation
+- ✅ On voit tous les commentaires d'un ticket
+- ✅ On peut ajouter un nouveau commentaire
+- ✅ Le commentaire apparaît immédiatement
+- ✅ Les dates sont affichées correctement
+
+---
+
+## ✏️ Étape 7 : Modifier un Ticket
+
+**Objectif** : Permettre de modifier le titre et la description d'un ticket
+
+### Ce qu'on livre
+- Bouton "Modifier" dans la page de détail
+- Formulaire de modification pré-rempli
+- Sauvegarde des modifications
+
+### Tâches
+- [ ] Créer l'API route `PUT /api/tickets/[id]`
+- [ ] Créer le composant `EditTicketForm` avec tests
+- [ ] Ajouter un mode "édition" dans la page de détail
+- [ ] Valider les modifications
+- [ ] Afficher un message de confirmation
+- [ ] Déployer
+
+### Validation
+- ✅ Le bouton "Modifier" affiche le formulaire
+- ✅ Les champs sont pré-remplis
+- ✅ Les modifications sont sauvegardées
+- ✅ On peut annuler l'édition
+
+---
+
+## 📦 Étape 8 : Archiver un Ticket
+
+**Objectif** : Permettre d'archiver un ticket (les tickets ne sont jamais supprimés)
+
+### Ce qu'on livre
+- Bouton "Archiver" dans la page de détail
+- Confirmation avant archivage
+- Les tickets archivés disparaissent de la liste principale
+- Possibilité de voir les tickets archivés (liste séparée ou toggle)
+- Les commentaires restent attachés au ticket archivé
+
+### Tâches
+- [ ] Ajouter le champ `archived` (boolean, default: false) dans le type Ticket
+- [ ] Mettre à jour le schéma Mongoose avec le champ `archived`
+- [ ] Créer l'API route `PATCH /api/tickets/[id]/archive`
+- [ ] Modifier l'API `GET /api/tickets` pour exclure les tickets archivés par défaut
+- [ ] Créer un composant de confirmation d'archivage
+- [ ] Implémenter le bouton "Archiver"
+- [ ] Rediriger vers la liste après archivage
+- [ ] Ajouter un indicateur visuel "ARCHIVÉ" dans le détail si le ticket est archivé
+- [ ] Optionnel : ajouter un toggle "Voir les archives" dans la liste
+- [ ] Déployer
+
+### Validation
+- ✅ Le bouton "Archiver" demande confirmation
+- ✅ L'archivage marque le ticket comme archived dans MongoDB
+- ✅ Les tickets archivés n'apparaissent plus dans la liste principale
+- ✅ Les commentaires du ticket restent accessibles
+- ✅ On peut toujours consulter un ticket archivé via son URL directe
+- ✅ Redirection vers la liste après archivage
+
+---
+
+## 🎯 Étape 9 : Filtrer par Statut
+
+**Objectif** : Permettre de filtrer la liste des tickets par statut
+
+### Ce qu'on livre
+- Boutons de filtre en haut de la liste
+- Filtre "Tous" / "Nouveau" / "En cours" / "Résolu" / "Fermé"
+- Le filtre persiste dans l'URL (query param)
+
+### Tâches
+- [ ] Modifier l'API `GET /api/tickets` pour accepter un paramètre `status`
+- [ ] Créer le composant `StatusFilter` avec tests
+- [ ] Utiliser les query params Next.js
+- [ ] Mettre à jour la liste selon le filtre
+- [ ] Indiquer visuellement le filtre actif
+- [ ] Déployer
+
+### Validation
+- ✅ Les boutons de filtre fonctionnent
+- ✅ L'URL change (ex: `/?status=IN_PROGRESS`)
+- ✅ Le filtre actif est mis en évidence
+- ✅ Le lien peut être partagé avec le filtre
+
+---
+
+## 🔍 Étape 10 : Recherche de Tickets
+
+**Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
+
+### Ce qu'on livre
+- Barre de recherche en haut de la liste
+- Recherche en temps réel (debounced)
+- Combinable avec le filtre par statut
+
+### Tâches
+- [ ] Modifier l'API `GET /api/tickets` pour accepter un paramètre `search`
+- [ ] Implémenter la recherche texte dans MongoDB
+- [ ] Créer le composant `SearchBar` avec tests
+- [ ] Implémenter le debouncing (300ms)
+- [ ] Combiner recherche et filtre de statut
+- [ ] Déployer
+
+### Validation
+- ✅ La recherche filtre les tickets en temps réel
+- ✅ La recherche cherche dans titre ET description
+- ✅ On peut combiner recherche + filtre de statut
+- ✅ La recherche est performante
+
+---
+
+## 📊 Étape 11 : Dashboard avec Statistiques
+
+**Objectif** : Afficher un résumé des tickets sur la page d'accueil
+
+### Ce qu'on livre
+- Compteurs : total, par statut
+- Graphique simple (barres ou camembert)
+- Carte cliquable pour filtrer
+
+### Tâches
+- [ ] Créer l'API route `GET /api/tickets/stats`
+- [ ] Créer le composant `TicketStats` avec tests
+- [ ] Afficher les compteurs en haut de page
+- [ ] Rendre les compteurs cliquables (filtre le statut)
+- [ ] Optionnel : ajouter un graphique avec une lib (recharts)
+- [ ] Déployer
+
+### Validation
+- ✅ Les statistiques sont affichées
+- ✅ Les chiffres sont corrects
+- ✅ Cliquer sur un compteur filtre la liste
+- ✅ Mise à jour en temps réel
+
+---
+
+## 🎨 Étape 12 : Polish UX/UI
+
+**Objectif** : Améliorer l'expérience utilisateur
+
+### Ce qu'on livre
+- Indicateurs de chargement (spinners)
+- Messages de succès/erreur (toasts)
+- Animations douces
+- Mode responsive parfait (mobile/tablet/desktop)
+- Gestion des états vides ("Aucun ticket")
+
+### Tâches
+- [ ] Ajouter une librairie de toasts (sonner ou react-hot-toast)
+- [ ] Ajouter les states de loading partout
+- [ ] Ajouter les états vides avec illustrations
+- [ ] Optimiser pour mobile
+- [ ] Ajouter des transitions CSS
+- [ ] Tester sur différents devices
+- [ ] Déployer
+
+### Validation
+- ✅ L'app est fluide et agréable à utiliser
+- ✅ Les feedbacks utilisateur sont clairs
+- ✅ Parfaitement responsive
+- ✅ Pas de "flash" de chargement
+
+---
+
+## 🚀 Étapes Futures (Optionnelles)
+
+Une fois le MVP complet, voici des évolutions possibles :
+
+### Fonctionnalités Métier
+- [ ] **Catégories de tickets** (Plomberie, Électricité, Ascenseur, etc.)
+- [ ] **Niveaux de priorité** (Basse, Normale, Haute, Urgente)
+- [ ] **Assignation** (attribuer un ticket à une personne)
+- [ ] **Dates d'échéance** et rappels
+- [ ] **Pièces jointes** (photos de problèmes)
+- [ ] **Historique des modifications** (qui a changé quoi et quand)
+
+### Fonctionnalités Techniques
+- [ ] **Authentification** (NextAuth.js ou Clerk)
+- [ ] **Rôles utilisateurs** (admin, copropriétaire, syndic)
+- [ ] **Pagination** (liste longue de tickets)
+- [ ] **Tri** (par date, priorité, statut)
+- [ ] **Export** (PDF ou CSV)
+- [ ] **Notifications email** (nouveau ticket, changement de statut)
+- [ ] **Mode hors-ligne** (PWA)
+- [ ] **Websockets** (temps réel multi-utilisateurs)
+
+### Qualité et Performance
+- [ ] **Tests E2E** (Playwright ou Cypress)
+- [ ] **Monitoring** (Sentry pour les erreurs)
+- [ ] **Analytics** (Google Analytics ou Plausible)
+- [ ] **SEO** (meta tags, sitemap)
+- [ ] **Performance** (images optimisées, lazy loading)
+- [ ] **Cache** (Redis pour la scalabilité)
+
+---
+
+## 📝 Notes Importantes
+
+### Principes à Respecter
+- **Commit après chaque étape** : gardez l'historique propre
+- **Déployer après chaque étape** : validez en production
+- **Écrire les tests en même temps** : pas après coup
+- **Garder l'architecture hexagonale** : même dans l'incrémental
+
+### Architecture Progressive
+Au départ, vous pouvez :
+- Mettre la logique directement dans les API routes
+- Garder les types dans un seul fichier
+
+Puis, au fur et à mesure :
+- Extraire les use cases
+- Créer les repositories
+- Structurer en couches hexagonales
+
+L'important est que **chaque étape livre de la valeur**.
+
+### Tests
+- Tests unitaires pour les composants React
+- Tests d'intégration pour les API routes
+- Tests E2E à partir de l'étape 12
+
+### Commandes Utiles
+```bash
+npm run dev          # Développement local
+npm test            # Lancer les tests
+npm run build       # Build de production
+git add . && git commit -m "Étape X: ..."
+git push            # Déclenche le déploiement Render
+```
