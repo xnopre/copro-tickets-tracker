@@ -1,5 +1,7 @@
 # CoTiTra - Copro Tickets Tracker
 
+[![CI](https://github.com/xnopre/copro-tickets-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/xnopre/copro-tickets-tracker/actions/workflows/ci.yml)
+
 Application web de gestion de tickets pour copropriété.
 
 ## 📋 À propos du projet
@@ -198,6 +200,40 @@ src/
 
 L'architecture sera progressivement mise en place au fur et à mesure des étapes.
 
+## 🛡️ Protection Git
+
+Le projet utilise **Husky** pour empêcher les commits accidentels sur la branche `main`.
+
+### Comment ça fonctionne
+
+**Installation automatique** :
+Lors du `npm install`, Husky s'installe automatiquement grâce au script `prepare`.
+
+**Protection à deux niveaux** :
+1. 🛡️ **Husky (local)** - Bloque les commits sur `main` avant même de les créer
+2. 🛡️ **GitHub (remote)** - Bloque les push directs vers `main`
+
+**En pratique** :
+- Si vous essayez de commiter sur `main`, le commit est bloqué avec un message d'aide
+- Sur toute autre branche, les commits fonctionnent normalement
+- Vous devez créer une branche (`feature/...`) pour toute modification
+
+**Workflow recommandé** :
+```bash
+git checkout -b feature/ma-fonctionnalite  # Créer une branche
+git add .
+git commit -m "Description"                 # ✅ Autorisé
+git push origin feature/ma-fonctionnalite
+# Créer une Pull Request sur GitHub
+```
+
+**Contournement** (à éviter sauf urgence absolue) :
+```bash
+git commit --no-verify  # Bypass le hook Husky
+```
+
+Voir le workflow complet dans [PLAN.md](./PLAN.md) (Étape 2).
+
 ## 🧪 Tests
 
 Les tests seront configurés à l'étape 1 avec :
@@ -227,4 +263,4 @@ ISC
 
 ---
 
-**Status** : 🚧 En développement - Étape 0 complétée
+**Status** : 🚧 En développement - Étape 2 complétée (CI/CD configuré)

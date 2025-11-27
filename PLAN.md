@@ -83,12 +83,12 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [x] Configurer l'exécution des tests (`npm test`)
 - [x] Configurer la vérification du build (`npm run build`)
 - [x] Configurer le linting TypeScript (`npm run type-check`)
-- [ ] Tester le workflow en créant une PR de test
-- [ ] Configurer les règles de protection de branche sur main
-  - [ ] Exiger que les vérifications de statut passent avant de merger
-  - [ ] Exiger que les branches soient à jour avant de merger
-  - [ ] Activer la vérification "CI" comme obligatoire
-- [ ] Ajouter un badge CI dans README.md (optionnel)
+- [x] Tester le workflow en créant une PR de test
+- [x] Configurer les règles de protection de branche sur main
+  - [x] Exiger que les vérifications de statut passent avant de merger
+  - [x] Exiger que les branches soient à jour avant de merger
+  - [x] Activer la vérification "CI" comme obligatoire
+- [x] Ajouter un badge CI dans README.md (optionnel)
 
 ### Validation
 - ✅ Les tests s'exécutent automatiquement sur chaque PR
@@ -109,6 +109,44 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 3. Exiger que les vérifications de statut passent avant de merger
 4. Exiger que les branches soient à jour avant de merger
 5. Activer la vérification "CI" comme obligatoire
+
+**Workflow de développement** (⚠️ NE JAMAIS commiter directement sur `main`) :
+
+À partir de maintenant, pour toute modification, suivre ce workflow :
+
+```bash
+# 1. S'assurer d'être sur main et à jour
+git checkout main
+git pull origin main
+
+# 2. Créer une branche de feature
+git checkout -b feature/nom-de-la-fonctionnalite
+# Exemples : feature/etape-3-mongodb, feature/fix-typo, feature/add-comments
+
+# 3. Faire vos modifications et commiter
+git add .
+git commit -m "Description des changements"
+
+# 4. Pousser la branche sur GitHub
+git push origin feature/nom-de-la-fonctionnalite
+
+# 5. Créer une Pull Request sur GitHub
+# - Aller sur github.com/xnopre/copro-tickets-tracker
+# - Cliquer sur "Compare & pull request"
+# - Vérifier que les checks CI passent ✅
+# - Merger la PR une fois les checks validés
+# - Supprimer la branche après le merge
+
+# 6. Revenir sur main et mettre à jour
+git checkout main
+git pull origin main
+git branch -d feature/nom-de-la-fonctionnalite  # Supprimer la branche locale
+```
+
+**Important** :
+- ❌ `git push origin main` est maintenant bloqué (branche protégée)
+- ✅ Toujours passer par une branche + Pull Request
+- ✅ Les tests/build doivent passer avant de pouvoir merger
 
 ---
 
