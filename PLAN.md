@@ -78,11 +78,11 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Badge de statut dans le README (optionnel)
 
 ### Tâches
-- [ ] Créer le répertoire `.github/workflows/`
-- [ ] Créer le fichier `ci.yml` avec workflow GitHub Actions (Node.js 20)
-- [ ] Configurer l'exécution des tests (`npm test`)
-- [ ] Configurer la vérification du build (`npm run build`)
-- [ ] Configurer le linting TypeScript (`npm run type-check`)
+- [x] Créer le répertoire `.github/workflows/`
+- [x] Créer le fichier `ci.yml` avec workflow GitHub Actions (Node.js 20)
+- [x] Configurer l'exécution des tests (`npm test`)
+- [x] Configurer la vérification du build (`npm run build`)
+- [x] Configurer le linting TypeScript (`npm run type-check`)
 - [ ] Tester le workflow en créant une PR de test
 - [ ] Configurer les règles de protection de branche sur main
   - [ ] Exiger que les vérifications de statut passent avant de merger
