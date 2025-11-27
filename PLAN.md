@@ -66,7 +66,53 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 🗄️ Étape 2 : Tickets depuis MongoDB
+## 🤖 Étape 2 : CI/CD avec GitHub Actions
+
+**Objectif** : Automatiser la vérification des Pull Requests et l'exécution des tests
+
+### Ce qu'on livre
+- Workflow GitHub Actions configuré
+- Tests automatiques sur chaque PR
+- Vérification du build TypeScript
+- Protection de la branche main
+- Badge de statut dans le README (optionnel)
+
+### Tâches
+- [ ] Créer le répertoire `.github/workflows/`
+- [ ] Créer le fichier `ci.yml` avec workflow GitHub Actions (Node.js 20)
+- [ ] Configurer l'exécution des tests (`npm test`)
+- [ ] Configurer la vérification du build (`npm run build`)
+- [ ] Configurer le linting TypeScript (`npm run type-check`)
+- [ ] Tester le workflow en créant une PR de test
+- [ ] Configurer les règles de protection de branche sur main
+  - [ ] Exiger que les vérifications de statut passent avant de merger
+  - [ ] Exiger que les branches soient à jour avant de merger
+  - [ ] Activer la vérification "CI" comme obligatoire
+- [ ] Ajouter un badge CI dans README.md (optionnel)
+
+### Validation
+- ✅ Les tests s'exécutent automatiquement sur chaque PR
+- ✅ Le build est vérifié automatiquement
+- ✅ Les checks doivent passer avant de pouvoir merger
+- ✅ Le statut CI est visible dans les PRs
+
+### Notes techniques
+**Workflow GitHub Actions** (`.github/workflows/ci.yml`) :
+- Déclenchement : push et pull_request vers main
+- Job nommé "CI" (pour la protection de branche)
+- Node.js 20.x (LTS actuel)
+- Étapes : checkout → setup node → npm ci → npm test → npm run build → npm run type-check
+
+**Protection de branche** :
+1. Paramètres → Branches → Ajouter une règle
+2. Modèle de nom de branche : `main`
+3. Exiger que les vérifications de statut passent avant de merger
+4. Exiger que les branches soient à jour avant de merger
+5. Activer la vérification "CI" comme obligatoire
+
+---
+
+## 🗄️ Étape 3 : Tickets depuis MongoDB
 
 **Objectif** : Remplacer les données statiques par des vraies données venant de MongoDB
 
@@ -98,7 +144,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## ➕ Étape 3 : Créer un Nouveau Ticket
+## ➕ Étape 4 : Créer un Nouveau Ticket
 
 **Objectif** : Permettre de créer des tickets via l'interface
 
@@ -123,7 +169,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 📄 Étape 4 : Voir le Détail d'un Ticket
+## 📄 Étape 5 : Voir le Détail d'un Ticket
 
 **Objectif** : Cliquer sur un ticket pour voir tous ses détails
 
@@ -148,7 +194,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 🔄 Étape 5 : Changer le Statut et Assigner un Ticket
+## 🔄 Étape 6 : Changer le Statut et Assigner un Ticket
 
 **Objectif** : Modifier le statut d'un ticket (NEW → IN_PROGRESS → RESOLVED → CLOSED) avec assignation obligatoire de la personne en charge
 
@@ -183,7 +229,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 💬 Étape 6 : Ajouter des Commentaires
+## 💬 Étape 7 : Ajouter des Commentaires
 
 **Objectif** : Permettre de commenter les tickets
 
@@ -210,7 +256,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## ✏️ Étape 7 : Modifier un Ticket
+## ✏️ Étape 8 : Modifier un Ticket
 
 **Objectif** : Permettre de modifier le titre et la description d'un ticket
 
@@ -235,7 +281,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 📦 Étape 8 : Archiver un Ticket
+## 📦 Étape 9 : Archiver un Ticket
 
 **Objectif** : Permettre d'archiver un ticket (les tickets ne sont jamais supprimés)
 
@@ -268,7 +314,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 🎯 Étape 9 : Filtrer par Statut
+## 🎯 Étape 10 : Filtrer par Statut
 
 **Objectif** : Permettre de filtrer la liste des tickets par statut
 
@@ -293,7 +339,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 🔍 Étape 10 : Recherche de Tickets
+## 🔍 Étape 11 : Recherche de Tickets
 
 **Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
 
@@ -318,7 +364,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 📊 Étape 11 : Dashboard avec Statistiques
+## 📊 Étape 12 : Dashboard avec Statistiques
 
 **Objectif** : Afficher un résumé des tickets sur la page d'accueil
 
@@ -343,7 +389,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
-## 🎨 Étape 12 : Polish UX/UI
+## 🎨 Étape 13 : Polish UX/UI
 
 **Objectif** : Améliorer l'expérience utilisateur
 
