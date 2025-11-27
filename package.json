@@ -10,7 +10,10 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "mongodb:start": "brew services start mongodb/brew/mongodb-community",
+    "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
+    "seed": "tsx scripts/seed.ts"
   },
   "repository": {
     "type": "git",
@@ -25,6 +28,7 @@
   "homepage": "https://github.com/xnopre/copro-tickets-tracker#readme",
   "description": "",
   "dependencies": {
+    "mongoose": "^9.0.0",
     "next": "^16.0.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
@@ -47,6 +51,7 @@
     "jsdom": "^27.2.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
   }

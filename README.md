@@ -67,24 +67,39 @@ Application web de gestion de tickets pour copropriété.
    MONGODB_URI=mongodb://localhost:27017/cotitra
    ```
 
-5. **Lancer le serveur de développement**
+5. **Ajouter des tickets de test dans la base de données**
+
+   Pour peupler la base de données avec des tickets d'exemple :
+   ```bash
+   npm run seed
+   ```
+
+   Ce script va :
+   - Supprimer les tickets existants
+   - Créer 4 tickets de démonstration avec différents statuts
+   - Afficher un résumé des tickets créés
+
+6. **Lancer le serveur de développement**
    ```bash
    npm run dev
    ```
 
-6. **Ouvrir l'application**
+7. **Ouvrir l'application**
 
    Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur
 
 ## 📦 Scripts disponibles
 
 ```bash
-npm run dev          # Lancer le serveur de développement (avec Turbopack)
-npm run build        # Builder l'application pour la production
-npm start            # Démarrer le serveur de production
-npm run lint         # Linter le code avec ESLint
-npm run type-check   # Vérifier les types TypeScript
-npm test             # Lancer les tests (à configurer à l'étape 1)
+npm run dev            # Lancer le serveur de développement (avec Turbopack)
+npm run build          # Builder l'application pour la production
+npm start              # Démarrer le serveur de production
+npm run lint           # Linter le code avec ESLint
+npm run type-check     # Vérifier les types TypeScript
+npm test               # Lancer les tests
+npm run seed           # Peupler la base de données avec des tickets de test
+npm run mongodb:start  # Démarrer MongoDB (macOS)
+npm run mongodb:stop   # Arrêter MongoDB (macOS)
 ```
 
 ## 🌍 Déploiement sur Render.com
@@ -168,8 +183,8 @@ copro-tickets-tracker/
 │   ├── globals.css        # Styles globaux
 │   ├── layout.tsx         # Layout racine
 │   └── page.tsx           # Page d'accueil
-├── components/            # Composants React réutilisables (à venir)
-├── lib/                   # Utilitaires et configurations (à venir)
+├── components/            # Composants React réutilisables
+├── lib/                   # Utilitaires et configurations
 ├── public/                # Assets statiques
 ├── .env.local             # Variables d'environnement locales (non versionné)
 ├── next.config.ts         # Configuration Next.js
