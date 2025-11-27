@@ -110,43 +110,57 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 4. Exiger que les branches soient à jour avant de merger
 5. Activer la vérification "CI" comme obligatoire
 
-**Workflow de développement** (⚠️ NE JAMAIS commiter directement sur `main`) :
+**Workflow de développement** :
+Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Protection Git").
 
-À partir de maintenant, pour toute modification, suivre ce workflow :
+---
 
-```bash
-# 1. S'assurer d'être sur main et à jour
-git checkout main
-git pull origin main
+## 🤖 Étape 2b : Workflows GitHub avec Claude
 
-# 2. Créer une branche de feature
-git checkout -b feature/nom-de-la-fonctionnalite
-# Exemples : feature/etape-3-mongodb, feature/fix-typo, feature/add-comments
+**Objectif** : Ajouter des workflows GitHub pour l'assistance automatique de Claude sur les PRs et issues
 
-# 3. Faire vos modifications et commiter
-git add .
-git commit -m "Description des changements"
+### Ce qu'on livre
+- Workflow de revue de code automatique par Claude sur chaque PR
+- Workflow d'assistance Claude via mentions @claude dans les issues et PRs
+- Configuration du token OAuth pour l'authentification de Claude
 
-# 4. Pousser la branche sur GitHub
-git push origin feature/nom-de-la-fonctionnalite
+### Tâches
+- [x] Créer le fichier `.github/workflows/claude-code-review.yml`
+- [x] Créer le fichier `.github/workflows/claude.yml`
+- [x] Configurer le secret `CLAUDE_CODE_OAUTH_TOKEN` dans les paramètres GitHub
+  - Settings → Secrets and variables → Actions → New repository secret
+- [x] Tester le workflow de revue sur une PR de test
+- [x] Tester le workflow d'assistance avec @claude dans une issue
 
-# 5. Créer une Pull Request sur GitHub
-# - Aller sur github.com/xnopre/copro-tickets-tracker
-# - Cliquer sur "Compare & pull request"
-# - Vérifier que les checks CI passent ✅
-# - Merger la PR une fois les checks validés
-# - Supprimer la branche après le merge
+### Validation
+- ✅ Claude commente automatiquement les PRs avec une revue de code
+- ✅ On peut mentionner @claude dans les issues/PRs pour obtenir de l'aide
+- ✅ Les workflows s'exécutent sans erreur
 
-# 6. Revenir sur main et mettre à jour
-git checkout main
-git pull origin main
-git branch -d feature/nom-de-la-fonctionnalite  # Supprimer la branche locale
-```
+### Notes techniques
 
-**Important** :
-- ❌ `git push origin main` est maintenant bloqué (branche protégée)
-- ✅ Toujours passer par une branche + Pull Request
-- ✅ Les tests/build doivent passer avant de pouvoir merger
+**Workflow Claude Code Review** (`.github/workflows/claude-code-review.yml`) :
+- Déclenchement : ouverture ou synchronisation de PR
+- Revue automatique du code avec feedback sur :
+  - Qualité du code et bonnes pratiques
+  - Bugs potentiels
+  - Performance et sécurité
+  - Couverture de tests
+- Utilise les conventions du projet définies dans CLAUDE.md
+
+**Workflow Claude Assistant** (`.github/workflows/claude.yml`) :
+- Déclenchement : mention @claude dans :
+  - Commentaires d'issues
+  - Commentaires de PR
+  - Revues de PR
+  - Corps d'issues
+- Claude exécute les instructions fournies dans le commentaire
+- Permissions : lecture du code, PRs, issues, et résultats CI
+
+**Configuration du token** :
+1. Générer un token OAuth Claude depuis [claude.ai](https://claude.ai)
+2. GitHub Settings → Secrets and variables → Actions
+3. Ajouter `CLAUDE_CODE_OAUTH_TOKEN` avec la valeur du token
 
 ---
 
