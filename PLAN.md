@@ -43,9 +43,15 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Une page qui affiche 3 tickets codés en dur
 - Chaque ticket montre : titre, statut, date
 - Interface stylée avec Tailwind
+- Infrastructure de test (Vitest + React Testing Library)
 - Tests des composants
 
 ### Tâches
+- [ ] **Mettre en place l'infrastructure de test**
+  - [ ] Installer Vitest, @testing-library/react, jsdom, @vitejs/plugin-react
+  - [ ] Créer vitest.config.ts et vitest.setup.ts
+  - [ ] Ajouter les scripts test dans package.json
+  - [ ] Valider que npm test fonctionne
 - [ ] Créer le type TypeScript `Ticket` (id, titre, description, statut, dates)
 - [ ] Créer le composant `TicketCard` avec tests
 - [ ] Créer le composant `TicketList` avec tests

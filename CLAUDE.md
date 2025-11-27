@@ -175,3 +175,6 @@ const config: NextConfig = {
 **Chaque ligne de code doit avoir une raison d'exister maintenant, pas "au cas où" ou "pour plus tard".**
 
 Si quelque chose n'est pas utilisé dans l'étape actuelle, il ne doit pas être dans le code.
+
+Autres règles :
+- Mets toujours à jour le plan dans @PLAN.md lorsque je te demande quelque chose qui n'y était pas
