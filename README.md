@@ -218,21 +218,49 @@ Lors du `npm install`, Husky s'installe automatiquement grâce au script `prepar
 - Sur toute autre branche, les commits fonctionnent normalement
 - Vous devez créer une branche (`feature/...`) pour toute modification
 
-**Workflow recommandé** :
+### Workflow de développement (⚠️ NE JAMAIS commiter directement sur `main`)
+
+À partir de maintenant, pour toute modification, suivre ce workflow :
+
 ```bash
-git checkout -b feature/ma-fonctionnalite  # Créer une branche
+# 1. S'assurer d'être sur main et à jour
+git checkout main
+git pull origin main
+
+# 2. Créer une branche de feature
+git checkout -b feature/nom-de-la-fonctionnalite
+# Exemples : feature/etape-3-mongodb, feature/fix-typo, feature/add-comments
+
+# 3. Faire vos modifications et commiter
 git add .
-git commit -m "Description"                 # ✅ Autorisé
-git push origin feature/ma-fonctionnalite
-# Créer une Pull Request sur GitHub
+git commit -m "Description des changements"
+
+# 4. Pousser la branche sur GitHub
+git push origin feature/nom-de-la-fonctionnalite
+
+# 5. Créer une Pull Request sur GitHub
+# - Aller sur github.com/xnopre/copro-tickets-tracker
+# - Cliquer sur "Compare & pull request"
+# - Vérifier que les checks CI passent ✅
+# - Merger la PR une fois les checks validés
+# - Supprimer la branche après le merge
+
+# 6. Revenir sur main et mettre à jour
+git checkout main
+git pull origin main
+git branch -d feature/nom-de-la-fonctionnalite  # Supprimer la branche locale
 ```
+
+**Important** :
+- ❌ `git push origin main` est maintenant bloqué (branche protégée)
+- ❌ `git commit` sur `main` est bloqué par Husky
+- ✅ Toujours passer par une branche + Pull Request
+- ✅ Les tests/build doivent passer avant de pouvoir merger
 
 **Contournement** (à éviter sauf urgence absolue) :
 ```bash
 git commit --no-verify  # Bypass le hook Husky
 ```
-
-Voir le workflow complet dans [PLAN.md](./PLAN.md) (Étape 2).
 
 ## 🧪 Tests
 
