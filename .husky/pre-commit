@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Récupérer le nom de la branche actuelle
+BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+# Vérifier si on est sur main
+if [ "$BRANCH" = "main" ]; then
+  echo ""
+  echo "❌ ERREUR : Commits directs sur 'main' sont interdits !"
+  echo ""
+  echo "Pour créer une nouvelle fonctionnalité :"
+  echo "  git checkout -b feature/nom-de-la-feature"
+  echo ""
+  echo "Pour revenir à votre dernière branche :"
+  echo "  git checkout -"
+  echo ""
+  echo "📖 Voir le workflow complet dans PLAN.md (Étape 2)"
+  echo ""
+  exit 1
+fi
+
+# Si on n'est pas sur main, laisser passer
+exit 0
