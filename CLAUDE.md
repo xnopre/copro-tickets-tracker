@@ -178,3 +178,5 @@ Si quelque chose n'est pas utilisé dans l'étape actuelle, il ne doit pas être
 
 Autres règles :
 - Mets toujours à jour le plan dans @PLAN.md lorsque je te demande quelque chose qui n'y était pas
+- Tu ne dois jamais commiter sur Git, je le ferai toujours moi-même
+- Tu dois toujours mettre à jour le plan lorsque tu as implémenté une étape et/ou traité des tâches

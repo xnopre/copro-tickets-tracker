@@ -47,22 +47,22 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Tests des composants
 
 ### Tâches
-- [ ] **Mettre en place l'infrastructure de test**
-  - [ ] Installer Vitest, @testing-library/react, jsdom, @vitejs/plugin-react
-  - [ ] Créer vitest.config.ts et vitest.setup.ts
-  - [ ] Ajouter les scripts test dans package.json
-  - [ ] Valider que npm test fonctionne
-- [ ] Créer le type TypeScript `Ticket` (id, titre, description, statut, dates)
-- [ ] Créer le composant `TicketCard` avec tests
-- [ ] Créer le composant `TicketList` avec tests
-- [ ] Afficher 3 tickets statiques dans la page d'accueil
-- [ ] Styler l'interface (responsive, couleurs par statut)
+- [x] **Mettre en place l'infrastructure de test**
+  - [x] Installer Vitest, @testing-library/react, jsdom, @vitejs/plugin-react
+  - [x] Créer vitest.config.ts et vitest.setup.ts
+  - [x] Ajouter les scripts test dans package.json
+  - [x] Valider que npm test fonctionne
+- [x] Créer le type TypeScript `Ticket` (id, titre, description, statut, dates)
+- [x] Créer le composant `TicketCard` avec tests
+- [x] Créer le composant `TicketList` avec tests
+- [x] Afficher 3 tickets statiques dans la page d'accueil
+- [x] Styler l'interface (responsive, couleurs par statut)
 - [ ] Déployer
 
 ### Validation
 - ✅ On voit 3 tickets affichés joliment
-- ✅ Les tests passent (`npm test`)
-- ✅ Déployé et accessible en ligne
+- ✅ Les tests passent (`npm test`) - 13 tests passants
+- ⏳ Déployé et accessible en ligne (en attente du push git)
 
 ---
 
