@@ -92,6 +92,7 @@ Application web de gestion de tickets pour copropriété.
 
 ```bash
 npm run dev            # Lancer le serveur de développement (avec Turbopack)
+npm run dev:stop       # Arrêter le serveur de développement
 npm run build          # Builder l'application pour la production
 npm start              # Démarrer le serveur de production
 npm run lint           # Linter le code avec ESLint

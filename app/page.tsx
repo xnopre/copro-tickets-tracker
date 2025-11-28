@@ -3,19 +3,23 @@ import connectDB from '@/lib/mongodb'
 import { TicketModel } from '@/lib/models/Ticket'
 import { Ticket, TicketStatus } from '@/types/ticket'
 
+export const dynamic = 'force-dynamic'
+
 async function getTickets(): Promise<Ticket[]> {
-  await connectDB()
+    console.log('[SERVER] 🔄 Fetching tickets from MongoDB...')
+    await connectDB()
 
-  const tickets = await TicketModel.find({}).sort({ createdAt: -1 }).lean()
+    const tickets = await TicketModel.find({}).sort({ createdAt: -1 }).lean()
+    console.log(`[SERVER] ✅ Found ${tickets.length} tickets`)
 
-  return tickets.map((ticket) => ({
-    id: ticket._id.toString(),
-    title: ticket.title,
-    description: ticket.description,
-    status: ticket.status as TicketStatus,
-    createdAt: new Date(ticket.createdAt),
-    updatedAt: new Date(ticket.updatedAt),
-  }))
+    return tickets.map((ticket) => ({
+      id: ticket._id.toString(),
+      title: ticket.title,
+      description: ticket.description,
+      status: ticket.status as TicketStatus,
+      createdAt: new Date(ticket.createdAt),
+      updatedAt: new Date(ticket.updatedAt),
+    }))
 }
 
 export default async function Home() {

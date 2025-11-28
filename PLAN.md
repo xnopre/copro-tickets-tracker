@@ -183,6 +183,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [x] Créer l'API route `GET /api/tickets`
 - [x] Connecter la page d'accueil à l'API
 - [x] Créer un script seed pour ajouter des tickets de test
+- [x] Désactiver le cache Next.js pour recharger les données à chaque requête
 - [x] Tester en local
 - [ ] Créer un compte MongoDB Atlas (gratuit)
 - [ ] Créer un cluster et une database sur Atlas
@@ -191,8 +192,15 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 
 ### Validation
 - ✅ Les tickets affichés viennent de MongoDB local
+- ✅ Les données sont rechargées à chaque rafraîchissement de la page (cache désactivé)
 - ⏳ Si on modifie un ticket dans MongoDB, il change dans l'app (à tester)
 - ⏳ Fonctionne en local (MongoDB local) ET en production (MongoDB Atlas) (production en attente)
+
+### Notes techniques
+**Désactivation du cache Next.js** :
+- Par défaut, Next.js 15 met en cache les Server Components pour optimiser les performances
+- Pour forcer le rechargement des données à chaque requête, on utilise `export const dynamic = 'force-dynamic'` dans la page
+- Cela garantit que les modifications dans MongoDB sont immédiatement visibles dans l'application
 
 ---
 
