@@ -2,7 +2,11 @@ import mongoose from 'mongoose'
 import { TicketModel } from '../lib/models/Ticket'
 import { TicketStatus } from '../types/ticket'
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/cotitra'
+const MONGODB_URI = process.env.MONGODB_URI
+
+if (!MONGODB_URI) {
+  throw new Error('MONGODB_URI environment variable is not defined')
+}
 
 async function seed() {
   try {
