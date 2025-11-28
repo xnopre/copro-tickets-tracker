@@ -5,7 +5,7 @@ import { Ticket, TicketStatus } from '@/types/ticket'
 
 export const dynamic = 'force-dynamic'
 
-async function getTickets(): Promise<Ticket[]> {
+export async function getTickets(): Promise<Ticket[]> {
     console.log('[SERVER] 🔄 Fetching tickets from MongoDB...')
     await connectDB()
 
