@@ -4,23 +4,18 @@ import { TicketModel } from '@/lib/models/Ticket'
 import { Ticket, TicketStatus } from '@/types/ticket'
 
 async function getTickets(): Promise<Ticket[]> {
-  try {
-    await connectDB()
+  await connectDB()
 
-    const tickets = await TicketModel.find({}).sort({ createdAt: -1 }).lean()
+  const tickets = await TicketModel.find({}).sort({ createdAt: -1 }).lean()
 
-    return tickets.map((ticket) => ({
-      id: ticket._id.toString(),
-      title: ticket.title,
-      description: ticket.description,
-      status: ticket.status as TicketStatus,
-      createdAt: new Date(ticket.createdAt),
-      updatedAt: new Date(ticket.updatedAt),
-    }))
-  } catch (error) {
-    console.error('Error fetching tickets:', error)
-    return []
-  }
+  return tickets.map((ticket) => ({
+    id: ticket._id.toString(),
+    title: ticket.title,
+    description: ticket.description,
+    status: ticket.status as TicketStatus,
+    createdAt: new Date(ticket.createdAt),
+    updatedAt: new Date(ticket.updatedAt),
+  }))
 }
 
 export default async function Home() {
