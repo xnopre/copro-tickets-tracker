@@ -175,15 +175,15 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Configuration des variables d'environnement
 
 ### Tâches
-- [ ] Installer MongoDB localement (brew/apt/windows)
-- [ ] Démarrer MongoDB en local
-- [ ] Installer mongoose
-- [ ] Créer le schéma Mongoose pour Ticket
-- [ ] Créer la connexion MongoDB dans `lib/mongodb.ts`
-- [ ] Créer l'API route `GET /api/tickets`
-- [ ] Connecter la page d'accueil à l'API
-- [ ] Ajouter manuellement 3 tickets dans MongoDB local (via MongoDB Compass ou shell)
-- [ ] Tester en local
+- [x] Installer MongoDB localement (brew/apt/windows)
+- [x] Démarrer MongoDB en local
+- [x] Installer mongoose
+- [x] Créer le schéma Mongoose pour Ticket
+- [x] Créer la connexion MongoDB dans `lib/mongodb.ts`
+- [x] Créer l'API route `GET /api/tickets`
+- [x] Connecter la page d'accueil à l'API
+- [x] Créer un script seed pour ajouter des tickets de test
+- [x] Tester en local
 - [ ] Créer un compte MongoDB Atlas (gratuit)
 - [ ] Créer un cluster et une database sur Atlas
 - [ ] Configurer MONGODB_URI dans les variables d'environnement Render.com
@@ -191,8 +191,8 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 
 ### Validation
 - ✅ Les tickets affichés viennent de MongoDB local
-- ✅ Si on modifie un ticket dans MongoDB, il change dans l'app
-- ✅ Fonctionne en local (MongoDB local) ET en production (MongoDB Atlas)
+- ⏳ Si on modifie un ticket dans MongoDB, il change dans l'app (à tester)
+- ⏳ Fonctionne en local (MongoDB local) ET en production (MongoDB Atlas) (production en attente)
 
 ---
 

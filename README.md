@@ -306,4 +306,4 @@ ISC
 
 ---
 
-**Status** : 🚧 En développement - Étape 2 complétée (CI/CD configuré)
+**Status** : 🚧 En développement - Étape 3 en cours (MongoDB local configuré)
