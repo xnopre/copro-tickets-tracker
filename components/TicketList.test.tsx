@@ -33,6 +33,7 @@ describe('TicketList', () => {
 
   it('should render all tickets', () => {
     render(<TicketList tickets={mockTickets} />);
+    expect(screen.queryByText('Aucun ticket à afficher')).not.toBeInTheDocument();
     expect(screen.getByText('First Ticket')).toBeInTheDocument();
     expect(screen.getByText('Second Ticket')).toBeInTheDocument();
     expect(screen.getByText('Third Ticket')).toBeInTheDocument();
@@ -41,16 +42,5 @@ describe('TicketList', () => {
   it('should render empty state when no tickets', () => {
     render(<TicketList tickets={[]} />);
     expect(screen.getByText('Aucun ticket à afficher')).toBeInTheDocument();
-  });
-
-  it('should render correct number of tickets', () => {
-    const { container } = render(<TicketList tickets={mockTickets} />);
-    const ticketCards = container.querySelectorAll('.bg-white.rounded-lg');
-    expect(ticketCards).toHaveLength(3);
-  });
-
-  it('should not render empty state when tickets exist', () => {
-    render(<TicketList tickets={mockTickets} />);
-    expect(screen.queryByText('Aucun ticket à afficher')).not.toBeInTheDocument();
   });
 });

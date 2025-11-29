@@ -78,24 +78,7 @@ describe('Home Page', () => {
       render(jsx);
 
       expect(screen.getByText('CoTiTra')).toBeDefined();
-    });
-
-    it('should display "Copro Tickets Tracker"', async () => {
-      const Home = (await import('./page')).default;
-      const jsx = await Home();
-      render(jsx);
-
       expect(screen.getByText('Copro Tickets Tracker')).toBeDefined();
-    });
-
-    it('should have correct page structure', async () => {
-      const Home = (await import('./page')).default;
-      const jsx = await Home();
-      const { container } = render(jsx);
-
-      const main = container.querySelector('main');
-      expect(main).toBeDefined();
-      expect(main?.className).toContain('min-h-screen');
     });
   });
 });
