@@ -1,6 +1,7 @@
 # CoTiTra - Copro Tickets Tracker
 
 [![CI](https://github.com/xnopre/copro-tickets-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/xnopre/copro-tickets-tracker/actions/workflows/ci.yml)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 Application web de gestion de tickets pour copropriété.
 
@@ -37,12 +38,14 @@ Application web de gestion de tickets pour copropriété.
 ### Installation locale
 
 1. **Cloner le repository**
+
    ```bash
    git clone https://github.com/xnopre/copro-tickets-tracker.git
    cd copro-tickets-tracker
    ```
 
 2. **Installer les dépendances**
+
    ```bash
    npm install
    ```
@@ -50,6 +53,7 @@ Application web de gestion de tickets pour copropriété.
 3. **Installer et démarrer MongoDB localement**
 
    **macOS** :
+
    ```bash
    brew tap mongodb/brew
    brew install mongodb-community
@@ -63,28 +67,47 @@ Application web de gestion de tickets pour copropriété.
 4. **Configurer les variables d'environnement**
 
    Créer un fichier `.env.local` à la racine :
+
    ```bash
    MONGODB_URI=mongodb://localhost:27017/cotitra
    ```
 
-5. **Lancer le serveur de développement**
+5. **Ajouter des tickets de test dans la base de données**
+
+   Pour peupler la base de données avec des tickets d'exemple :
+
+   ```bash
+   npm run seed
+   ```
+
+   Ce script va :
+   - Supprimer les tickets existants
+   - Créer 4 tickets de démonstration avec différents statuts
+   - Afficher un résumé des tickets créés
+
+6. **Lancer le serveur de développement**
+
    ```bash
    npm run dev
    ```
 
-6. **Ouvrir l'application**
+7. **Ouvrir l'application**
 
    Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur
 
 ## 📦 Scripts disponibles
 
 ```bash
-npm run dev          # Lancer le serveur de développement (avec Turbopack)
-npm run build        # Builder l'application pour la production
-npm start            # Démarrer le serveur de production
-npm run lint         # Linter le code avec ESLint
-npm run type-check   # Vérifier les types TypeScript
-npm test             # Lancer les tests (à configurer à l'étape 1)
+npm run dev            # Lancer le serveur de développement (avec Turbopack)
+npm run dev:stop       # Arrêter le serveur de développement
+npm run build          # Builder l'application pour la production
+npm start              # Démarrer le serveur de production
+npm run lint           # Linter le code avec ESLint
+npm run type-check     # Vérifier les types TypeScript
+npm test               # Lancer les tests
+npm run seed           # Peupler la base de données avec des tickets de test
+npm run mongodb:start  # Démarrer MongoDB (macOS)
+npm run mongodb:stop   # Arrêter MongoDB (macOS)
 ```
 
 ## 🌍 Déploiement sur Render.com
@@ -129,22 +152,22 @@ npm test             # Lancer les tests (à configurer à l'étape 1)
 
    Remplir les champs suivants :
 
-   | Champ | Valeur |
-   |-------|--------|
-   | **Name** | `cotitra` (ou votre choix) |
-   | **Region** | `Frankfurt` (ou proche de vous) |
-   | **Branch** | `main` |
-   | **Runtime** | `Node` |
-   | **Build Command** | `npm install && npm run build` |
-   | **Start Command** | `npm start` |
-   | **Instance Type** | `Free` |
+   | Champ             | Valeur                          |
+   | ----------------- | ------------------------------- |
+   | **Name**          | `cotitra` (ou votre choix)      |
+   | **Region**        | `Frankfurt` (ou proche de vous) |
+   | **Branch**        | `main`                          |
+   | **Runtime**       | `Node`                          |
+   | **Build Command** | `npm install && npm run build`  |
+   | **Start Command** | `npm start`                     |
+   | **Instance Type** | `Free`                          |
 
 4. **Configurer les variables d'environnement**
 
    Dans la section "Environment Variables", ajouter :
 
-   | Key | Value |
-   |-----|-------|
+   | Key           | Value                                                     |
+   | ------------- | --------------------------------------------------------- |
    | `MONGODB_URI` | `mongodb+srv://user:password@cluster.mongodb.net/cotitra` |
 
    ⚠️ Remplacer par votre URL MongoDB Atlas complète
@@ -168,8 +191,8 @@ copro-tickets-tracker/
 │   ├── globals.css        # Styles globaux
 │   ├── layout.tsx         # Layout racine
 │   └── page.tsx           # Page d'accueil
-├── components/            # Composants React réutilisables (à venir)
-├── lib/                   # Utilitaires et configurations (à venir)
+├── components/            # Composants React réutilisables
+├── lib/                   # Utilitaires et configurations
 ├── public/                # Assets statiques
 ├── .env.local             # Variables d'environnement locales (non versionné)
 ├── next.config.ts         # Configuration Next.js
@@ -210,10 +233,12 @@ Le projet utilise **Husky** pour empêcher les commits accidentels sur la branch
 Lors du `npm install`, Husky s'installe automatiquement grâce au script `prepare`.
 
 **Protection à deux niveaux** :
+
 1. 🛡️ **Husky (local)** - Bloque les commits sur `main` avant même de les créer
 2. 🛡️ **GitHub (remote)** - Bloque les push directs vers `main`
 
 **En pratique** :
+
 - Si vous essayez de commiter sur `main`, le commit est bloqué avec un message d'aide
 - Sur toute autre branche, les commits fonctionnent normalement
 - Vous devez créer une branche (`feature/...`) pour toute modification
@@ -252,12 +277,14 @@ git branch -d feature/nom-de-la-fonctionnalite  # Supprimer la branche locale
 ```
 
 **Important** :
+
 - ❌ `git push origin main` est maintenant bloqué (branche protégée)
 - ❌ `git commit` sur `main` est bloqué par Husky
 - ✅ Toujours passer par une branche + Pull Request
 - ✅ Les tests/build doivent passer avant de pouvoir merger
 
 **Contournement** (à éviter sauf urgence absolue) :
+
 ```bash
 git commit --no-verify  # Bypass le hook Husky
 ```
@@ -265,6 +292,7 @@ git commit --no-verify  # Bypass le hook Husky
 ## 🧪 Tests
 
 Les tests seront configurés à l'étape 1 avec :
+
 - **Vitest** pour les tests unitaires
 - **React Testing Library** pour les tests de composants
 - Tests d'intégration pour les API routes
@@ -274,7 +302,6 @@ npm test              # Lancer tous les tests
 npm test -- <file>    # Tester un fichier spécifique
 npm test -- --coverage # Avec couverture de code
 ```
-
 
 ## 📝 Documentation
 
@@ -291,4 +318,4 @@ ISC
 
 ---
 
-**Status** : 🚧 En développement - Étape 2 complétée (CI/CD configuré)
+**Status** : 🚧 En développement - Étape 3 en cours (MongoDB local configuré)

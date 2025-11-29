@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Formater le code avec Prettier
+npx lint-staged
+
 # Récupérer le nom de la branche actuelle
 BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null)
 
