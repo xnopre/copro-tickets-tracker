@@ -55,7 +55,7 @@ describe('MongoDB Connection', () => {
       expect(conn1).toBeDefined();
       expect(conn1).toBe(conn2);
       expect(mongoose.connection.readyState).toBe(1);
-      expect(global.mongoose.conn).toBe(conn1);
+      expect(global.mongoose?.conn).toBe(conn1);
     });
   });
 });
