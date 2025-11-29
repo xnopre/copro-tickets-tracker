@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TicketModel } from '@/lib/models/Ticket';
@@ -24,8 +24,6 @@ describe('Home Page', () => {
     });
 
     it('should retrieve and format tickets correctly', async () => {
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
       await TicketModel.create({
         title: 'Ticket 1',
         description: 'Description 1',
@@ -52,35 +50,13 @@ describe('Home Page', () => {
       expect(tickets[0].id).toBeDefined();
       expect(tickets[0].createdAt).toBeInstanceOf(Date);
       expect(tickets[0].updatedAt).toBeInstanceOf(Date);
-
-      expect(consoleLogSpy).toHaveBeenCalledWith('[SERVER] 🔄 Fetching tickets from MongoDB...');
-      expect(consoleLogSpy).toHaveBeenCalledWith('[SERVER] ✅ Found 2 tickets');
-
-      consoleLogSpy.mockRestore();
     });
 
     it('should return empty array if database is empty', async () => {
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
       const { getTickets } = await import('./page');
       const tickets = await getTickets();
 
       expect(tickets).toEqual([]);
-      expect(consoleLogSpy).toHaveBeenCalledWith('[SERVER] ✅ Found 0 tickets');
-
-      consoleLogSpy.mockRestore();
-    });
-
-    it('should log server messages correctly', async () => {
-      const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-      const { getTickets } = await import('./page');
-      await getTickets();
-
-      expect(consoleLogSpy).toHaveBeenCalledWith('[SERVER] 🔄 Fetching tickets from MongoDB...');
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('[SERVER] ✅ Found'));
-
-      consoleLogSpy.mockRestore();
     });
   });
 

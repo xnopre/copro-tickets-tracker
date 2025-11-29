@@ -108,6 +108,7 @@ brew services start mongodb-community
 - Utiliser Vitest pour les tests unitaires
 - Utiliser React Testing Library pour les composants
 - Mocker les dépendances externes (database, API calls)
+- Ne pas tester les appels à console.log
 
 Structure de test recommandée :
 
