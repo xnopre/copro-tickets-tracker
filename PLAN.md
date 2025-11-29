@@ -5,6 +5,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 ## Principe
 
 À chaque étape :
+
 - ✅ L'application est **fonctionnelle** (pas de code incomplet)
 - 🧪 Les fonctionnalités sont **testées**
 - 🚀 L'application peut être **déployée** sur Render.com
@@ -17,11 +18,13 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 **Objectif** : Avoir une application Next.js qui tourne et qui est déployée sur Render.com
 
 ### Ce qu'on livre
+
 - Une page d'accueil avec le titre "CoTiTra"
 - Build réussi
 - Déploiement fonctionnel sur Render.com
 
 ### Tâches
+
 - [x] Initialiser Next.js 16 avec TypeScript et Tailwind
 - [x] Créer une page d'accueil minimaliste
 - [x] Vérifier que `npm run build` fonctionne
@@ -30,6 +33,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [x] Vérifier que l'application est accessible en ligne (https://copro-tickets-tracker.onrender.com/)
 
 ### Validation
+
 - ✅ L'URL Render.com affiche "CoTiTra"
 - ✅ Le build passe sans erreur
 
@@ -40,6 +44,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 **Objectif** : Afficher une liste de tickets en dur dans l'interface
 
 ### Ce qu'on livre
+
 - Une page qui affiche 3 tickets codés en dur
 - Chaque ticket montre : titre, statut, date
 - Interface stylée avec Tailwind
@@ -47,6 +52,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Tests des composants
 
 ### Tâches
+
 - [x] **Mettre en place l'infrastructure de test**
   - [x] Installer Vitest, @testing-library/react, jsdom, @vitejs/plugin-react
   - [x] Créer vitest.config.ts et vitest.setup.ts
@@ -60,6 +66,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [ ] Déployer
 
 ### Validation
+
 - ✅ On voit 3 tickets affichés joliment
 - ✅ Les tests passent (`npm test`) - 13 tests passants
 - ⏳ Déployé et accessible en ligne (en attente du push git)
@@ -71,6 +78,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 **Objectif** : Automatiser la vérification des Pull Requests et l'exécution des tests
 
 ### Ce qu'on livre
+
 - Workflow GitHub Actions configuré
 - Tests automatiques sur chaque PR
 - Vérification du build TypeScript
@@ -78,6 +86,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - Badge de statut dans le README (optionnel)
 
 ### Tâches
+
 - [x] Créer le répertoire `.github/workflows/`
 - [x] Créer le fichier `ci.yml` avec workflow GitHub Actions (Node.js 20)
 - [x] Configurer l'exécution des tests (`npm test`)
@@ -91,19 +100,23 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [x] Ajouter un badge CI dans README.md (optionnel)
 
 ### Validation
+
 - ✅ Les tests s'exécutent automatiquement sur chaque PR
 - ✅ Le build est vérifié automatiquement
 - ✅ Les checks doivent passer avant de pouvoir merger
 - ✅ Le statut CI est visible dans les PRs
 
 ### Notes techniques
+
 **Workflow GitHub Actions** (`.github/workflows/ci.yml`) :
+
 - Déclenchement : push et pull_request vers main
 - Job nommé "CI" (pour la protection de branche)
 - Node.js 20.x (LTS actuel)
 - Étapes : checkout → setup node → npm ci → npm test → npm run build → npm run type-check
 
 **Protection de branche** :
+
 1. Paramètres → Branches → Ajouter une règle
 2. Modèle de nom de branche : `main`
 3. Exiger que les vérifications de statut passent avant de merger
@@ -120,11 +133,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Ajouter des workflows GitHub pour l'assistance automatique de Claude sur les PRs et issues
 
 ### Ce qu'on livre
+
 - Workflow de revue de code automatique par Claude sur chaque PR
 - Workflow d'assistance Claude via mentions @claude dans les issues et PRs
 - Configuration du token OAuth pour l'authentification de Claude
 
 ### Tâches
+
 - [x] Créer le fichier `.github/workflows/claude-code-review.yml`
 - [x] Créer le fichier `.github/workflows/claude.yml`
 - [x] Configurer le secret `CLAUDE_CODE_OAUTH_TOKEN` dans les paramètres GitHub
@@ -133,6 +148,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [x] Tester le workflow d'assistance avec @claude dans une issue
 
 ### Validation
+
 - ✅ Claude commente automatiquement les PRs avec une revue de code
 - ✅ On peut mentionner @claude dans les issues/PRs pour obtenir de l'aide
 - ✅ Les workflows s'exécutent sans erreur
@@ -140,6 +156,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 ### Notes techniques
 
 **Workflow Claude Code Review** (`.github/workflows/claude-code-review.yml`) :
+
 - Déclenchement : ouverture ou synchronisation de PR
 - Revue automatique du code avec feedback sur :
   - Qualité du code et bonnes pratiques
@@ -149,6 +166,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Utilise les conventions du projet définies dans CLAUDE.md
 
 **Workflow Claude Assistant** (`.github/workflows/claude.yml`) :
+
 - Déclenchement : mention @claude dans :
   - Commentaires d'issues
   - Commentaires de PR
@@ -158,6 +176,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Permissions : lecture du code, PRs, issues, et résultats CI
 
 **Configuration du token** :
+
 1. Générer un token OAuth Claude depuis [claude.ai](https://claude.ai)
 2. GitHub Settings → Secrets and variables → Actions
 3. Ajouter `CLAUDE_CODE_OAUTH_TOKEN` avec la valeur du token
@@ -169,12 +188,14 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Remplacer les données statiques par des vraies données venant de MongoDB
 
 ### Ce qu'on livre
+
 - Connexion à MongoDB local en développement
 - Connexion à MongoDB Atlas en production
 - Les tickets sont stockés et récupérés depuis la base
 - Configuration des variables d'environnement
 
 ### Tâches
+
 - [x] Installer MongoDB localement (brew/apt/windows)
 - [x] Démarrer MongoDB en local
 - [x] Installer mongoose
@@ -191,13 +212,16 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Tester en production
 
 ### Validation
+
 - ✅ Les tickets affichés viennent de MongoDB local
 - ✅ Les données sont rechargées à chaque rafraîchissement de la page (cache désactivé)
 - ⏳ Si on modifie un ticket dans MongoDB, il change dans l'app (à tester)
 - ⏳ Fonctionne en local (MongoDB local) ET en production (MongoDB Atlas) (production en attente)
 
 ### Notes techniques
+
 **Désactivation du cache Next.js** :
+
 - Par défaut, Next.js 15 met en cache les Server Components pour optimiser les performances
 - Pour forcer le rechargement des données à chaque requête, on utilise `export const dynamic = 'force-dynamic'` dans la page
 - Cela garantit que les modifications dans MongoDB sont immédiatement visibles dans l'application
@@ -209,11 +233,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Permettre de créer des tickets via l'interface
 
 ### Ce qu'on livre
+
 - Un formulaire de création de ticket
 - Validation des champs (titre et description requis)
 - Le nouveau ticket apparaît immédiatement dans la liste
 
 ### Tâches
+
 - [ ] Créer l'API route `POST /api/tickets`
 - [ ] Créer le composant `CreateTicketForm` avec tests
 - [ ] Valider les champs côté client et serveur
@@ -222,6 +248,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ On peut créer un ticket avec titre + description
 - ✅ Le formulaire valide les champs vides
 - ✅ Le nouveau ticket apparaît dans la liste
@@ -234,11 +261,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Cliquer sur un ticket pour voir tous ses détails
 
 ### Ce qu'on livre
+
 - Page de détail d'un ticket (`/tickets/[id]`)
 - Affiche titre, description complète, statut, dates
 - Bouton retour vers la liste
 
 ### Tâches
+
 - [ ] Créer l'API route `GET /api/tickets/[id]`
 - [ ] Créer la page `/tickets/[id]/page.tsx`
 - [ ] Créer le composant `TicketDetail` avec tests
@@ -247,6 +276,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ Cliquer sur un ticket ouvre sa page de détail
 - ✅ Toutes les infos sont affichées
 - ✅ Le bouton retour fonctionne
@@ -259,6 +289,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Modifier le statut d'un ticket (NEW → IN_PROGRESS → RESOLVED → CLOSED) avec assignation obligatoire de la personne en charge
 
 ### Ce qu'on livre
+
 - Un formulaire pour changer le statut dans la page de détail
 - Un champ obligatoire pour saisir le nom de la personne assignée
 - Validation : impossible de changer le statut sans nom
@@ -266,6 +297,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Le statut et la personne assignée se reflètent dans la liste
 
 ### Tâches
+
 - [ ] Ajouter le champ `assignedTo` (string, obligatoire) dans le type Ticket
 - [ ] Mettre à jour le schéma Mongoose avec le champ `assignedTo` (required)
 - [ ] Créer l'API route `PATCH /api/tickets/[id]` (pour statut + assignation)
@@ -280,6 +312,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ On ne peut pas changer le statut sans saisir un nom
 - ✅ Le formulaire affiche une erreur si le nom est vide
 - ✅ On peut changer le statut ET saisir le nom en même temps
@@ -294,11 +327,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Permettre de commenter les tickets
 
 ### Ce qu'on livre
+
 - Liste des commentaires sous le détail du ticket
 - Formulaire pour ajouter un commentaire
 - Les commentaires sont horodatés
 
 ### Tâches
+
 - [ ] Créer le type TypeScript `Comment`
 - [ ] Créer le schéma Mongoose pour Comment
 - [ ] Créer l'API route `GET /api/tickets/[id]/comments`
@@ -309,6 +344,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ On voit tous les commentaires d'un ticket
 - ✅ On peut ajouter un nouveau commentaire
 - ✅ Le commentaire apparaît immédiatement
@@ -321,11 +357,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Permettre de modifier le titre et la description d'un ticket
 
 ### Ce qu'on livre
+
 - Bouton "Modifier" dans la page de détail
 - Formulaire de modification pré-rempli
 - Sauvegarde des modifications
 
 ### Tâches
+
 - [ ] Créer l'API route `PUT /api/tickets/[id]`
 - [ ] Créer le composant `EditTicketForm` avec tests
 - [ ] Ajouter un mode "édition" dans la page de détail
@@ -334,6 +372,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ Le bouton "Modifier" affiche le formulaire
 - ✅ Les champs sont pré-remplis
 - ✅ Les modifications sont sauvegardées
@@ -346,6 +385,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Permettre d'archiver un ticket (les tickets ne sont jamais supprimés)
 
 ### Ce qu'on livre
+
 - Bouton "Archiver" dans la page de détail
 - Confirmation avant archivage
 - Les tickets archivés disparaissent de la liste principale
@@ -353,6 +393,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Les commentaires restent attachés au ticket archivé
 
 ### Tâches
+
 - [ ] Ajouter le champ `archived` (boolean, default: false) dans le type Ticket
 - [ ] Mettre à jour le schéma Mongoose avec le champ `archived`
 - [ ] Créer l'API route `PATCH /api/tickets/[id]/archive`
@@ -365,6 +406,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ Le bouton "Archiver" demande confirmation
 - ✅ L'archivage marque le ticket comme archived dans MongoDB
 - ✅ Les tickets archivés n'apparaissent plus dans la liste principale
@@ -379,11 +421,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Permettre de filtrer la liste des tickets par statut
 
 ### Ce qu'on livre
+
 - Boutons de filtre en haut de la liste
 - Filtre "Tous" / "Nouveau" / "En cours" / "Résolu" / "Fermé"
 - Le filtre persiste dans l'URL (query param)
 
 ### Tâches
+
 - [ ] Modifier l'API `GET /api/tickets` pour accepter un paramètre `status`
 - [ ] Créer le composant `StatusFilter` avec tests
 - [ ] Utiliser les query params Next.js
@@ -392,6 +436,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ Les boutons de filtre fonctionnent
 - ✅ L'URL change (ex: `/?status=IN_PROGRESS`)
 - ✅ Le filtre actif est mis en évidence
@@ -404,11 +449,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
 
 ### Ce qu'on livre
+
 - Barre de recherche en haut de la liste
 - Recherche en temps réel (debounced)
 - Combinable avec le filtre par statut
 
 ### Tâches
+
 - [ ] Modifier l'API `GET /api/tickets` pour accepter un paramètre `search`
 - [ ] Implémenter la recherche texte dans MongoDB
 - [ ] Créer le composant `SearchBar` avec tests
@@ -417,6 +464,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ La recherche filtre les tickets en temps réel
 - ✅ La recherche cherche dans titre ET description
 - ✅ On peut combiner recherche + filtre de statut
@@ -429,11 +477,13 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Afficher un résumé des tickets sur la page d'accueil
 
 ### Ce qu'on livre
+
 - Compteurs : total, par statut
 - Graphique simple (barres ou camembert)
 - Carte cliquable pour filtrer
 
 ### Tâches
+
 - [ ] Créer l'API route `GET /api/tickets/stats`
 - [ ] Créer le composant `TicketStats` avec tests
 - [ ] Afficher les compteurs en haut de page
@@ -442,6 +492,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ Les statistiques sont affichées
 - ✅ Les chiffres sont corrects
 - ✅ Cliquer sur un compteur filtre la liste
@@ -454,6 +505,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 **Objectif** : Améliorer l'expérience utilisateur
 
 ### Ce qu'on livre
+
 - Indicateurs de chargement (spinners)
 - Messages de succès/erreur (toasts)
 - Animations douces
@@ -461,6 +513,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Gestion des états vides ("Aucun ticket")
 
 ### Tâches
+
 - [ ] Ajouter une librairie de toasts (sonner ou react-hot-toast)
 - [ ] Ajouter les states de loading partout
 - [ ] Ajouter les états vides avec illustrations
@@ -470,6 +523,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [ ] Déployer
 
 ### Validation
+
 - ✅ L'app est fluide et agréable à utiliser
 - ✅ Les feedbacks utilisateur sont clairs
 - ✅ Parfaitement responsive
@@ -482,6 +536,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 Une fois le MVP complet, voici des évolutions possibles :
 
 ### Fonctionnalités Métier
+
 - [ ] **Catégories de tickets** (Plomberie, Électricité, Ascenseur, etc.)
 - [ ] **Niveaux de priorité** (Basse, Normale, Haute, Urgente)
 - [ ] **Assignation** (attribuer un ticket à une personne)
@@ -490,6 +545,7 @@ Une fois le MVP complet, voici des évolutions possibles :
 - [ ] **Historique des modifications** (qui a changé quoi et quand)
 
 ### Fonctionnalités Techniques
+
 - [ ] **Authentification** (NextAuth.js ou Clerk)
 - [ ] **Rôles utilisateurs** (admin, copropriétaire, syndic)
 - [ ] **Pagination** (liste longue de tickets)
@@ -500,6 +556,7 @@ Une fois le MVP complet, voici des évolutions possibles :
 - [ ] **Websockets** (temps réel multi-utilisateurs)
 
 ### Qualité et Performance
+
 - [ ] **Tests E2E** (Playwright ou Cypress)
 - [ ] **Monitoring** (Sentry pour les erreurs)
 - [ ] **Analytics** (Google Analytics ou Plausible)
@@ -512,17 +569,21 @@ Une fois le MVP complet, voici des évolutions possibles :
 ## 📝 Notes Importantes
 
 ### Principes à Respecter
+
 - **Commit après chaque étape** : gardez l'historique propre
 - **Déployer après chaque étape** : validez en production
 - **Écrire les tests en même temps** : pas après coup
 - **Garder l'architecture hexagonale** : même dans l'incrémental
 
 ### Architecture Progressive
+
 Au départ, vous pouvez :
+
 - Mettre la logique directement dans les API routes
 - Garder les types dans un seul fichier
 
 Puis, au fur et à mesure :
+
 - Extraire les use cases
 - Créer les repositories
 - Structurer en couches hexagonales
@@ -530,11 +591,13 @@ Puis, au fur et à mesure :
 L'important est que **chaque étape livre de la valeur**.
 
 ### Tests
+
 - Tests unitaires pour les composants React
 - Tests d'intégration pour les API routes
 - Tests E2E à partir de l'étape 12
 
 ### Commandes Utiles
+
 ```bash
 npm run dev          # Développement local
 npm test            # Lancer les tests

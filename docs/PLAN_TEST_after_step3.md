@@ -22,6 +22,7 @@ npm install --save-dev mongodb-memory-server node-mocks-http
 ```
 
 **Justification** :
+
 - `mongodb-memory-server` : Instance MongoDB en mémoire pour tests d'intégration rapides et isolés
 - `node-mocks-http` : Création de mocks Request/Response pour tester les API routes Next.js
 
@@ -54,6 +55,7 @@ copro-tickets-tracker/
 **Objectif** : Valider le schéma Mongoose, les validations, et les comportements
 
 **Tests clés** :
+
 - ✅ Création de ticket valide avec tous les champs requis
 - ✅ Échec de validation si `title` manque
 - ✅ Échec de validation si `description` manque
@@ -75,9 +77,11 @@ copro-tickets-tracker/
 **Objectif** : Valider le pooling de connexion et la gestion d'erreurs
 
 **Tests unitaires** :
+
 - ✅ Erreur si `MONGODB_URI` n'est pas définie
 
 **Tests d'intégration** :
+
 - ✅ Établissement de connexion au premier appel
 - ✅ Réutilisation de la connexion en cache aux appels suivants
 - ✅ Gestion gracieuse des échecs de connexion
@@ -95,12 +99,14 @@ copro-tickets-tracker/
 **Objectif** : Valider l'endpoint GET /api/tickets
 
 **Tests unitaires** :
+
 - ✅ Retourne tableau vide si aucun ticket
 - ✅ Retourne tickets formatés correctement
 - ✅ Retourne erreur 500 si requête DB échoue
 - ✅ Trie par `createdAt` descendant
 
 **Tests d'intégration** :
+
 - ✅ Retourne tickets depuis vraie base de données
 - ✅ Convertit `_id` MongoDB en `id` string
 - ✅ Convertit dates en objets Date dans la réponse
@@ -115,11 +121,13 @@ copro-tickets-tracker/
 **Objectif** : Valider la récupération de données et le rendu de page
 
 **Tests de getTickets** :
+
 - ✅ Récupère et formate les tickets correctement
 - ✅ Retourne tableau vide en cas d'erreur DB
 - ✅ Logs serveur corrects (`[SERVER]` messages)
 
 **Tests de rendu** :
+
 - ✅ Affiche le titre "CoTiTra"
 - ✅ Affiche "Copro Tickets Tracker"
 - ✅ Structure de page correcte
@@ -141,27 +149,29 @@ export async function getTickets(): Promise<Ticket[]> {
 **Objectif** : Utilitaires partagés pour réduire la duplication de code
 
 **Fonctions** :
+
 - `setupTestDB()` : Démarre MongoDB in-memory et connecte Mongoose
 - `teardownTestDB()` : Déconnecte et arrête le serveur
 - `clearDatabase()` : Nettoie toutes les collections
 
 **Usage** :
-```typescript
-import { setupTestDB, teardownTestDB, clearDatabase } from '@/tests/helpers/db-setup'
 
-let mongoServer: MongoMemoryServer
+```typescript
+import { setupTestDB, teardownTestDB, clearDatabase } from '@/tests/helpers/db-setup';
+
+let mongoServer: MongoMemoryServer;
 
 beforeAll(async () => {
-  mongoServer = await setupTestDB()
-})
+  mongoServer = await setupTestDB();
+});
 
 afterAll(async () => {
-  await teardownTestDB(mongoServer)
-})
+  await teardownTestDB(mongoServer);
+});
 
 beforeEach(async () => {
-  await clearDatabase()
-})
+  await clearDatabase();
+});
 ```
 
 ---
@@ -169,27 +179,33 @@ beforeEach(async () => {
 ## 4. Séquence d'implémentation
 
 ### Phase 1 : Configuration (15 min)
+
 1. Installer les dépendances
 2. Créer `tests/helpers/db-setup.ts`
 3. Exporter `getTickets` de `app/page.tsx`
 
 ### Phase 2 : Tests du modèle (30 min)
+
 4. Créer `lib/models/Ticket.test.ts`
 5. Exécuter : `npm test Ticket.test.ts`
 
 ### Phase 3 : Tests de connexion (30 min)
+
 6. Créer `lib/mongodb.test.ts`
 7. Exécuter : `npm test mongodb.test.ts`
 
 ### Phase 4 : Tests API (45 min)
+
 8. Créer `app/api/tickets/route.test.ts`
 9. Exécuter : `npm test route.test.ts`
 
 ### Phase 5 : Tests de page (30 min)
+
 10. Créer `app/page.test.tsx`
 11. Exécuter : `npm test page.test.tsx`
 
 ### Phase 6 : Vérification (15 min)
+
 12. Exécuter tous les tests : `npm test`
 13. Vérifier la couverture : `npm test -- --coverage`
 14. Valider que CI passe
@@ -201,22 +217,27 @@ beforeEach(async () => {
 ## 5. Patterns de test utilisés
 
 ### Pattern AAA (Arrange-Act-Assert)
+
 Tous les tests suivent cette structure claire et explicite.
 
 ### Isolation des tests
+
 - Chaque test est indépendant
 - `beforeEach` réinitialise l'état de la DB
 - Mocks réinitialisés entre tests
 
 ### Noms de tests descriptifs
+
 - Utilisation de `should` dans les noms
 - Groupement logique avec `describe`
 
 ### Approche hybride
+
 - Tests unitaires : Rapides, dépendances mockées
 - Tests d'intégration : Lents, comportement réel vérifié
 
 ### Couverture des erreurs
+
 - Test des chemins de succès ET d'échec
 - Vérification des messages d'erreur
 - Validation des logs console
@@ -225,12 +246,12 @@ Tous les tests suivent cette structure claire et explicite.
 
 ## 6. Objectifs de couverture
 
-| Fichier | Couverture cible | Justification |
-|---------|------------------|---------------|
-| `lib/models/Ticket.ts` | 100% | Toutes les validations de schéma |
-| `lib/mongodb.ts` | 90%+ | Logique de pooling de connexion |
-| `app/api/tickets/route.ts` | 95%+ | Tous endpoints et erreurs |
-| `app/page.tsx` | 80%+ | Fonction getTickets + rendu de base |
+| Fichier                    | Couverture cible | Justification                       |
+| -------------------------- | ---------------- | ----------------------------------- |
+| `lib/models/Ticket.ts`     | 100%             | Toutes les validations de schéma    |
+| `lib/mongodb.ts`           | 90%+             | Logique de pooling de connexion     |
+| `app/api/tickets/route.ts` | 95%+             | Tous endpoints et erreurs           |
+| `app/page.tsx`             | 80%+             | Fonction getTickets + rendu de base |
 
 ---
 
@@ -258,6 +279,7 @@ npm run test:ui
 ## 8. Fichiers critiques à modifier/créer
 
 ### À créer (5 nouveaux fichiers)
+
 1. `lib/models/Ticket.test.ts` - Tests du schéma Mongoose
 2. `lib/mongodb.test.ts` - Tests de connexion DB
 3. `app/api/tickets/route.test.ts` - Tests de l'API endpoint
@@ -265,6 +287,7 @@ npm run test:ui
 5. `tests/helpers/db-setup.ts` - Utilitaires partagés
 
 ### À modifier (1 fichier)
+
 6. `app/page.tsx` - Exporter la fonction `getTickets`
 
 ---

@@ -1,5 +1,5 @@
-import mongoose, { Schema, model, models } from 'mongoose'
-import { TicketStatus } from '@/types/ticket'
+import mongoose, { Schema, model, models } from 'mongoose';
+import { TicketStatus } from '@/types/ticket';
 
 const ticketSchema = new Schema(
   {
@@ -22,6 +22,6 @@ const ticketSchema = new Schema(
   {
     timestamps: true,
   }
-)
+);
 
-export const TicketModel = models.Ticket || model('Ticket', ticketSchema)
+export const TicketModel = models.Ticket || model('Ticket', ticketSchema);
