@@ -11,6 +11,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "husky",
     "mongodb:start": "brew services start mongodb/brew/mongodb-community",
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
@@ -51,12 +53,19 @@
     "eslint-config-next": "^16.0.4",
     "husky": "^9.1.7",
     "jsdom": "^27.2.0",
+    "lint-staged": "^16.2.7",
     "mongodb-memory-server": "^10.3.0",
     "node-mocks-http": "^1.17.2",
     "postcss": "^8.5.6",
+    "prettier": "^3.7.2",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "vitest": "^4.0.14"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ]
   }
 }
