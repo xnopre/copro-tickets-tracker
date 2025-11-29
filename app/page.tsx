@@ -1,7 +1,7 @@
 import TicketList from '@/components/TicketList';
 import connectDB from '@/lib/mongodb';
 import { TicketModel } from '@/lib/models/Ticket';
-import { Ticket, TicketStatus } from '@/types/ticket';
+import { Ticket, TicketDocument, TicketStatus } from '@/types/ticket';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +9,7 @@ export async function getTickets(): Promise<Ticket[]> {
   console.log('[SERVER] 🔄 Fetching tickets from MongoDB...');
   await connectDB();
 
-  const tickets = await TicketModel.find({}).sort({ createdAt: -1 }).lean();
+  const tickets = (await TicketModel.find({}).sort({ createdAt: -1 }).lean()) as TicketDocument[];
   console.log(`[SERVER] ✅ Found ${tickets.length} tickets`);
 
   return tickets.map(ticket => ({
