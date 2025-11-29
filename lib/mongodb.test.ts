@@ -29,10 +29,12 @@ describe('MongoDB Connection', () => {
       const originalEnv = process.env.MONGODB_URI;
       delete process.env.MONGODB_URI;
 
-      await expect(async () => {
-        vi.resetModules();
-        await import('./mongodb');
-      }).rejects.toThrow('Please define the MONGODB_URI environment variable inside .env.local');
+      vi.resetModules();
+      const connectDB = (await import('./mongodb')).default;
+
+      await expect(connectDB()).rejects.toThrow(
+        'Please define the MONGODB_URI environment variable inside .env.local'
+      );
 
       process.env.MONGODB_URI = originalEnv;
     });
