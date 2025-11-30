@@ -2,6 +2,7 @@ import TicketList from '@/components/TicketList';
 import connectDB from '@/lib/mongodb';
 import { TicketModel } from '@/lib/models/Ticket';
 import { Ticket, TicketDocument, TicketStatus } from '@/types/ticket';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,7 +35,15 @@ export default async function Home() {
         </div>
 
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tickets</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-semibold text-gray-800">Tickets</h2>
+            <Link
+              href="/tickets/new"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              + Créer un ticket
+            </Link>
+          </div>
           <TicketList tickets={tickets} />
         </div>
       </div>

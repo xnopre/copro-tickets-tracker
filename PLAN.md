@@ -302,11 +302,11 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 
 ### Tâches
 
-- [ ] Créer l'API route `POST /api/tickets`
-- [ ] Créer le composant `CreateTicketForm` avec tests
-- [ ] Valider les champs côté client et serveur
-- [ ] Rafraîchir la liste après création
-- [ ] Afficher un message de succès/erreur
+- [x] Créer l'API route `POST /api/tickets`
+- [x] Créer le composant `CreateTicketForm` avec tests
+- [x] Valider les champs côté client et serveur
+- [x] Rafraîchir la liste après création
+- [x] Afficher un message de succès/erreur
 - [ ] Déployer
 
 ### Validation
@@ -314,7 +314,23 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - ✅ On peut créer un ticket avec titre + description
 - ✅ Le formulaire valide les champs vides
 - ✅ Le nouveau ticket apparaît dans la liste
-- ✅ Fonctionne en production
+- ⏳ Fonctionne en production (en attente du déploiement)
+
+### Notes techniques
+
+**Architecture** :
+
+- Formulaire de création dans une page dédiée `/tickets/new`
+- Bouton "+ Créer un ticket" sur la page d'accueil
+- Redirection automatique vers la page d'accueil après création (délai de 1 seconde pour afficher le message de succès)
+
+**Gestion des routes** :
+
+- Next.js `typedRoutes` activé (validation automatique des routes)
+- Routes validées à la compilation via TypeScript
+- Autocomplete IDE pour toutes les routes existantes
+- Zero dépendance - fonctionnalité native de Next.js
+- Types générés automatiquement dans `.next/types/link.d.ts`
 
 ---
 
