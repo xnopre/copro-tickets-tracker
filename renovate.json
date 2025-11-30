@@ -6,18 +6,23 @@
   "prConcurrentLimit": 5,
   "packageRules": [
     {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": false
+    },
+    {
       "matchPackagePatterns": ["^next", "^react", "^react-dom"],
       "groupName": "Next.js and React",
       "automerge": false
     },
     {
       "matchUpdateTypes": ["patch"],
-      "matchCurrentVersion": "!/^0/",
       "groupName": "all patch dependencies",
       "groupSlug": "all-patch",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true
+      "platformAutomerge": true,
+      "labels": ["dependencies", "renovate", "automerge"]
     },
     {
       "matchUpdateTypes": ["minor"],
@@ -26,7 +31,8 @@
       "groupSlug": "all-minor-dev",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true
+      "platformAutomerge": true,
+      "labels": ["dependencies", "renovate", "automerge"]
     },
     {
       "matchUpdateTypes": ["minor"],
