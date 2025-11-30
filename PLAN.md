@@ -13,6 +13,29 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 ---
 
+## Sommaire
+
+- [📦 Étape 0 : Application Minimale Déployable](#-étape-0--application-minimale-déployable)
+- [🎨 Étape 1 : Liste Statique de Tickets](#-étape-1--liste-statique-de-tickets)
+- [🤖 Étape 2 : CI/CD avec GitHub Actions](#-étape-2--cicd-avec-github-actions)
+- [🤖 Étape 2b : Workflows GitHub avec Claude](#-étape-2b--workflows-github-avec-claude)
+- [🔄 Étape 2c : Renovate pour la Gestion Automatique des Dépendances](#-étape-2c--renovate-pour-la-gestion-automatique-des-dépendances)
+- [🗄️ Étape 3 : Tickets depuis MongoDB](#️-étape-3--tickets-depuis-mongodb)
+- [➕ Étape 4 : Créer un Nouveau Ticket](#-étape-4--créer-un-nouveau-ticket)
+- [📄 Étape 5 : Voir le Détail d'un Ticket](#-étape-5--voir-le-détail-dun-ticket)
+- [🔄 Étape 6 : Changer le Statut et Assigner un Ticket](#-étape-6--changer-le-statut-et-assigner-un-ticket)
+- [💬 Étape 7 : Ajouter des Commentaires](#-étape-7--ajouter-des-commentaires)
+- [✏️ Étape 8 : Modifier un Ticket](#️-étape-8--modifier-un-ticket)
+- [📦 Étape 9 : Archiver un Ticket](#-étape-9--archiver-un-ticket)
+- [🎯 Étape 10 : Filtrer par Statut](#-étape-10--filtrer-par-statut)
+- [🔍 Étape 11 : Recherche de Tickets](#-étape-11--recherche-de-tickets)
+- [📊 Étape 12 : Dashboard avec Statistiques](#-étape-12--dashboard-avec-statistiques)
+- [🎨 Étape 13 : Polish UX/UI](#-étape-13--polish-uxui)
+- [🚀 Étapes Futures (Optionnelles)](#-étapes-futures-optionnelles)
+- [📝 Notes Importantes](#-notes-importantes)
+
+---
+
 ## 📦 Étape 0 : Application Minimale Déployable
 
 **Objectif** : Avoir une application Next.js qui tourne et qui est déployée sur Render.com
@@ -180,6 +203,45 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 1. Générer un token OAuth Claude depuis [claude.ai](https://claude.ai)
 2. GitHub Settings → Secrets and variables → Actions
 3. Ajouter `CLAUDE_CODE_OAUTH_TOKEN` avec la valeur du token
+
+---
+
+## 🔄 Étape 2c : Renovate pour la Gestion Automatique des Dépendances
+
+**Objectif** : Automatiser la mise à jour des dépendances npm avec Renovate Bot via GitHub Actions (self-hosted)
+
+### Ce qu'on livre
+
+- Renovate Bot configuré en self-hosted via GitHub Actions
+- Mise à jour automatique des dépendances via Pull Requests
+- Configuration personnalisée pour le projet (regroupement, scheduling, automerge)
+- Aucun compte externe requis (tout dans GitHub)
+
+### Tâches
+
+- [x] Créer le fichier de workflow `.github/workflows/renovate.yml`
+  - [x] Configurer le déclenchement (schedule + workflow_dispatch)
+  - [x] Utiliser l'image Docker officielle de Renovate
+  - [x] Configurer le token GitHub pour créer les PRs
+- [x] Créer le fichier de configuration `renovate.json` à la racine du projet
+  - [x] Étendre la configuration recommandée (`config:recommended`)
+  - [x] Configurer le timezone (Europe/Paris)
+  - [x] Configurer le regroupement des dépendances (mineures/patch ensemble)
+  - [x] Créer un groupe spécial pour Next.js et React
+  - [x] Limiter le nombre de PRs ouvertes simultanément (5 max)
+  - [x] Ajouter des labels (`dependencies`, `renovate`)
+  - [x] Configurer l'automerge pour les mises à jour patch
+- [ ] Tester le workflow manuellement via "Run workflow" dans GitHub Actions
+- [ ] Valider qu'une PR de Renovate est créée et passe les checks CI
+
+### Validation
+
+- ✅ Le workflow Renovate s'exécute automatiquement selon le schedule
+- ✅ Le fichier `renovate.json` est présent et valide
+- ✅ Renovate crée automatiquement des PRs pour les mises à jour de dépendances
+- ✅ Les PRs de Renovate déclenchent les workflows CI/CD
+- ✅ Les tests passent sur les PRs de Renovate
+- ✅ Pas besoin de compte externe (tout dans GitHub)
 
 ---
 
