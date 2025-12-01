@@ -11,7 +11,7 @@
       "automerge": false
     },
     {
-      "matchPackagePatterns": ["^next", "^react", "^react-dom"],
+      "matchPackageNames": ["/^next/", "/^react/", "/^react-dom/"],
       "groupName": "Next.js and React",
       "automerge": false
     },
