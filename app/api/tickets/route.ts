@@ -12,6 +12,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Le titre est requis' }, { status: 400 });
     }
 
+    if (title.trim().length > 200) {
+      return NextResponse.json(
+        { error: 'Le titre ne doit pas dépasser 200 caractères' },
+        { status: 400 }
+      );
+    }
+
     if (!description || typeof description !== 'string' || description.trim().length === 0) {
       return NextResponse.json({ error: 'La description est requise' }, { status: 400 });
     }
