@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating ticket:', error);
+    console.error(
+      'Error creating ticket:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
     return NextResponse.json({ error: 'Erreur lors de la création du ticket' }, { status: 500 });
   }
 }
