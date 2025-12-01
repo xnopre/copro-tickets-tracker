@@ -198,3 +198,4 @@ Autres règles :
 - Ajoute les informations dans le plan dans @PLAN.md lorsque je te demande quelque chose qui n'y était pas
 - Tu ne dois jamais commiter sur Git, je le ferai toujours moi-même
 - Tu dois toujours mettre à jour le plan lorsque tu as implémenté une étape et/ou traité des tâches
+- Supprimer toujours les imports inutiles
