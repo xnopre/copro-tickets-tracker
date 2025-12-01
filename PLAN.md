@@ -222,11 +222,12 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - [x] Créer le fichier de workflow `.github/workflows/renovate.yml`
   - [x] Configurer le déclenchement (schedule + workflow_dispatch)
   - [x] Utiliser l'image Docker officielle de Renovate
+  - [x] Configurer le repository courant
   - [x] Configurer le token GitHub pour créer les PRs
 - [x] Créer le fichier de configuration `renovate.json` à la racine du projet
   - [x] Étendre la configuration recommandée (`config:recommended`)
   - [x] Configurer le timezone (Europe/Paris)
-  - [x] Configurer le regroupement des dépendances (mineures/patch ensemble)
+  - [x] Configurer le regroupement des dépendances (mineures/patch ensemble) (avec matchPackageNames)
   - [x] Créer un groupe spécial pour Next.js et React
   - [x] Limiter le nombre de PRs ouvertes simultanément (5 max)
   - [x] Ajouter des labels (`dependencies`, `renovate`)
@@ -238,9 +239,9 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 
 - ✅ Le workflow Renovate s'exécute automatiquement selon le schedule
 - ✅ Le fichier `renovate.json` est présent et valide
-- ✅ Renovate crée automatiquement des PRs pour les mises à jour de dépendances
-- ✅ Les PRs de Renovate déclenchent les workflows CI/CD
-- ✅ Les tests passent sur les PRs de Renovate
+- ⏳ Renovate crée automatiquement des PRs pour les mises à jour de dépendances (à tester)
+- ⏳ Les PRs de Renovate déclenchent les workflows CI/CD (à tester)
+- ⏳ Les tests passent sur les PRs de Renovate (à tester)
 - ✅ Pas besoin de compte externe (tout dans GitHub)
 
 ---
