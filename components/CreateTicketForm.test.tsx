@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CreateTicketForm from './CreateTicketForm';
 
@@ -54,6 +54,8 @@ describe('CreateTicketForm', () => {
   });
 
   it('should create ticket successfully when form is valid', async () => {
+    vi.useFakeTimers();
+
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -83,9 +85,12 @@ describe('CreateTicketForm', () => {
     expect(descriptionInput.disabled).toBe(true);
     expect(screen.getByText('Création en cours...')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
+    // Avancer le temps pour résoudre les promesses et les timers
+    await act(async () => {
+      await vi.runAllTimersAsync();
     });
+
+    expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
 
     expect(global.fetch).toHaveBeenCalledWith('/api/tickets', {
       method: 'POST',
@@ -95,12 +100,9 @@ describe('CreateTicketForm', () => {
       body: JSON.stringify({ title: 'Test Title', description: 'Test Description' }),
     });
 
-    await waitFor(
-      () => {
-        expect(mockRouterPush).toHaveBeenCalledWith('/');
-      },
-      { timeout: 2000 }
-    );
+    expect(mockRouterPush).toHaveBeenCalledWith('/');
+
+    vi.useRealTimers();
   });
 
   it('should show error when API returns error', async () => {
