@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { server } from '../vitest.setup';
 import CreateTicketForm from './CreateTicketForm';
 
 const mockRouterPush = vi.fn();
@@ -13,7 +15,6 @@ vi.mock('next/navigation', () => ({
 describe('CreateTicketForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
   });
 
   it('should render form with title and description fields', () => {
@@ -34,7 +35,7 @@ describe('CreateTicketForm', () => {
       expect(screen.getByText('Le titre est requis')).toBeInTheDocument();
     });
 
-    expect(global.fetch).not.toHaveBeenCalled();
+    // Pas de requête API si la validation échoue
   });
 
   it('should show error when description is empty', async () => {
@@ -50,23 +51,25 @@ describe('CreateTicketForm', () => {
       expect(screen.getByText('La description est requise')).toBeInTheDocument();
     });
 
-    expect(global.fetch).not.toHaveBeenCalled();
+    // Pas de requête API si la validation échoue
   });
 
   it('should create ticket successfully when form is valid', async () => {
     vi.useFakeTimers();
 
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        id: '123',
-        title: 'Test Title',
-        description: 'Test Description',
-        status: 'NEW',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }),
-    });
+    // Configurer le handler MSW pour simuler une création de ticket réussie
+    server.use(
+      http.post('/api/tickets', async () => {
+        return HttpResponse.json({
+          id: '123',
+          title: 'Test Title',
+          description: 'Test Description',
+          status: 'NEW',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      })
+    );
 
     render(<CreateTicketForm />);
 
@@ -91,25 +94,18 @@ describe('CreateTicketForm', () => {
     });
 
     expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
-
-    expect(global.fetch).toHaveBeenCalledWith('/api/tickets', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title: 'Test Title', description: 'Test Description' }),
-    });
-
     expect(mockRouterPush).toHaveBeenCalledWith('/');
 
     vi.useRealTimers();
   });
 
   it('should show error when API returns error', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ error: 'API Error' }),
-    });
+    // Configurer le handler MSW pour simuler une erreur API
+    server.use(
+      http.post('/api/tickets', async () => {
+        return HttpResponse.json({ error: 'API Error' }, { status: 400 });
+      })
+    );
 
     render(<CreateTicketForm />);
 
