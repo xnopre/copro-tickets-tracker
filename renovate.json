@@ -22,7 +22,6 @@
       "groupSlug": "all-patch",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true,
       "labels": ["dependencies", "renovate", "automerge"]
     },
     {
@@ -32,7 +31,6 @@
       "groupSlug": "all-minor-dev",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true,
       "labels": ["dependencies", "renovate", "automerge"]
     },
     {
