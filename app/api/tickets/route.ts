@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'La description est requise' }, { status: 400 });
     }
 
+    if (description.trim().length > 5000) {
+      return NextResponse.json(
+        { error: 'La description ne doit pas dépasser 5000 caractères' },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
 
     const ticket = await TicketModel.create({

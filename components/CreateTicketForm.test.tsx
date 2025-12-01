@@ -123,4 +123,29 @@ describe('CreateTicketForm', () => {
 
     expect(mockRouterPush).not.toHaveBeenCalled();
   });
+
+  it('should show error when title exceeds 200 characters', async () => {
+    server.use(
+      http.post('/api/tickets', async () => {
+        return HttpResponse.json({ error: 'Erreur côté serveur, bla, bla, bla' }, { status: 400 });
+      })
+    );
+
+    render(<CreateTicketForm />);
+
+    const titleInput = screen.getByLabelText('Titre');
+    const descriptionInput = screen.getByLabelText('Description');
+    const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+
+    const longTitle = 'A'.repeat(201);
+    fireEvent.change(titleInput, { target: { value: longTitle } });
+    fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText('Erreur côté serveur, bla, bla, bla')).toBeInTheDocument();
+    });
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+  });
 });
