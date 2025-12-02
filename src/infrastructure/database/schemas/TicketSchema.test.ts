@@ -1,24 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, it, expect } from 'vitest';
 import mongoose from 'mongoose';
-import { TicketModel } from './Ticket';
-import { TicketStatus } from '@/types/ticket';
-import { setupTestDB, teardownTestDB, clearDatabase } from '@/tests/helpers/db-setup';
+import { TicketModel } from './TicketSchema';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { useTestDB } from '../../../../tests/helpers/useTestDB';
 
-describe('Ticket Model', () => {
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await setupTestDB();
-  });
-
-  afterAll(async () => {
-    await teardownTestDB(mongoServer);
-  });
-
-  beforeEach(async () => {
-    await clearDatabase();
-  });
+describe('Ticket Schema', () => {
+  useTestDB();
 
   describe('Schema Validation', () => {
     it('should create a valid ticket with all required fields', async () => {
@@ -121,18 +108,18 @@ describe('Ticket Model', () => {
   });
 
   describe('Timestamps', () => {
-    // it('should automatically generate createdAt and updatedAt', async () => {
-    //   const ticketData = {
-    //     title: 'Test Ticket',
-    //     description: 'Test Description',
-    //   };
-    //
-    //   const ticket = new TicketModel(ticketData);
-    //   const savedTicket = await ticket.save();
-    //
-    //   expect(savedTicket.createdAt).toBeInstanceOf(Date);
-    //   expect(savedTicket.updatedAt).toBeInstanceOf(Date);
-    // });
+    it('should automatically generate createdAt and updatedAt', async () => {
+      const ticketData = {
+        title: 'Test Ticket',
+        description: 'Test Description',
+      };
+
+      const ticket = new TicketModel(ticketData);
+      const savedTicket = await ticket.save();
+
+      expect(savedTicket.createdAt).toBeInstanceOf(Date);
+      expect(savedTicket.updatedAt).toBeInstanceOf(Date);
+    });
 
     it('should update updatedAt when ticket is modified', async () => {
       const ticketData = {
@@ -150,6 +137,13 @@ describe('Ticket Model', () => {
       const updatedTicket = await savedTicket.save();
 
       expect(updatedTicket.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime());
+    });
+  });
+
+  describe('Model Caching', () => {
+    it('should reuse cached model', () => {
+      expect(mongoose.models.Ticket).toBeDefined();
+      expect(TicketModel).toBe(mongoose.models.Ticket);
     });
   });
 });

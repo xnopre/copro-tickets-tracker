@@ -1,4 +1,4 @@
-import { Ticket } from '@/types/ticket';
+import { Ticket } from '@/domain/entities/Ticket';
 import TicketCard from './TicketCard';
 
 interface TicketListProps {

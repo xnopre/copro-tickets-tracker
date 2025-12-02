@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
-import { server } from '../vitest.setup';
+import { server } from '../../../vitest.setup';
 import CreateTicketForm from './CreateTicketForm';
 
 const mockRouterPush = vi.fn();
@@ -34,8 +34,6 @@ describe('CreateTicketForm', () => {
     await waitFor(() => {
       expect(screen.getByText('Le titre est requis')).toBeInTheDocument();
     });
-
-    // Pas de requête API si la validation échoue
   });
 
   it('should show error when description is empty', async () => {
@@ -50,14 +48,11 @@ describe('CreateTicketForm', () => {
     await waitFor(() => {
       expect(screen.getByText('La description est requise')).toBeInTheDocument();
     });
-
-    // Pas de requête API si la validation échoue
   });
 
   it('should create ticket successfully when form is valid', async () => {
     vi.useFakeTimers();
 
-    // Configurer le handler MSW pour simuler une création de ticket réussie
     server.use(
       http.post('/api/tickets', async () => {
         return HttpResponse.json({
@@ -88,7 +83,6 @@ describe('CreateTicketForm', () => {
     expect(descriptionInput.disabled).toBe(true);
     expect(screen.getByText('Création en cours...')).toBeInTheDocument();
 
-    // Avancer le temps pour résoudre les promesses et les timers
     await act(async () => {
       await vi.runAllTimersAsync();
     });
@@ -100,7 +94,6 @@ describe('CreateTicketForm', () => {
   });
 
   it('should show error when API returns error', async () => {
-    // Configurer le handler MSW pour simuler une erreur API
     server.use(
       http.post('/api/tickets', async () => {
         return HttpResponse.json({ error: 'API Error' }, { status: 400 });

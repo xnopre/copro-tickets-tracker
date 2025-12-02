@@ -1,4 +1,5 @@
-import { Ticket, TicketStatus } from '@/types/ticket';
+import { Ticket } from '@/domain/entities/Ticket';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
 interface TicketCardProps {
   ticket: Ticket;

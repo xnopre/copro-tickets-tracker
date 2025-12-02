@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import TicketList from './TicketList';
-import { Ticket, TicketStatus } from '@/types/ticket';
+import { Ticket } from '@/domain/entities/Ticket';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
 describe('TicketList', () => {
   const mockTickets: Ticket[] = [

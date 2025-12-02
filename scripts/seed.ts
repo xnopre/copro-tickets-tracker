@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { TicketModel } from '../lib/models/Ticket';
-import { TicketStatus } from '../types/ticket';
+import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
