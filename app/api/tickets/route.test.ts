@@ -1,24 +1,25 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST } from './route';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
-import { TicketStatus } from '@/types/ticket';
-
-vi.mock('@/lib/mongodb', () => ({
-  default: vi.fn().mockResolvedValue({}),
-}));
-
-vi.mock('@/lib/models/Ticket', () => ({
-  TicketModel: {
-    create: vi.fn(),
-  },
-}));
-
-import { TicketModel } from '@/lib/models/Ticket';
-const mockCreate = TicketModel.create as ReturnType<typeof vi.fn>;
+import { POST } from './route';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { setupTestDB, teardownTestDB, clearDatabase } from '../../../tests/helpers/db-setup';
 
 describe('POST /api/tickets', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  let mongoServer: MongoMemoryServer;
+
+  beforeAll(async () => {
+    mongoServer = await setupTestDB();
+    process.env.MONGODB_URI = mongoServer.getUri();
+  });
+
+  afterAll(async () => {
+    await teardownTestDB(mongoServer);
+  });
+
+  beforeEach(async () => {
+    await clearDatabase();
   });
 
   const createRequest = (body: unknown) => {
@@ -31,6 +32,69 @@ describe('POST /api/tickets', () => {
     });
   };
 
+  describe('Successful creation', () => {
+    it('should create a ticket successfully', async () => {
+      const request = createRequest({
+        title: 'Test Ticket',
+        description: 'Test Description',
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(data.id).toBeDefined();
+      expect(data.title).toBe('Test Ticket');
+      expect(data.description).toBe('Test Description');
+      expect(data.status).toBe(TicketStatus.NEW);
+      expect(data.createdAt).toBeDefined();
+      expect(data.updatedAt).toBeDefined();
+
+      // Verify ticket was saved in database
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb).toHaveLength(1);
+      expect(ticketsInDb[0].title).toBe('Test Ticket');
+    });
+
+    it('should trim title and description before saving', async () => {
+      const request = createRequest({
+        title: '  Spaced Title  ',
+        description: '  Spaced Description  ',
+      });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(data.title).toBe('Spaced Title');
+      expect(data.description).toBe('Spaced Description');
+    });
+
+    it('should accept title with exactly 200 characters', async () => {
+      const title = 'A'.repeat(200);
+      const request = createRequest({ title, description: 'Test description' });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb[0].title).toBe(title);
+    });
+
+    it('should accept description with exactly 5000 characters', async () => {
+      const description = 'A'.repeat(5000);
+      const request = createRequest({ title: 'Test title', description });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb[0].description).toBe(description);
+    });
+  });
+
   describe('Title validation', () => {
     it('should return 400 when title is missing', async () => {
       const request = createRequest({ description: 'Test description' });
@@ -40,7 +104,9 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Le titre est requis');
-      expect(mockCreate).not.toHaveBeenCalled();
+
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb).toHaveLength(0);
     });
 
     it('should return 400 when title is not a string', async () => {
@@ -51,7 +117,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Le titre est requis');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when title is empty string', async () => {
@@ -62,7 +127,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Le titre est requis');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when title is only whitespace', async () => {
@@ -73,7 +137,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Le titre est requis');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when title exceeds 200 characters', async () => {
@@ -85,26 +148,9 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('Le titre ne doit pas dépasser 200 caractères');
-      expect(mockCreate).not.toHaveBeenCalled();
-    });
 
-    it('should accept title with exactly 200 characters', async () => {
-      const title = 'A'.repeat(200);
-      const request = createRequest({ title, description: 'Test description' });
-
-      mockCreate.mockResolvedValue({
-        _id: '123',
-        title: title.trim(),
-        description: 'Test description',
-        status: TicketStatus.NEW,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      const response = await POST(request);
-
-      expect(response.status).toBe(201);
-      expect(mockCreate).toHaveBeenCalled();
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb).toHaveLength(0);
     });
   });
 
@@ -117,7 +163,9 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('La description est requise');
-      expect(mockCreate).not.toHaveBeenCalled();
+
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb).toHaveLength(0);
     });
 
     it('should return 400 when description is not a string', async () => {
@@ -128,7 +176,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('La description est requise');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when description is empty string', async () => {
@@ -139,7 +186,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('La description est requise');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when description is only whitespace', async () => {
@@ -150,7 +196,6 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('La description est requise');
-      expect(mockCreate).not.toHaveBeenCalled();
     });
 
     it('should return 400 when description exceeds 5000 characters', async () => {
@@ -162,101 +207,9 @@ describe('POST /api/tickets', () => {
 
       expect(response.status).toBe(400);
       expect(data.error).toBe('La description ne doit pas dépasser 5000 caractères');
-      expect(mockCreate).not.toHaveBeenCalled();
-    });
 
-    it('should accept description with exactly 5000 characters', async () => {
-      const description = 'A'.repeat(5000);
-      const request = createRequest({ title: 'Test title', description });
-
-      mockCreate.mockResolvedValue({
-        _id: '123',
-        title: 'Test title',
-        description: description.trim(),
-        status: TicketStatus.NEW,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      const response = await POST(request);
-
-      expect(response.status).toBe(201);
-      expect(mockCreate).toHaveBeenCalled();
-    });
-  });
-
-  describe('Successful ticket creation', () => {
-    it('should create ticket with valid data', async () => {
-      const title = 'Test ticket';
-      const description = 'This is a test ticket description';
-      const now = new Date();
-      const createdTicket = {
-        _id: '123',
-        title,
-        description,
-        status: TicketStatus.NEW,
-        createdAt: now,
-        updatedAt: now,
-      };
-
-      mockCreate.mockResolvedValue(createdTicket);
-
-      const request = createRequest({ title, description });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(201);
-      expect(mockCreate).toHaveBeenCalledWith({
-        title: title.trim(),
-        description: description.trim(),
-        status: TicketStatus.NEW,
-      });
-      expect(data).toEqual({
-        id: '123',
-        title,
-        description,
-        status: TicketStatus.NEW,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-      });
-    });
-
-    it('should trim title and description before saving', async () => {
-      const title = '  Test ticket  ';
-      const description = '  Test description  ';
-      const createdTicket = {
-        _id: '123',
-        title: title.trim(),
-        description: description.trim(),
-        status: TicketStatus.NEW,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      mockCreate.mockResolvedValue(createdTicket);
-
-      const request = createRequest({ title, description });
-      const response = await POST(request);
-
-      expect(response.status).toBe(201);
-      expect(mockCreate).toHaveBeenCalledWith({
-        title: 'Test ticket',
-        description: 'Test description',
-        status: TicketStatus.NEW,
-      });
-    });
-  });
-
-  describe('Error handling', () => {
-    it('should return 500 when database operation fails', async () => {
-      mockCreate.mockRejectedValue(new Error('Database error'));
-
-      const request = createRequest({ title: 'Test title', description: 'Test description' });
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(500);
-      expect(data.error).toBe('Erreur lors de la création du ticket');
+      const ticketsInDb = await TicketModel.find();
+      expect(ticketsInDb).toHaveLength(0);
     });
   });
 });

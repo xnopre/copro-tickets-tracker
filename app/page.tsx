@@ -1,30 +1,12 @@
-import TicketList from '@/components/TicketList';
-import connectDB from '@/lib/mongodb';
-import { TicketModel } from '@/lib/models/Ticket';
-import { Ticket, TicketDocument, TicketStatus } from '@/types/ticket';
+import TicketList from '@/presentation/components/TicketList';
+import { ServiceFactory } from '@/application/services/ServiceFactory';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export async function getTickets(): Promise<Ticket[]> {
-  console.log('[SERVER] 🔄 Fetching tickets from MongoDB...');
-  await connectDB();
-
-  const tickets = (await TicketModel.find({}).sort({ createdAt: -1 }).lean()) as TicketDocument[];
-  console.log(`[SERVER] ✅ Found ${tickets.length} tickets`);
-
-  return tickets.map(ticket => ({
-    id: ticket._id.toString(),
-    title: ticket.title,
-    description: ticket.description,
-    status: ticket.status as TicketStatus,
-    createdAt: new Date(ticket.createdAt),
-    updatedAt: new Date(ticket.updatedAt),
-  }));
-}
-
 export default async function Home() {
-  const tickets = await getTickets();
+  const ticketService = ServiceFactory.getTicketService();
+  const tickets = await ticketService.getAllTickets();
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">

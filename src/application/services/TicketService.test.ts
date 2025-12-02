@@ -1,0 +1,156 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { TicketService } from './TicketService';
+import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
+
+describe('TicketService', () => {
+  let mockRepository: ITicketRepository;
+  let ticketService: TicketService;
+
+  beforeEach(() => {
+    mockRepository = {
+      findAll: vi.fn(),
+      create: vi.fn(),
+    };
+    ticketService = new TicketService(mockRepository);
+  });
+
+  describe('getAllTickets', () => {
+    it('should return all tickets from repository', async () => {
+      const mockTickets: Ticket[] = [
+        {
+          id: '1',
+          title: 'Ticket 1',
+          description: 'Description 1',
+          status: TicketStatus.NEW,
+          createdAt: new Date('2025-01-15'),
+          updatedAt: new Date('2025-01-15'),
+        },
+        {
+          id: '2',
+          title: 'Ticket 2',
+          description: 'Description 2',
+          status: TicketStatus.IN_PROGRESS,
+          createdAt: new Date('2025-01-16'),
+          updatedAt: new Date('2025-01-16'),
+        },
+      ];
+
+      vi.mocked(mockRepository.findAll).mockResolvedValue(mockTickets);
+
+      const result = await ticketService.getAllTickets();
+
+      expect(result).toEqual(mockTickets);
+      expect(mockRepository.findAll).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return empty array when no tickets', async () => {
+      vi.mocked(mockRepository.findAll).mockResolvedValue([]);
+
+      const result = await ticketService.getAllTickets();
+
+      expect(result).toEqual([]);
+      expect(mockRepository.findAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('createTicket', () => {
+    it('should create a ticket with valid data', async () => {
+      const createData: CreateTicketData = {
+        title: 'New Ticket',
+        description: 'New Description',
+      };
+
+      const mockCreatedTicket: Ticket = {
+        id: '123',
+        title: 'New Ticket',
+        description: 'New Description',
+        status: TicketStatus.NEW,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(mockRepository.create).mockResolvedValue(mockCreatedTicket);
+
+      const result = await ticketService.createTicket(createData);
+
+      expect(result).toEqual(mockCreatedTicket);
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        title: 'New Ticket',
+        description: 'New Description',
+      });
+    });
+
+    it('should throw error when title is empty', async () => {
+      const createData: CreateTicketData = {
+        title: '',
+        description: 'Description',
+      };
+
+      await expect(ticketService.createTicket(createData)).rejects.toThrow('Le titre est requis');
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when description is empty', async () => {
+      const createData: CreateTicketData = {
+        title: 'Title',
+        description: '',
+      };
+
+      await expect(ticketService.createTicket(createData)).rejects.toThrow(
+        'La description est requise'
+      );
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when title exceeds 200 characters', async () => {
+      const createData: CreateTicketData = {
+        title: 'A'.repeat(201),
+        description: 'Description',
+      };
+
+      await expect(ticketService.createTicket(createData)).rejects.toThrow(
+        'Le titre ne doit pas dépasser 200 caractères'
+      );
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when description exceeds 5000 characters', async () => {
+      const createData: CreateTicketData = {
+        title: 'Title',
+        description: 'A'.repeat(5001),
+      };
+
+      await expect(ticketService.createTicket(createData)).rejects.toThrow(
+        'La description ne doit pas dépasser 5000 caractères'
+      );
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should trim title and description before creating', async () => {
+      const createData: CreateTicketData = {
+        title: '  Spaced Title  ',
+        description: '  Spaced Description  ',
+      };
+
+      const mockCreatedTicket: Ticket = {
+        id: '123',
+        title: 'Spaced Title',
+        description: 'Spaced Description',
+        status: TicketStatus.NEW,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(mockRepository.create).mockResolvedValue(mockCreatedTicket);
+
+      await ticketService.createTicket(createData);
+
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        title: 'Spaced Title',
+        description: 'Spaced Description',
+      });
+    });
+  });
+});

@@ -45,6 +45,28 @@ describe('MongoDB Connection', () => {
       process.env.MONGODB_URI = mongoServer.getUri();
     });
 
+    it('should connect to MongoDB successfully', async () => {
+      vi.resetModules();
+      const connectDB = (await import('./mongodb')).default;
+
+      const connection = await connectDB();
+
+      expect(connection).toBeDefined();
+      expect(mongoose.connection.readyState).toBe(1); // 1 = connected
+      expect(global.mongoose?.conn).toBe(connection);
+    });
+
+    it('should reuse existing connection', async () => {
+      vi.resetModules();
+      const connectDB = (await import('./mongodb')).default;
+
+      const conn1 = await connectDB();
+      const conn2 = await connectDB();
+
+      expect(conn1).toBe(conn2);
+      expect(global.mongoose?.conn).toBe(conn1);
+    });
+
     it('should not create new connection if promise is in progress', async () => {
       vi.resetModules();
       const connectDB = (await import('./mongodb')).default;

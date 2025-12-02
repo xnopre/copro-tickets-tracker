@@ -1,4 +1,4 @@
-import CreateTicketForm from '@/components/CreateTicketForm';
+import CreateTicketForm from '@/presentation/components/CreateTicketForm';
 import Link from 'next/link';
 
 export default function NewTicketPage() {
