@@ -6,6 +6,7 @@
   "labels": ["dependencies", "renovate"],
   "prConcurrentLimit": 5,
   "platformAutomerge": true,
+  "prTitle": "[Renovate] {{commitMessage}}",
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
