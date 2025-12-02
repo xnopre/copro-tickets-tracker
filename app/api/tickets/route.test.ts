@@ -1,26 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from './route';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { setupTestDB, teardownTestDB, clearDatabase } from '../../../tests/helpers/db-setup';
+import { useTestDB } from '../../../tests/helpers/useTestDB';
 
 describe('POST /api/tickets', () => {
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await setupTestDB();
-    process.env.MONGODB_URI = mongoServer.getUri();
-  });
-
-  afterAll(async () => {
-    await teardownTestDB(mongoServer);
-  });
-
-  beforeEach(async () => {
-    await clearDatabase();
-  });
+  useTestDB();
 
   const createRequest = (body: unknown) => {
     return new NextRequest('http://localhost:3000/api/tickets', {

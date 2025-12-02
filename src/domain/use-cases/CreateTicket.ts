@@ -1,5 +1,6 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
+import { ValidationError } from '../errors/ValidationError';
 
 export class CreateTicket {
   constructor(private ticketRepository: ITicketRepository) {}
@@ -17,11 +18,11 @@ export class CreateTicket {
 
   private validateData(data: CreateTicketData): void {
     if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
-      throw new Error('Le titre est requis');
+      throw new ValidationError('Le titre est requis');
     }
 
     if (data.title.trim().length > 200) {
-      throw new Error('Le titre ne doit pas dépasser 200 caractères');
+      throw new ValidationError('Le titre ne doit pas dépasser 200 caractères');
     }
 
     if (
@@ -29,11 +30,11 @@ export class CreateTicket {
       typeof data.description !== 'string' ||
       data.description.trim().length === 0
     ) {
-      throw new Error('La description est requise');
+      throw new ValidationError('La description est requise');
     }
 
     if (data.description.trim().length > 5000) {
-      throw new Error('La description ne doit pas dépasser 5000 caractères');
+      throw new ValidationError('La description ne doit pas dépasser 5000 caractères');
     }
   }
 }

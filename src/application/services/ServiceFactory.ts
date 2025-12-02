@@ -2,13 +2,9 @@ import { MongoTicketRepository } from '@/infrastructure/repositories/MongoTicket
 import { TicketService } from './TicketService';
 
 export class ServiceFactory {
-  private static ticketService: TicketService | null = null;
+  private static ticketService = new TicketService(new MongoTicketRepository());
 
   static getTicketService(): TicketService {
-    if (!this.ticketService) {
-      const ticketRepository = new MongoTicketRepository();
-      this.ticketService = new TicketService(ticketRepository);
-    }
     return this.ticketService;
   }
 }

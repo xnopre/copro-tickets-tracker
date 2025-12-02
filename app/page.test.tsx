@@ -1,25 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { setupTestDB, teardownTestDB, clearDatabase } from '../tests/helpers/db-setup';
+import { useTestDB } from '../tests/helpers/useTestDB';
 
 describe('Home Page', () => {
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await setupTestDB();
-    process.env.MONGODB_URI = mongoServer.getUri();
-  });
-
-  afterAll(async () => {
-    await teardownTestDB(mongoServer);
-  });
-
-  beforeEach(async () => {
-    await clearDatabase();
-  });
+  useTestDB();
 
   it('should display the title "CoTiTra"', async () => {
     const Home = (await import('./page')).default;

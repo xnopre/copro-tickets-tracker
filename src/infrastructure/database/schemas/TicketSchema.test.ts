@@ -1,24 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describe, it, expect } from 'vitest';
 import mongoose from 'mongoose';
 import { TicketModel } from './TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { setupTestDB, teardownTestDB, clearDatabase } from '../../../../tests/helpers/db-setup';
+import { useTestDB } from '../../../../tests/helpers/useTestDB';
 
 describe('Ticket Schema', () => {
-  let mongoServer: MongoMemoryServer;
-
-  beforeAll(async () => {
-    mongoServer = await setupTestDB();
-  });
-
-  afterAll(async () => {
-    await teardownTestDB(mongoServer);
-  });
-
-  beforeEach(async () => {
-    await clearDatabase();
-  });
+  useTestDB();
 
   describe('Schema Validation', () => {
     it('should create a valid ticket with all required fields', async () => {
