@@ -5,6 +5,7 @@
   "timezone": "Europe/Paris",
   "labels": ["dependencies", "renovate"],
   "prConcurrentLimit": 5,
+  "platformAutomerge": true,
   "packageRules": [
     {
       "matchManagers": ["github-actions"],
