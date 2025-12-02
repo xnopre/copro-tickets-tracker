@@ -30,6 +30,4 @@ export function useTestDB() {
   beforeEach(async () => {
     await clearDatabase();
   });
-
-  return { mongoServer };
 }
