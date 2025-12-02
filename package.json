@@ -16,7 +16,8 @@
     "prepare": "husky",
     "mongodb:start": "brew services start mongodb/brew/mongodb-community",
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "renovate:trigger": "gh workflow run renovate.yml"
   },
   "repository": {
     "type": "git",
