@@ -215,7 +215,7 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
 - Renovate Bot configuré en self-hosted via GitHub Actions
 - Mise à jour automatique des dépendances via Pull Requests
 - Configuration personnalisée pour le projet (regroupement, scheduling, automerge)
-- Aucun compte externe requis (tout dans GitHub)
+- Authentification avec Personal Access Token pour créer les PRs
 
 ### Tâches
 
@@ -232,17 +232,58 @@ Voir le workflow Git complet dans [README.md](./README.md) (section "🛡️ Pro
   - [x] Limiter le nombre de PRs ouvertes simultanément (5 max)
   - [x] Ajouter des labels (`dependencies`, `renovate`)
   - [x] Configurer l'automerge pour les mises à jour patch
-- [ ] Tester le workflow manuellement via "Run workflow" dans GitHub Actions
-- [ ] Valider qu'une PR de Renovate est créée et passe les checks CI
+  - [x] Créer un Personal Access Token (PAT) GitHub avec les permissions requises
+  - [x] Configurer le secret `RENOVATE_TOKEN` dans les paramètres GitHub
+  - [ ] Tester le workflow manuellement via "Run workflow" dans GitHub Actions
+  - [ ] Valider qu'une PR de Renovate est créée et passe les checks CI
 
 ### Validation
 
 - ✅ Le workflow Renovate s'exécute automatiquement selon le schedule
 - ✅ Le fichier `renovate.json` est présent et valide
-- ⏳ Renovate crée automatiquement des PRs pour les mises à jour de dépendances (à tester)
-- ⏳ Les PRs de Renovate déclenchent les workflows CI/CD (à tester)
-- ⏳ Les tests passent sur les PRs de Renovate (à tester)
-- ✅ Pas besoin de compte externe (tout dans GitHub)
+- ✅ Workflow mis à jour pour utiliser un PAT
+- ⏳ PAT créé et configuré (en attente de configuration manuelle)
+- ⏳ Renovate crée automatiquement des PRs pour les mises à jour de dépendances (à tester après config PAT)
+- ⏳ Les PRs de Renovate déclenchent les workflows CI/CD (à tester après config PAT)
+- ⏳ Les tests passent sur les PRs de Renovate (à tester après config PAT)
+
+### Notes techniques
+
+**Problème identifié** :
+
+Le `GITHUB_TOKEN` par défaut fourni par GitHub Actions a des limitations de permissions qui empêchent Renovate de créer des Pull Requests. Les logs montrent :
+
+```
+POST https://api.github.com/repos/xnopre/copro-tickets-tracker/pulls = statusCode=403
+GitHub failure: Resource not accessible by integration
+```
+
+Renovate crée bien les branches (`renovate/all-patch`, `renovate/all-minor-dev`, `renovate/major-github-actions`) mais ne peut pas créer les PRs associées.
+
+**Solution : Personal Access Token (PAT)** :
+
+1. **Créer un PAT** (GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens) :
+   - **Name** : `Renovate Bot`
+   - **Expiration** : 1 an (ou No expiration)
+   - **Repository access** : `Only select repositories` → `copro-tickets-tracker`
+   - **Permissions (Repository)** :
+     - ✅ **Contents** : Read and write
+     - ✅ **Pull requests** : Read and write
+     - ✅ **Issues** : Read and write
+     - ✅ **Metadata** : Read-only (automatique)
+     - ✅ **Workflows** : Read and write (optionnel, pour déclencher les workflows CI)
+
+2. **Ajouter le secret** :
+   - Repository → Settings → Secrets and variables → Actions
+   - New repository secret : `RENOVATE_TOKEN`
+   - Coller le token généré
+
+3. **Workflow mis à jour** :
+   - Utilise maintenant `token: ${{ secrets.RENOVATE_TOKEN }}` au lieu de `${{ secrets.GITHUB_TOKEN }}`
+
+**Test** :
+
+Après configuration du PAT, lancer manuellement le workflow via Actions → Renovate → Run workflow. Les PRs devraient être créées automatiquement pour les branches existantes.
 
 ---
 
