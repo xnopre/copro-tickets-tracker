@@ -12,6 +12,17 @@ export class MongoTicketRepository implements ITicketRepository {
     return documents.map(doc => this.mapToEntity(doc));
   }
 
+  async findById(id: string): Promise<Ticket | null> {
+    await connectDB();
+    const document = await TicketModel.findById(id);
+
+    if (!document) {
+      return null;
+    }
+
+    return this.mapToEntity(document);
+  }
+
   async create(data: CreateTicketData): Promise<Ticket> {
     await connectDB();
     const document = await TicketModel.create({

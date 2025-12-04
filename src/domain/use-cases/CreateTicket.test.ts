@@ -6,6 +6,7 @@ import { TicketStatus } from '../value-objects/TicketStatus';
 describe('CreateTicket', () => {
   const mockRepository: ITicketRepository = {
     findAll: vi.fn(),
+    findById: vi.fn(),
     create: vi.fn(),
   };
 

@@ -11,6 +11,7 @@ describe('TicketService', () => {
   beforeEach(() => {
     mockRepository = {
       findAll: vi.fn(),
+      findById: vi.fn(),
       create: vi.fn(),
     };
     ticketService = new TicketService(mockRepository);
@@ -151,6 +152,37 @@ describe('TicketService', () => {
         title: 'Spaced Title',
         description: 'Spaced Description',
       });
+    });
+  });
+
+  describe('getTicketById', () => {
+    it('should return a ticket when found', async () => {
+      const mockTicket: Ticket = {
+        id: '123',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        createdAt: new Date('2025-01-15'),
+        updatedAt: new Date('2025-01-15'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicket);
+
+      const result = await ticketService.getTicketById('123');
+
+      expect(result).toEqual(mockTicket);
+      expect(mockRepository.findById).toHaveBeenCalledWith('123');
+      expect(mockRepository.findById).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when ticket not found', async () => {
+      vi.mocked(mockRepository.findById).mockResolvedValue(null);
+
+      const result = await ticketService.getTicketById('non-existent-id');
+
+      expect(result).toBeNull();
+      expect(mockRepository.findById).toHaveBeenCalledWith('non-existent-id');
+      expect(mockRepository.findById).toHaveBeenCalledTimes(1);
     });
   });
 });
