@@ -3,8 +3,9 @@ import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   try {
-    const { id } = await params;
     const ticketService = ServiceFactory.getTicketService();
     const ticket = await ticketService.getTicketById(id);
 
@@ -19,7 +20,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     console.error(
-      'Error fetching ticket:',
+      'Error fetching ticket with ID:',
+      id,
       error instanceof Error ? error.message : 'Unknown error'
     );
 
