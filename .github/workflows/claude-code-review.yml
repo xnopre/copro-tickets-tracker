@@ -9,7 +9,7 @@ on:
 jobs:
   claude-review:
     # Ne pas lancer la revue de code sur les PRs de Renovate
-    if: "!contains(github.event.pull_request.labels.*.name, 'renovate')"
+    if: "!startsWith(github.event.pull_request.head.ref, 'renovate/')"
 
     runs-on: ubuntu-latest
     permissions:
