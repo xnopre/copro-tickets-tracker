@@ -199,3 +199,4 @@ Autres règles :
 - Tu ne dois jamais commiter sur Git, je le ferai toujours moi-même
 - Tu dois toujours mettre à jour le plan lorsque tu as implémenté une étape et/ou traité des tâches
 - Supprimer toujours les imports inutiles
+- Pour les assertions dans les tests unitaires, utilise au maximum des valeurs en durs, et pas des regexp ou des calculs
