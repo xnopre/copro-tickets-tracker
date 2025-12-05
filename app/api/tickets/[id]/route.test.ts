@@ -7,6 +7,7 @@ import { TicketService } from '@/application/services/TicketService';
 import { CreateTicket } from '@/domain/use-cases/CreateTicket';
 import { GetTickets } from '@/domain/use-cases/GetTickets';
 import { GetTicketById } from '@/domain/use-cases/GetTicketById';
+import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 
 vi.mock('@/application/services/ServiceFactory');
 
@@ -53,6 +54,20 @@ describe('GET /api/tickets/[id]', () => {
       updatedAt: mockTicket.updatedAt.toISOString(),
     });
     expect(mockTicketService.getTicketById).toHaveBeenCalledWith('123');
+  });
+
+  it('should return 400 for invalid ObjectId format', async () => {
+    vi.mocked(mockTicketService.getTicketById).mockRejectedValue(new InvalidIdError('invalid-id'));
+
+    const request = new NextRequest('http://localhost/api/tickets/invalid-id');
+    const params = Promise.resolve({ id: 'invalid-id' });
+
+    const response = await GET(request, { params });
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data).toEqual({ error: 'ID invalide' });
+    expect(mockTicketService.getTicketById).toHaveBeenCalledWith('invalid-id');
   });
 
   it('should return 404 when ticket not found', async () => {

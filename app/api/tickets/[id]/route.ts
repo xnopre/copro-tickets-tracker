@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
+import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,6 +14,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return NextResponse.json(ticket);
   } catch (error) {
+    if (error instanceof InvalidIdError) {
+      return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
+    }
+
     console.error(
       'Error fetching ticket:',
       error instanceof Error ? error.message : 'Unknown error'
