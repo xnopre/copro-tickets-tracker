@@ -53,4 +53,30 @@ describe('TicketCard', () => {
     const badge = screen.getByText(label);
     expect(badge).toHaveClass(bgClass, textClass);
   });
+
+  describe('Accessibility', () => {
+    it('should have proper aria-label on link', () => {
+      render(<TicketCard ticket={mockTicket} />);
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute('aria-label', 'Voir le ticket : Test Ticket - Statut : Nouveau');
+    });
+
+    it('should have proper aria-label on status badge', () => {
+      render(<TicketCard ticket={mockTicket} />);
+      const badge = screen.getByLabelText('Statut : Nouveau');
+      expect(badge).toBeInTheDocument();
+    });
+
+    it('should use semantic time elements for dates', () => {
+      render(<TicketCard ticket={mockTicket} />);
+      const timeElements = screen.getAllByText(/Créé le|Modifié le/);
+      expect(timeElements.length).toBeGreaterThan(0);
+    });
+
+    it('should have article role for card content', () => {
+      const { container } = render(<TicketCard ticket={mockTicket} />);
+      const article = container.querySelector('article');
+      expect(article).toBeInTheDocument();
+    });
+  });
 });

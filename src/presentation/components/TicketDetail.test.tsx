@@ -62,4 +62,53 @@ describe('TicketDetail', () => {
     const badge = screen.getByText(label);
     expect(badge).toHaveClass(bgClass, textClass);
   });
+
+  describe('Accessibility', () => {
+    it('should have proper aria-label on back link', () => {
+      render(<TicketDetail ticket={mockTicket} />);
+      const backLink = screen.getByLabelText('Retour à la liste des tickets');
+      expect(backLink).toBeInTheDocument();
+      expect(backLink).toHaveAttribute('href', '/');
+    });
+
+    it('should have proper aria-label on status badge', () => {
+      render(<TicketDetail ticket={mockTicket} />);
+      const badge = screen.getByLabelText('Statut du ticket : Nouveau');
+      expect(badge).toBeInTheDocument();
+    });
+
+    it('should use semantic article element', () => {
+      const { container } = render(<TicketDetail ticket={mockTicket} />);
+      const article = container.querySelector('article');
+      expect(article).toBeInTheDocument();
+    });
+
+    it('should use semantic nav element for back link', () => {
+      const { container } = render(<TicketDetail ticket={mockTicket} />);
+      const nav = container.querySelector('nav');
+      expect(nav).toBeInTheDocument();
+      expect(nav).toHaveAttribute('aria-label', 'Navigation de retour');
+    });
+
+    it('should use semantic header element', () => {
+      const { container } = render(<TicketDetail ticket={mockTicket} />);
+      const header = container.querySelector('header');
+      expect(header).toBeInTheDocument();
+    });
+
+    it('should use semantic section with aria-labelledby for description', () => {
+      const { container } = render(<TicketDetail ticket={mockTicket} />);
+      const section = container.querySelector('section[aria-labelledby="description-heading"]');
+      expect(section).toBeInTheDocument();
+      const heading = container.querySelector('#description-heading');
+      expect(heading).toHaveTextContent('Description');
+    });
+
+    it('should use semantic footer for dates info', () => {
+      const { container } = render(<TicketDetail ticket={mockTicket} />);
+      const footer = container.querySelector('footer');
+      expect(footer).toBeInTheDocument();
+      expect(footer).toHaveAttribute('aria-label', 'Informations sur les dates');
+    });
+  });
 });

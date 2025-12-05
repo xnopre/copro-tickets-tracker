@@ -20,8 +20,8 @@ describe('CreateTicketForm', () => {
   it('should render form with title and description fields', () => {
     render(<CreateTicketForm />);
 
-    expect(screen.getByLabelText('Titre')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Titre/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Créer le ticket' })).toBeInTheDocument();
   });
 
@@ -39,7 +39,7 @@ describe('CreateTicketForm', () => {
   it('should show error when description is empty', async () => {
     render(<CreateTicketForm />);
 
-    const titleInput = screen.getByLabelText('Titre');
+    const titleInput = screen.getByLabelText(/Titre/);
     fireEvent.change(titleInput, { target: { value: 'Test Title' } });
 
     const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
@@ -68,8 +68,8 @@ describe('CreateTicketForm', () => {
 
     render(<CreateTicketForm />);
 
-    const titleInput = screen.getByLabelText('Titre') as HTMLInputElement;
-    const descriptionInput = screen.getByLabelText('Description') as HTMLTextAreaElement;
+    const titleInput = screen.getByLabelText(/Titre/) as HTMLInputElement;
+    const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement;
     const submitButton = screen.getByRole('button', {
       name: 'Créer le ticket',
     }) as HTMLButtonElement;
@@ -102,8 +102,8 @@ describe('CreateTicketForm', () => {
 
     render(<CreateTicketForm />);
 
-    const titleInput = screen.getByLabelText('Titre');
-    const descriptionInput = screen.getByLabelText('Description');
+    const titleInput = screen.getByLabelText(/Titre/);
+    const descriptionInput = screen.getByLabelText(/Description/);
     const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
 
     fireEvent.change(titleInput, { target: { value: 'Test Title' } });
@@ -126,8 +126,8 @@ describe('CreateTicketForm', () => {
 
     render(<CreateTicketForm />);
 
-    const titleInput = screen.getByLabelText('Titre');
-    const descriptionInput = screen.getByLabelText('Description');
+    const titleInput = screen.getByLabelText(/Titre/);
+    const descriptionInput = screen.getByLabelText(/Description/);
     const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
 
     const longTitle = 'A'.repeat(201);
@@ -140,5 +140,101 @@ describe('CreateTicketForm', () => {
     });
 
     expect(mockRouterPush).not.toHaveBeenCalled();
+  });
+
+  describe('Accessibility', () => {
+    it('should have proper aria-required on required fields', () => {
+      render(<CreateTicketForm />);
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      expect(titleInput).toHaveAttribute('aria-required', 'true');
+      expect(descriptionInput).toHaveAttribute('aria-required', 'true');
+    });
+
+    it('should have role="alert" on error messages', async () => {
+      render(<CreateTicketForm />);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const alert = screen.getByRole('alert');
+        expect(alert).toBeInTheDocument();
+        expect(alert).toHaveTextContent('Le titre est requis');
+      });
+    });
+
+    it('should have aria-live="assertive" on error messages', async () => {
+      render(<CreateTicketForm />);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        const errorMessage = screen.getByText('Le titre est requis');
+        const container = errorMessage.closest('[aria-live]');
+        expect(container).toHaveAttribute('aria-live', 'assertive');
+      });
+    });
+
+    it('should have aria-busy when submitting', async () => {
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json({
+            id: '123',
+            title: 'Test',
+            description: 'Test',
+            status: 'NEW',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        })
+      );
+
+      render(<CreateTicketForm />);
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+
+      fireEvent.change(titleInput, { target: { value: 'Test' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test' } });
+      fireEvent.click(submitButton);
+
+      expect(submitButton).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('should have role="status" on success message', async () => {
+      vi.useFakeTimers();
+
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json({
+            id: '123',
+            title: 'Test',
+            description: 'Test',
+            status: 'NEW',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        })
+      );
+
+      render(<CreateTicketForm />);
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+
+      fireEvent.change(titleInput, { target: { value: 'Test' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test' } });
+      fireEvent.click(submitButton);
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      const status = screen.getByRole('status');
+      expect(status).toBeInTheDocument();
+      expect(status).toHaveTextContent('Ticket créé avec succès !');
+
+      vi.useRealTimers();
+    });
   });
 });
