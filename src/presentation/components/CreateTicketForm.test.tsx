@@ -20,125 +20,193 @@ describe('CreateTicketForm', () => {
   it('should render form with title and description fields', () => {
     render(<CreateTicketForm />);
 
-    expect(screen.getByLabelText('Titre')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Titre/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Créer le ticket' })).toBeInTheDocument();
   });
 
-  it('should show error when title is empty', async () => {
-    render(<CreateTicketForm />);
+  describe('Validation', () => {
+    it('should show error when title is empty', async () => {
+      render(<CreateTicketForm />);
 
-    const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
-    fireEvent.click(submitButton);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.click(submitButton);
 
-    await waitFor(() => {
-      expect(screen.getByText('Le titre est requis')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Le titre est requis')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when description is empty', async () => {
+      render(<CreateTicketForm />);
+
+      const titleInput = screen.getByLabelText(/Titre/);
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('La description est requise')).toBeInTheDocument();
+      });
+    });
+
+    it('should show error when title exceeds 200 characters', async () => {
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json(
+            { error: 'Erreur côté serveur, bla, bla, bla' },
+            { status: 400 }
+          );
+        })
+      );
+
+      render(<CreateTicketForm />);
+
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+
+      const longTitle = 'A'.repeat(201);
+      fireEvent.change(titleInput, { target: { value: longTitle } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Erreur côté serveur, bla, bla, bla')).toBeInTheDocument();
+      });
+
+      expect(mockRouterPush).not.toHaveBeenCalled();
     });
   });
 
-  it('should show error when description is empty', async () => {
-    render(<CreateTicketForm />);
+  describe('Form submission', () => {
+    it('should create ticket successfully when form is valid', async () => {
+      vi.useFakeTimers();
 
-    const titleInput = screen.getByLabelText('Titre');
-    fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json({
+            id: '123',
+            title: 'Test Title',
+            description: 'Test Description',
+            status: 'NEW',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        })
+      );
 
-    const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
-    fireEvent.click(submitButton);
+      render(<CreateTicketForm />);
 
-    await waitFor(() => {
-      expect(screen.getByText('La description est requise')).toBeInTheDocument();
+      const titleInput = screen.getByLabelText(/Titre/) as HTMLInputElement;
+      const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement;
+      const submitButton = screen.getByRole('button', {
+        name: 'Créer le ticket',
+      }) as HTMLButtonElement;
+
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
+      fireEvent.click(submitButton);
+
+      expect(submitButton.disabled).toBe(true);
+      expect(titleInput.disabled).toBe(true);
+      expect(descriptionInput.disabled).toBe(true);
+      expect(screen.getByText('Création en cours...')).toBeInTheDocument();
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
+      expect(mockRouterPush).toHaveBeenCalledWith('/');
+
+      vi.useRealTimers();
+    });
+
+    it('should show error when API returns error', async () => {
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json({ error: 'API Error' }, { status: 400 });
+        })
+      );
+
+      render(<CreateTicketForm />);
+
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+
+      fireEvent.change(titleInput, { target: { value: 'Test Title' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('API Error')).toBeInTheDocument();
+      });
+
+      expect(mockRouterPush).not.toHaveBeenCalled();
     });
   });
 
-  it('should create ticket successfully when form is valid', async () => {
-    vi.useFakeTimers();
-
-    server.use(
-      http.post('/api/tickets', async () => {
-        return HttpResponse.json({
-          id: '123',
-          title: 'Test Title',
-          description: 'Test Description',
-          status: 'NEW',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-      })
-    );
-
-    render(<CreateTicketForm />);
-
-    const titleInput = screen.getByLabelText('Titre') as HTMLInputElement;
-    const descriptionInput = screen.getByLabelText('Description') as HTMLTextAreaElement;
-    const submitButton = screen.getByRole('button', {
-      name: 'Créer le ticket',
-    }) as HTMLButtonElement;
-
-    fireEvent.change(titleInput, { target: { value: 'Test Title' } });
-    fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
-    fireEvent.click(submitButton);
-
-    expect(submitButton.disabled).toBe(true);
-    expect(titleInput.disabled).toBe(true);
-    expect(descriptionInput.disabled).toBe(true);
-    expect(screen.getByText('Création en cours...')).toBeInTheDocument();
-
-    await act(async () => {
-      await vi.runAllTimersAsync();
+  describe('Accessibility', () => {
+    it('should have proper aria-required on required fields', () => {
+      render(<CreateTicketForm />);
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      expect(titleInput).toHaveAttribute('aria-required', 'true');
+      expect(descriptionInput).toHaveAttribute('aria-required', 'true');
     });
 
-    expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
-    expect(mockRouterPush).toHaveBeenCalledWith('/');
+    it('should have role="alert" and aria-live="assertive" on error messages', async () => {
+      render(<CreateTicketForm />);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.click(submitButton);
 
-    vi.useRealTimers();
-  });
-
-  it('should show error when API returns error', async () => {
-    server.use(
-      http.post('/api/tickets', async () => {
-        return HttpResponse.json({ error: 'API Error' }, { status: 400 });
-      })
-    );
-
-    render(<CreateTicketForm />);
-
-    const titleInput = screen.getByLabelText('Titre');
-    const descriptionInput = screen.getByLabelText('Description');
-    const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
-
-    fireEvent.change(titleInput, { target: { value: 'Test Title' } });
-    fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('API Error')).toBeInTheDocument();
+      await waitFor(() => {
+        const alert = screen.getByRole('alert');
+        expect(alert).toBeInTheDocument();
+        expect(alert).toHaveTextContent('Le titre est requis');
+        expect(alert).toHaveAttribute('aria-live', 'assertive');
+      });
     });
 
-    expect(mockRouterPush).not.toHaveBeenCalled();
-  });
+    it('should have aria-busy when submitting and role="status" on success', async () => {
+      vi.useFakeTimers();
 
-  it('should show error when title exceeds 200 characters', async () => {
-    server.use(
-      http.post('/api/tickets', async () => {
-        return HttpResponse.json({ error: 'Erreur côté serveur, bla, bla, bla' }, { status: 400 });
-      })
-    );
+      server.use(
+        http.post('/api/tickets', async () => {
+          return HttpResponse.json({
+            id: '123',
+            title: 'Test',
+            description: 'Test',
+            status: 'NEW',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
+        })
+      );
 
-    render(<CreateTicketForm />);
+      render(<CreateTicketForm />);
+      const titleInput = screen.getByLabelText(/Titre/);
+      const descriptionInput = screen.getByLabelText(/Description/);
+      const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
 
-    const titleInput = screen.getByLabelText('Titre');
-    const descriptionInput = screen.getByLabelText('Description');
-    const submitButton = screen.getByRole('button', { name: 'Créer le ticket' });
+      fireEvent.change(titleInput, { target: { value: 'Test' } });
+      fireEvent.change(descriptionInput, { target: { value: 'Test' } });
+      fireEvent.click(submitButton);
 
-    const longTitle = 'A'.repeat(201);
-    fireEvent.change(titleInput, { target: { value: longTitle } });
-    fireEvent.change(descriptionInput, { target: { value: 'Test Description' } });
-    fireEvent.click(submitButton);
+      expect(submitButton).toHaveAttribute('aria-busy', 'true');
 
-    await waitFor(() => {
-      expect(screen.getByText('Erreur côté serveur, bla, bla, bla')).toBeInTheDocument();
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      const status = screen.getByRole('status');
+      expect(status).toBeInTheDocument();
+      expect(status).toHaveTextContent('Ticket créé avec succès !');
+
+      vi.useRealTimers();
     });
-
-    expect(mockRouterPush).not.toHaveBeenCalled();
   });
 });

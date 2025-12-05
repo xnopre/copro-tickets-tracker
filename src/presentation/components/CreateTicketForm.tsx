@@ -54,12 +54,14 @@ export default function CreateTicketForm() {
     }
   };
 
+  const hasError = error !== null;
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-label="Formulaire de création de ticket">
         <div className="mb-4">
           <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-            Titre
+            Titre <span aria-label="requis">*</span>
           </label>
           <input
             type="text"
@@ -68,12 +70,16 @@ export default function CreateTicketForm() {
             onChange={e => setTitle(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isSubmitting}
+            aria-required="true"
+            aria-invalid={hasError && !title.trim()}
+            aria-describedby={hasError && !title.trim() ? 'form-error' : undefined}
+            autoComplete="off"
           />
         </div>
 
         <div className="mb-4">
           <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-            Description
+            Description <span aria-label="requis">*</span>
           </label>
           <textarea
             id="description"
@@ -82,17 +88,30 @@ export default function CreateTicketForm() {
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isSubmitting}
+            aria-required="true"
+            aria-invalid={hasError && !description.trim()}
+            aria-describedby={hasError && !description.trim() ? 'form-error' : undefined}
+            autoComplete="off"
           />
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+          <div
+            id="form-error"
+            className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm"
+            role="alert"
+            aria-live="assertive"
+          >
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md text-sm">
+          <div
+            className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md text-sm"
+            role="status"
+            aria-live="polite"
+          >
             Ticket créé avec succès !
           </div>
         )}
@@ -101,6 +120,7 @@ export default function CreateTicketForm() {
           type="submit"
           disabled={isSubmitting}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-busy={isSubmitting}
         >
           {isSubmitting ? 'Création en cours...' : 'Créer le ticket'}
         </button>

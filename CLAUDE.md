@@ -122,6 +122,183 @@ describe('MyComponent', () => {
 });
 ```
 
+## Accessibilité (a11y)
+
+### Principes obligatoires
+
+Tous les composants visuels DOIVENT respecter les standards d'accessibilité WCAG 2.1 niveau AA.
+
+### 1. Éléments sémantiques HTML
+
+Utiliser les balises sémantiques appropriées :
+
+```tsx
+// ✅ BON
+<article>
+  <header>
+    <h1>Titre</h1>
+  </header>
+  <nav aria-label="Navigation de retour">
+    <a href="/">Retour</a>
+  </nav>
+  <section aria-labelledby="description-heading">
+    <h2 id="description-heading">Description</h2>
+    <p>Contenu...</p>
+  </section>
+  <footer aria-label="Informations supplémentaires">
+    <time dateTime="2025-01-15T10:30:00">15/01/2025 à 10:30</time>
+  </footer>
+</article>
+
+// ❌ MAUVAIS
+<div>
+  <div>
+    <div>Titre</div>
+  </div>
+  <div>
+    <div>Retour</div>
+  </div>
+  <div>
+    <div>Description</div>
+    <div>Contenu...</div>
+  </div>
+  <div>
+    <div>15/01/2025 à 10:30</div>
+  </div>
+</div>
+```
+
+### 2. Attributs ARIA
+
+#### Rôles et labels
+
+```tsx
+// Liste de tickets
+<div role="list" aria-label="Liste de 5 tickets">
+  {tickets.map(ticket => <TicketCard key={ticket.id} ticket={ticket} />)}
+</div>
+
+// État vide
+<div role="status" aria-live="polite">
+  <p>Aucun ticket à afficher</p>
+</div>
+
+// Lien avec description
+<Link
+  href="/tickets/123"
+  aria-label="Voir le ticket : Réparer l'ascenseur - Statut : En cours"
+>
+  <article>...</article>
+</Link>
+```
+
+#### Formulaires
+
+```tsx
+// Champs requis
+<label htmlFor="title">
+  Titre <span aria-label="requis">*</span>
+</label>
+<input
+  id="title"
+  aria-required="true"
+  aria-invalid={hasError}
+  aria-describedby={hasError ? 'title-error' : undefined}
+/>
+{error && <div id="title-error" role="alert" aria-live="assertive">{error}</div>}
+
+// Bouton avec état de chargement
+<button
+  type="submit"
+  disabled={isSubmitting}
+  aria-busy={isSubmitting}
+>
+  {isSubmitting ? 'Création en cours...' : 'Créer le ticket'}
+</button>
+
+// Message de succès
+<div role="status" aria-live="polite">
+  Ticket créé avec succès !
+</div>
+```
+
+### 3. Focus et navigation au clavier
+
+```tsx
+// Focus visible avec Tailwind
+<Link
+  href="/"
+  className="text-blue-600 hover:text-blue-800
+    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+>
+  Retour
+</Link>
+
+// Éviter les tabindex positifs (toujours utiliser 0 ou -1)
+// ✅ BON
+<div role="button" tabIndex={0} onKeyDown={handleKeyDown}>...</div>
+
+// ❌ MAUVAIS
+<div role="button" tabIndex={1}>...</div>
+```
+
+### 4. Dates et heures
+
+Toujours utiliser l'élément `<time>` avec l'attribut `dateTime` :
+
+```tsx
+<time dateTime={ticket.createdAt.toISOString()}>{formatTicketDate(ticket.createdAt)}</time>
+```
+
+### 5. Tests d'accessibilité
+
+Chaque composant visuel DOIT avoir des tests d'accessibilité :
+
+```typescript
+describe('Accessibility', () => {
+  it('should have proper accessibility attributes and semantic elements', () => {
+    const { container } = render(<MyComponent />);
+
+    // Vérifier les aria-labels
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('aria-label', 'Description du lien');
+
+    // Vérifier les rôles
+    const alert = screen.getByRole('alert');
+    expect(alert).toBeInTheDocument();
+
+    // Vérifier les éléments sémantiques
+    const article = container.querySelector('article');
+    expect(article).toBeInTheDocument();
+
+    // Vérifier aria-live
+    const status = container.querySelector('[aria-live="polite"]');
+    expect(status).toBeInTheDocument();
+  });
+});
+```
+
+### 6. Checklist d'accessibilité
+
+Avant de livrer un composant, vérifier :
+
+- [ ] Utilisation d'éléments sémantiques HTML (`article`, `nav`, `header`, `footer`, `section`, `main`)
+- [ ] Tous les liens interactifs ont un `aria-label` descriptif
+- [ ] Tous les formulaires ont des labels associés (`htmlFor` / `id`)
+- [ ] Les champs requis ont `aria-required="true"`
+- [ ] Les erreurs ont `role="alert"` et `aria-live="assertive"`
+- [ ] Les succès ont `role="status"` et `aria-live="polite"`
+- [ ] Les états de chargement ont `aria-busy="true"`
+- [ ] Les dates utilisent `<time dateTime="...">`
+- [ ] Le focus est visible (ring Tailwind)
+- [ ] Les tests d'accessibilité sont présents et passent
+
+### Ressources
+
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
+- [MDN Accessibility](https://developer.mozilla.org/en-US/docs/Web/Accessibility)
+
 ## Fonctionnalités Principales
 
 ### Gestion des Tickets
@@ -199,3 +376,4 @@ Autres règles :
 - Tu ne dois jamais commiter sur Git, je le ferai toujours moi-même
 - Tu dois toujours mettre à jour le plan lorsque tu as implémenté une étape et/ou traité des tâches
 - Supprimer toujours les imports inutiles
+- Pour les assertions dans les tests unitaires, utilise au maximum des valeurs en durs, et pas des regexp ou des calculs

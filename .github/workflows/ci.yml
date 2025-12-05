@@ -9,6 +9,8 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
+    env:
+      TZ: Europe/Paris
 
     steps:
       - name: Checkout code

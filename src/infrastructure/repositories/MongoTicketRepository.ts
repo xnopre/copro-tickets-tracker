@@ -1,8 +1,10 @@
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { TicketModel, TicketDocument } from '../database/schemas/TicketSchema';
 import connectDB from '../database/mongodb';
+import { Types } from 'mongoose';
 
 export class MongoTicketRepository implements ITicketRepository {
   async findAll(): Promise<Ticket[]> {
@@ -10,6 +12,23 @@ export class MongoTicketRepository implements ITicketRepository {
     const documents = await TicketModel.find().sort({ createdAt: -1 });
 
     return documents.map(doc => this.mapToEntity(doc));
+  }
+
+  async findById(id: string): Promise<Ticket | null> {
+    await connectDB();
+
+    // Valider le format MongoDB ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      throw new InvalidIdError(id);
+    }
+
+    const document = await TicketModel.findById(id);
+
+    if (!document) {
+      return null;
+    }
+
+    return this.mapToEntity(document);
   }
 
   async create(data: CreateTicketData): Promise<Ticket> {
