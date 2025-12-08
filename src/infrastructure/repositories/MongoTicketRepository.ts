@@ -1,5 +1,5 @@
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
-import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
+import { Ticket, CreateTicketData, UpdateTicketData } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { TicketModel, TicketDocument } from '../database/schemas/TicketSchema';
@@ -42,12 +42,37 @@ export class MongoTicketRepository implements ITicketRepository {
     return this.mapToEntity(document);
   }
 
+  async update(id: string, data: UpdateTicketData): Promise<Ticket | null> {
+    await connectDB();
+
+    // Valider le format MongoDB ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      throw new InvalidIdError(id);
+    }
+
+    const document = await TicketModel.findByIdAndUpdate(
+      id,
+      {
+        status: data.status,
+        assignedTo: data.assignedTo,
+      },
+      { new: true }
+    );
+
+    if (!document) {
+      return null;
+    }
+
+    return this.mapToEntity(document);
+  }
+
   private mapToEntity(document: TicketDocument): Ticket {
     return {
       id: document._id.toString(),
       title: document.title,
       description: document.description,
       status: document.status,
+      assignedTo: document.assignedTo,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     };

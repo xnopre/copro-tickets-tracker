@@ -21,22 +21,26 @@ async function seed() {
         title: "Fuite d'eau dans le hall",
         description: "Une fuite d'eau a été détectée dans le hall d'entrée au niveau du plafond",
         status: TicketStatus.NEW,
+        assignedTo: null,
       },
       {
         title: 'Panne ascenseur',
         description: "L'ascenseur principal est en panne depuis ce matin",
         status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
       },
       {
         title: 'Ampoule grillée parking',
         description: "L'éclairage au niveau -1 du parking est défectueux",
         status: TicketStatus.RESOLVED,
+        assignedTo: 'Marie Dubois',
       },
       {
         title: "Porte d'entrée défectueuse",
         description:
           "La porte d'entrée principale ne se fermait plus correctement. Réparation effectuée et vérifiée",
         status: TicketStatus.CLOSED,
+        assignedTo: 'Pierre Lefebvre',
       },
     ];
 

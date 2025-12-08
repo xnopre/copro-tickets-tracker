@@ -13,6 +13,7 @@ describe('TicketService', () => {
       findAll: vi.fn(),
       findById: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
     };
     ticketService = new TicketService(mockRepository);
   });
@@ -25,6 +26,7 @@ describe('TicketService', () => {
           title: 'Ticket 1',
           description: 'Description 1',
           status: TicketStatus.NEW,
+          assignedTo: null,
           createdAt: new Date('2025-01-15'),
           updatedAt: new Date('2025-01-15'),
         },
@@ -33,6 +35,7 @@ describe('TicketService', () => {
           title: 'Ticket 2',
           description: 'Description 2',
           status: TicketStatus.IN_PROGRESS,
+          assignedTo: 'Jean Martin',
           createdAt: new Date('2025-01-16'),
           updatedAt: new Date('2025-01-16'),
         },
@@ -68,6 +71,7 @@ describe('TicketService', () => {
         title: 'New Ticket',
         description: 'New Description',
         status: TicketStatus.NEW,
+        assignedTo: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -140,6 +144,7 @@ describe('TicketService', () => {
         title: 'Spaced Title',
         description: 'Spaced Description',
         status: TicketStatus.NEW,
+        assignedTo: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -162,6 +167,7 @@ describe('TicketService', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
+        assignedTo: null,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-15'),
       };
@@ -183,6 +189,98 @@ describe('TicketService', () => {
       expect(result).toBeNull();
       expect(mockRepository.findById).toHaveBeenCalledWith('non-existent-id');
       expect(mockRepository.findById).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('updateTicket', () => {
+    it('should update a ticket with valid data', async () => {
+      const updateData = {
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
+      };
+
+      const mockUpdatedTicket: Ticket = {
+        id: '123',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
+        createdAt: new Date('2025-01-15'),
+        updatedAt: new Date('2025-01-16'),
+      };
+
+      vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
+
+      const result = await ticketService.updateTicket('123', updateData);
+
+      expect(result).toEqual(mockUpdatedTicket);
+      expect(mockRepository.update).toHaveBeenCalledWith('123', updateData);
+      expect(mockRepository.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when ticket not found', async () => {
+      const updateData = {
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
+      };
+
+      vi.mocked(mockRepository.update).mockResolvedValue(null);
+
+      const result = await ticketService.updateTicket('non-existent-id', updateData);
+
+      expect(result).toBeNull();
+      expect(mockRepository.update).toHaveBeenCalledWith('non-existent-id', updateData);
+      expect(mockRepository.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should update ticket status to RESOLVED', async () => {
+      const updateData = {
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Marie Dupont',
+      };
+
+      const mockUpdatedTicket: Ticket = {
+        id: '456',
+        title: 'Bug Fix',
+        description: 'Fix the login issue',
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Marie Dupont',
+        createdAt: new Date('2025-01-10'),
+        updatedAt: new Date('2025-01-16'),
+      };
+
+      vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
+
+      const result = await ticketService.updateTicket('456', updateData);
+
+      expect(result).toEqual(mockUpdatedTicket);
+      expect(result?.status).toBe(TicketStatus.RESOLVED);
+      expect(result?.assignedTo).toBe('Marie Dupont');
+    });
+
+    it('should update ticket status to CLOSED', async () => {
+      const updateData = {
+        status: TicketStatus.CLOSED,
+        assignedTo: 'Admin',
+      };
+
+      const mockUpdatedTicket: Ticket = {
+        id: '789',
+        title: 'Completed Task',
+        description: 'Task completed successfully',
+        status: TicketStatus.CLOSED,
+        assignedTo: 'Admin',
+        createdAt: new Date('2025-01-05'),
+        updatedAt: new Date('2025-01-16'),
+      };
+
+      vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
+
+      const result = await ticketService.updateTicket('789', updateData);
+
+      expect(result).toEqual(mockUpdatedTicket);
+      expect(result?.status).toBe(TicketStatus.CLOSED);
+      expect(result?.assignedTo).toBe('Admin');
     });
   });
 });

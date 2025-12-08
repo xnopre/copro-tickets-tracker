@@ -28,6 +28,11 @@ export default function TicketCard({ ticket }: TicketCardProps) {
           </span>
         </div>
         <p className="text-gray-600 text-sm mb-4">{ticket.description}</p>
+        {ticket.assignedTo && (
+          <div className="mb-3 text-sm text-gray-700">
+            <span className="font-medium">Assigné à :</span> {ticket.assignedTo}
+          </div>
+        )}
         <div className="flex justify-between text-xs text-gray-500">
           <time dateTime={ticket.createdAt.toISOString()}>Créé le {formattedCreatedAt}</time>
           <time dateTime={ticket.updatedAt.toISOString()}>Modifié le {formattedUpdatedAt}</time>

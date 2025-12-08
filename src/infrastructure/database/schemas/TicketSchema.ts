@@ -5,6 +5,7 @@ export interface TicketDocument extends Document {
   title: string;
   description: string;
   status: TicketStatus;
+  assignedTo: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,10 @@ const ticketSchema = new Schema<TicketDocument>(
       enum: Object.values(TicketStatus),
       default: TicketStatus.NEW,
       required: true,
+    },
+    assignedTo: {
+      type: String,
+      default: null,
     },
   },
   {

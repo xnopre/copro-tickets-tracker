@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import TicketDetail from './TicketDetail';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+
+const mockRouterRefresh = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    refresh: mockRouterRefresh,
+  }),
+}));
 
 describe('TicketDetail', () => {
   const mockTicket: Ticket = {
@@ -10,6 +18,7 @@ describe('TicketDetail', () => {
     title: 'Test Ticket',
     description: 'This is a detailed test ticket description',
     status: TicketStatus.NEW,
+    assignedTo: null,
     createdAt: new Date('2025-01-15T10:30:00'),
     updatedAt: new Date('2025-01-20T14:45:00'),
   };
@@ -35,33 +44,41 @@ describe('TicketDetail', () => {
     {
       status: TicketStatus.NEW,
       label: 'Nouveau',
+      ariaLabel: 'Statut du ticket : Nouveau',
       bgClass: 'bg-blue-100',
       textClass: 'text-blue-800',
     },
     {
       status: TicketStatus.IN_PROGRESS,
       label: 'En cours',
+      ariaLabel: 'Statut du ticket : En cours',
       bgClass: 'bg-yellow-100',
       textClass: 'text-yellow-800',
     },
     {
       status: TicketStatus.RESOLVED,
       label: 'Résolu',
+      ariaLabel: 'Statut du ticket : Résolu',
       bgClass: 'bg-green-100',
       textClass: 'text-green-800',
     },
     {
       status: TicketStatus.CLOSED,
       label: 'Fermé',
+      ariaLabel: 'Statut du ticket : Fermé',
       bgClass: 'bg-gray-100',
       textClass: 'text-gray-800',
     },
-  ])('should apply correct color for $status status', ({ status, label, bgClass, textClass }) => {
-    const ticket = { ...mockTicket, status };
-    render(<TicketDetail ticket={ticket} />);
-    const badge = screen.getByText(label);
-    expect(badge).toHaveClass(bgClass, textClass);
-  });
+  ])(
+    'should apply correct color for $status status',
+    ({ status, label, ariaLabel, bgClass, textClass }) => {
+      const ticket = { ...mockTicket, status };
+      render(<TicketDetail ticket={ticket} />);
+      const badge = screen.getByLabelText(ariaLabel);
+      expect(badge).toHaveTextContent(label);
+      expect(badge).toHaveClass(bgClass, textClass);
+    }
+  );
 
   describe('Accessibility', () => {
     it('should have proper aria-label on back link', () => {
@@ -108,7 +125,7 @@ describe('TicketDetail', () => {
       const { container } = render(<TicketDetail ticket={mockTicket} />);
       const footer = container.querySelector('footer');
       expect(footer).toBeInTheDocument();
-      expect(footer).toHaveAttribute('aria-label', 'Informations sur les dates');
+      expect(footer).toHaveAttribute('aria-label', 'Informations supplémentaires');
     });
   });
 });
