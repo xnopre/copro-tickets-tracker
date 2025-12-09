@@ -23,12 +23,14 @@ export default function UpdateTicketStatusForm({
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
+  const trimmedAssignedTo = assignedTo.trim();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
-    if (!assignedTo.trim()) {
+    if (!trimmedAssignedTo) {
       setError('Le nom de la personne assignée est requis');
       return;
     }
@@ -41,7 +43,7 @@ export default function UpdateTicketStatusForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ status, assignedTo: assignedTo.trim() }),
+        body: JSON.stringify({ status, assignedTo: trimmedAssignedTo }),
       });
 
       const data = await response.json();
@@ -98,8 +100,8 @@ export default function UpdateTicketStatusForm({
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isSubmitting}
             aria-required="true"
-            aria-invalid={hasError && !assignedTo.trim()}
-            aria-describedby={hasError && !assignedTo.trim() ? 'form-error' : undefined}
+            aria-invalid={hasError && !trimmedAssignedTo}
+            aria-describedby={hasError && !trimmedAssignedTo ? 'form-error' : undefined}
             autoComplete="off"
           />
         </div>

@@ -254,8 +254,6 @@ describe('TicketService', () => {
       const result = await ticketService.updateTicket('456', updateData);
 
       expect(result).toEqual(mockUpdatedTicket);
-      expect(result?.status).toBe(TicketStatus.RESOLVED);
-      expect(result?.assignedTo).toBe('Marie Dupont');
     });
 
     it('should update ticket status to CLOSED', async () => {
@@ -279,8 +277,6 @@ describe('TicketService', () => {
       const result = await ticketService.updateTicket('789', updateData);
 
       expect(result).toEqual(mockUpdatedTicket);
-      expect(result?.status).toBe(TicketStatus.CLOSED);
-      expect(result?.assignedTo).toBe('Admin');
     });
   });
 });
