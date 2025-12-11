@@ -8,6 +8,7 @@ describe('GetTickets', () => {
     findAll: vi.fn(),
     findById: vi.fn(),
     create: vi.fn(),
+    update: vi.fn(),
   };
 
   it('should return all tickets', async () => {
@@ -17,6 +18,7 @@ describe('GetTickets', () => {
         title: 'Ticket 1',
         description: 'Description 1',
         status: TicketStatus.NEW,
+        assignedTo: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -25,6 +27,7 @@ describe('GetTickets', () => {
         title: 'Ticket 2',
         description: 'Description 2',
         status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
         createdAt: new Date(),
         updatedAt: new Date(),
       },

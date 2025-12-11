@@ -15,6 +15,7 @@ vi.mock('../database/schemas/TicketSchema', () => ({
     findById: vi.fn(),
     find: vi.fn(),
     create: vi.fn(),
+    findByIdAndUpdate: vi.fn(),
   },
 }));
 
@@ -243,6 +244,166 @@ describe('MongoTicketRepository', () => {
 
       expect(result.id).toBe('507f1f77bcf86cd799439015');
       expect(typeof result.id).toBe('string');
+    });
+  });
+
+  describe('update', () => {
+    it('should throw InvalidIdError for invalid ObjectId format', async () => {
+      const updateData = {
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+      };
+
+      await expect(repository.update('abc', updateData)).rejects.toThrow(InvalidIdError);
+      await expect(repository.update('abc', updateData)).rejects.toThrow('Invalid ID format: abc');
+      await expect(repository.update('123', updateData)).rejects.toThrow(InvalidIdError);
+      await expect(repository.update('', updateData)).rejects.toThrow(InvalidIdError);
+    });
+
+    it('should return null when ticket does not exist', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Marie Martin',
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(null);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).toBeNull();
+      expect(TicketModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        validObjectId,
+        {
+          status: TicketStatus.RESOLVED,
+          assignedTo: 'Marie Martin',
+        },
+        { new: true, runValidators: true }
+      );
+    });
+
+    it('should update ticket with valid data', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-20T14:30:00.000Z'),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).toEqual({
+        id: validObjectId,
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+        createdAt: mockDocument.createdAt,
+        updatedAt: mockDocument.updatedAt,
+      });
+    });
+
+    it('should call findByIdAndUpdate with correct options', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Pierre Durand',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Pierre Durand',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      await repository.update(validObjectId, updateData);
+
+      expect(TicketModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        validObjectId,
+        {
+          status: TicketStatus.RESOLVED,
+          assignedTo: 'Pierre Durand',
+        },
+        { new: true, runValidators: true }
+      );
+    });
+
+    it('should update ticket to CLOSED status', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        status: TicketStatus.CLOSED,
+        assignedTo: 'Sophie Bernard',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Closed Ticket',
+        description: 'This ticket is now closed',
+        status: TicketStatus.CLOSED,
+        assignedTo: 'Sophie Bernard',
+        createdAt: new Date('2025-01-10T09:00:00.000Z'),
+        updatedAt: new Date('2025-01-25T16:00:00.000Z'),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).not.toBeNull();
+      expect(result?.status).toBe(TicketStatus.CLOSED);
+      expect(result?.assignedTo).toBe('Sophie Bernard');
+    });
+
+    it('should map document fields correctly', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Test User',
+      };
+
+      const createdDate = new Date('2025-01-01T10:00:00.000Z');
+      const updatedDate = new Date('2025-01-20T15:30:00.000Z');
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Original Title',
+        description: 'Original Description',
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Test User',
+        createdAt: createdDate,
+        updatedAt: updatedDate,
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).toEqual({
+        id: validObjectId,
+        title: 'Original Title',
+        description: 'Original Description',
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Test User',
+        createdAt: createdDate,
+        updatedAt: updatedDate,
+      });
     });
   });
 });

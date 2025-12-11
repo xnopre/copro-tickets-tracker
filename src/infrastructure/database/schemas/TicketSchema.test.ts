@@ -22,6 +22,7 @@ describe('Ticket Schema', () => {
       expect(savedTicket.title).toBe(ticketData.title);
       expect(savedTicket.description).toBe(ticketData.description);
       expect(savedTicket.status).toBe(ticketData.status);
+      expect(savedTicket.assignedTo).toBeNull();
       expect(savedTicket.createdAt).toBeInstanceOf(Date);
       expect(savedTicket.updatedAt).toBeInstanceOf(Date);
     });
@@ -104,6 +105,51 @@ describe('Ticket Schema', () => {
       const savedTicket = await ticket.save();
 
       expect(savedTicket.status).toBe(TicketStatus.NEW);
+    });
+  });
+
+  describe('Assigned To Field', () => {
+    it('should have null as default assignedTo', async () => {
+      const ticketData = {
+        title: 'Test Ticket',
+        description: 'Test Description',
+      };
+
+      const ticket = new TicketModel(ticketData);
+      const savedTicket = await ticket.save();
+
+      expect(savedTicket.assignedTo).toBeNull();
+    });
+
+    it('should create a ticket with assignedTo', async () => {
+      const ticketData = {
+        title: 'Test Ticket',
+        description: 'Test Description',
+        assignedTo: 'Jean Martin',
+      };
+
+      const ticket = new TicketModel(ticketData);
+      const savedTicket = await ticket.save();
+
+      expect(savedTicket.assignedTo).toBe('Jean Martin');
+    });
+
+    it('should allow updating assignedTo', async () => {
+      const ticketData = {
+        title: 'Test Ticket',
+        description: 'Test Description',
+        assignedTo: null,
+      };
+
+      const ticket = new TicketModel(ticketData);
+      const savedTicket = await ticket.save();
+
+      expect(savedTicket.assignedTo).toBeNull();
+
+      savedTicket.assignedTo = 'Marie Dubois';
+      const updatedTicket = await savedTicket.save();
+
+      expect(updatedTicket.assignedTo).toBe('Marie Dubois');
     });
   });
 
