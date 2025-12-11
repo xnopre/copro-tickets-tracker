@@ -619,8 +619,13 @@ app/                          # Next.js (convention)
 **Tests** :
 
 - Tous les mocks de tests mis à jour avec le champ `assignedTo`
-- 128 tests passants au total
+- 141 tests passants au total (après amélioration de MongoTicketRepository)
 - Script seed mis à jour avec des assignations exemple
+
+**Optimisation MongoTicketRepository** :
+
+- Ajout de `runValidators: true` dans `findByIdAndUpdate` pour garantir l'exécution des validateurs Mongoose lors de la mise à jour
+- Option `{ new: true, runValidators: true }` assure la cohérence des données et la validation automatique
 
 ---
 

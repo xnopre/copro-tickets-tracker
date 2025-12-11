@@ -56,7 +56,7 @@ export class MongoTicketRepository implements ITicketRepository {
         status: data.status,
         assignedTo: data.assignedTo,
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!document) {
