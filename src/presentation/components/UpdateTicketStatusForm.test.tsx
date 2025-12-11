@@ -191,12 +191,23 @@ describe('UpdateTicketStatusForm', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have proper accessibility attributes', () => {
-      render(<UpdateTicketStatusForm {...defaultProps} />);
+    it('should have proper accessibility attributes and semantic elements', () => {
+      const { container } = render(<UpdateTicketStatusForm {...defaultProps} />);
 
-      const form = screen.getByRole('form', { name: 'Formulaire de mise à jour du statut' });
+      // Vérifier la section avec aria-labelledby
+      const section = container.querySelector('section[aria-labelledby="update-ticket-heading"]');
+      expect(section).toBeInTheDocument();
+
+      // Vérifier le titre avec id
+      const heading = container.querySelector('#update-ticket-heading');
+      expect(heading).toBeInTheDocument();
+      expect(heading).toHaveTextContent('Mettre à jour le ticket');
+
+      // Vérifier que le formulaire est présent
+      const form = container.querySelector('form');
       expect(form).toBeInTheDocument();
 
+      // Vérifier les attributs aria-required (existant)
       const statusSelect = screen.getByLabelText(/Statut/);
       expect(statusSelect).toHaveAttribute('aria-required', 'true');
 

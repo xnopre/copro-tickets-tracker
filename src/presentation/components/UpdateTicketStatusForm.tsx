@@ -64,9 +64,14 @@ export default function UpdateTicketStatusForm({
   const hasError = error !== null;
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-      <h2 className="text-xl font-semibold mb-4">Mettre à jour le ticket</h2>
-      <form onSubmit={handleSubmit} aria-label="Formulaire de mise à jour du statut">
+    <section
+      className="bg-white rounded-lg shadow-md p-6 mt-6"
+      aria-labelledby="update-ticket-heading"
+    >
+      <h2 id="update-ticket-heading" className="text-xl font-semibold mb-4">
+        Mettre à jour le ticket
+      </h2>
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
             Statut <span aria-label="requis">*</span>
@@ -102,7 +107,6 @@ export default function UpdateTicketStatusForm({
             aria-required="true"
             aria-invalid={hasError && !trimmedAssignedTo}
             aria-describedby={hasError && !trimmedAssignedTo ? 'form-error' : undefined}
-            autoComplete="off"
           />
         </div>
 
@@ -136,6 +140,6 @@ export default function UpdateTicketStatusForm({
           {isSubmitting ? 'Mise à jour en cours...' : 'Mettre à jour'}
         </button>
       </form>
-    </div>
+    </section>
   );
 }
