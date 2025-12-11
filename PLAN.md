@@ -568,7 +568,8 @@ app/                          # Next.js (convention)
 - [x] Afficher la personne assignée dans la carte ticket et le détail
 - [x] Mettre à jour le statut et l'assignation via l'API
 - [x] Revalider les données Next.js pour refresh (router.refresh())
-- [x] Mettre à jour les tests existants (128 tests passants)
+- [x] Mettre à jour les tests existants (145 tests passants)
+- [x] Créer tests unitaires pour le use case UpdateTicket (4 tests)
 - [ ] Déployer
 
 ### Validation
@@ -580,7 +581,7 @@ app/                          # Next.js (convention)
 - ✅ Le nouveau statut et la personne assignée apparaissent dans la liste et le détail
 - ✅ Les couleurs changent selon le statut
 - ✅ L'architecture hexagonale est respectée
-- ✅ Tous les tests passent (128/128)
+- ✅ Tous les tests passent (145/145)
 - ✅ Le build TypeScript et Next.js fonctionnent
 - ⏳ Déployé en production (en attente)
 
@@ -619,8 +620,13 @@ app/                          # Next.js (convention)
 **Tests** :
 
 - Tous les mocks de tests mis à jour avec le champ `assignedTo`
-- 141 tests passants au total (après amélioration de MongoTicketRepository)
+- 145 tests passants au total (après amélioration de MongoTicketRepository)
 - Script seed mis à jour avec des assignations exemple
+- Tests unitaires dédiés pour le use case `UpdateTicket` (4 tests)
+  - Test de mise à jour avec données valides
+  - Test retour null quand ticket non trouvé
+  - Test mise à jour vers RESOLVED
+  - Test mise à jour vers CLOSED
 
 **Optimisation MongoTicketRepository** :
 
