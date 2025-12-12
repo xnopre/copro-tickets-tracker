@@ -5,19 +5,14 @@ import { server } from '../../../vitest.setup';
 import UpdateTicketStatusForm from './UpdateTicketStatusForm';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
-const mockRouterRefresh = vi.fn();
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    refresh: mockRouterRefresh,
-  }),
-}));
-
 describe('UpdateTicketStatusForm', () => {
+  const mockOnTicketUpdated = vi.fn();
+
   const defaultProps = {
     ticketId: '123',
     currentStatus: TicketStatus.NEW,
     currentAssignedTo: null,
+    onTicketUpdated: mockOnTicketUpdated,
   };
 
   beforeEach(() => {
@@ -38,6 +33,7 @@ describe('UpdateTicketStatusForm', () => {
         ticketId="123"
         currentStatus={TicketStatus.IN_PROGRESS}
         currentAssignedTo="Jean Martin"
+        onTicketUpdated={mockOnTicketUpdated}
       />
     );
 
@@ -77,6 +73,9 @@ describe('UpdateTicketStatusForm', () => {
 
   describe('Form Submission', () => {
     it('should update ticket successfully', async () => {
+      const mockCreatedAt = new Date('2025-01-10T10:00:00.000Z');
+      const mockUpdatedAt = new Date('2025-01-15T12:00:00.000Z');
+
       server.use(
         http.patch('/api/tickets/123', () => {
           return HttpResponse.json({
@@ -85,8 +84,8 @@ describe('UpdateTicketStatusForm', () => {
             description: 'Test Description',
             status: TicketStatus.IN_PROGRESS,
             assignedTo: 'Jean Martin',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: mockCreatedAt.toISOString(),
+            updatedAt: mockUpdatedAt.toISOString(),
           });
         })
       );
@@ -106,7 +105,16 @@ describe('UpdateTicketStatusForm', () => {
         expect(screen.getByText('Ticket mis à jour avec succès !')).toBeInTheDocument();
       });
 
-      expect(mockRouterRefresh).toHaveBeenCalled();
+      expect(mockOnTicketUpdated).toHaveBeenCalledTimes(1);
+      expect(mockOnTicketUpdated).toHaveBeenCalledWith({
+        id: '123',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Martin',
+        createdAt: mockCreatedAt,
+        updatedAt: mockUpdatedAt,
+      });
     });
 
     it('should show error when API request fails', async () => {
