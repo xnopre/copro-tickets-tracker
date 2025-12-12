@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Comment } from '@/domain/entities/Comment';
 import CommentList from './CommentList';
 import AddCommentForm from './AddCommentForm';
@@ -14,7 +14,7 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -34,11 +34,11 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [ticketId]);
 
   useEffect(() => {
     fetchComments();
-  }, [ticketId]);
+  }, [fetchComments]);
 
   if (isLoading) {
     return (
