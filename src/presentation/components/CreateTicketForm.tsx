@@ -43,9 +43,10 @@ export default function CreateTicketForm() {
         throw new Error(data.error || 'Erreur lors de la création du ticket');
       }
 
+      // Rediriger vers la page de détail du ticket créé (pas de race condition)
       setSuccess(true);
       setTimeout(() => {
-        router.push('/');
+        router.push(`/tickets/${data.id}`);
       }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la création du ticket');
