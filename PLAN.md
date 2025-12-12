@@ -644,16 +644,36 @@ app/                          # Next.js (convention)
 - Liste des commentaires sous le détail du ticket
 - Formulaire pour ajouter un commentaire
 - Les commentaires sont horodatés
+- Architecture hexagonale complète
+- Tests unitaires et d'intégration
 
 ### Tâches
 
-- [ ] Créer le type TypeScript `Comment`
-- [ ] Créer le schéma Mongoose pour Comment
-- [ ] Créer l'API route `GET /api/tickets/[id]/comments`
-- [ ] Créer l'API route `POST /api/tickets/[id]/comments`
-- [ ] Créer le composant `CommentList` avec tests
-- [ ] Créer le composant `AddCommentForm` avec tests
-- [ ] Afficher les commentaires dans la page de détail
+- [x] Créer l'entité Comment dans le domain
+  - [x] Interface Comment avec ticketId, content, author, createdAt
+  - [x] Interface CreateCommentData
+- [x] Créer le schéma Mongoose pour Comment
+  - [x] Index sur ticketId pour optimiser les recherches
+  - [x] Timestamps avec createdAt uniquement
+- [x] Créer l'architecture hexagonale
+  - [x] Interface ICommentRepository (findByTicketId, create)
+  - [x] MongoCommentRepository
+  - [x] Use cases GetComments et AddComment
+  - [x] CommentService
+  - [x] ServiceFactory.getCommentService()
+- [x] Créer l'API route `GET /api/tickets/[id]/comments`
+- [x] Créer l'API route `POST /api/tickets/[id]/comments`
+- [x] Créer les composants avec tests
+  - [x] CommentCard (affichage d'un commentaire)
+  - [x] CommentList (liste des commentaires)
+  - [x] AddCommentForm (formulaire d'ajout)
+  - [x] TicketComments (composant client orchestrateur)
+- [x] Afficher les commentaires dans la page de détail
+- [x] Tests unitaires (202 tests au total, +27 nouveaux tests)
+  - [x] Tests use cases AddComment et GetComments (9 tests)
+  - [x] Tests composants CommentCard, CommentList, AddCommentForm (22 tests)
+  - [x] Tests API routes (10 tests)
+- [x] Build TypeScript et Next.js réussis
 - [ ] Déployer
 
 ### Validation
@@ -662,6 +682,38 @@ app/                          # Next.js (convention)
 - ✅ On peut ajouter un nouveau commentaire
 - ✅ Le commentaire apparaît immédiatement
 - ✅ Les dates sont affichées correctement
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent (202/202)
+- ✅ Build TypeScript et Next.js réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Architecture hexagonale** :
+
+- Entité `Comment` dans le domain (code métier pur)
+- Use cases `GetComments` et `AddComment` avec validation
+- Repository `MongoCommentRepository` implémente `ICommentRepository`
+- `CommentService` orchestre les use cases
+
+**Composants** :
+
+- `CommentCard` : affiche un commentaire individuel avec auteur, contenu et date
+- `CommentList` : affiche la liste des commentaires avec état vide
+- `AddCommentForm` : formulaire avec validation client et serveur
+- `TicketComments` : composant client qui gère le state et le refresh
+
+**Validation** :
+
+- Content : requis, max 2000 caractères
+- Author : requis, max 100 caractères
+- TicketId : validé côté serveur (format MongoDB ObjectId)
+
+**Accessibilité** :
+
+- Éléments sémantiques (article, header, time)
+- Attributs ARIA (role="list", aria-label, aria-live)
+- Formulaire accessible avec labels et messages d'erreur
 
 ---
 
