@@ -17,10 +17,13 @@ const commentSchema = new Schema<CommentDocument>(
     content: {
       type: String,
       required: true,
+      maxlength: 2000,
+      trim: true,
     },
     author: {
       type: String,
       required: true,
+      maxlength: 100,
       trim: true,
     },
   },

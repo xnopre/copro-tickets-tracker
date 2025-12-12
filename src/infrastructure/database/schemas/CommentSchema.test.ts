@@ -70,7 +70,7 @@ describe('Comment Schema', () => {
       expect(savedComment.author).toBe('Jean Dupont');
     });
 
-    it('should preserve content without trimming', async () => {
+    it('should automatically trim the content field', async () => {
       const commentData = {
         ticketId: '507f1f77bcf86cd799439011',
         content: '  Indented content  ',
@@ -80,7 +80,7 @@ describe('Comment Schema', () => {
       const comment = new CommentModel(commentData);
       const savedComment = await comment.save();
 
-      expect(savedComment.content).toBe('  Indented content  ');
+      expect(savedComment.content).toBe('Indented content');
     });
   });
 
@@ -177,6 +177,64 @@ describe('Comment Schema', () => {
       const savedComment = await comment.save();
 
       expect(savedComment.content).toBe(multilineContent);
+    });
+
+    it('should fail validation if content exceeds 2000 characters', async () => {
+      const tooLongContent = 'A'.repeat(2001);
+      const commentData = {
+        ticketId: '507f1f77bcf86cd799439011',
+        content: tooLongContent,
+        author: 'Jean Dupont',
+      };
+
+      const comment = new CommentModel(commentData);
+
+      await expect(comment.save()).rejects.toThrow();
+    });
+
+    it('should accept content with exactly 2000 characters', async () => {
+      const maxContent = 'A'.repeat(2000);
+      const commentData = {
+        ticketId: '507f1f77bcf86cd799439011',
+        content: maxContent,
+        author: 'Jean Dupont',
+      };
+
+      const comment = new CommentModel(commentData);
+      const savedComment = await comment.save();
+
+      expect(savedComment.content).toBe(maxContent);
+      expect(savedComment.content.length).toBe(2000);
+    });
+  });
+
+  describe('Author Field', () => {
+    it('should fail validation if author exceeds 100 characters', async () => {
+      const tooLongAuthor = 'A'.repeat(101);
+      const commentData = {
+        ticketId: '507f1f77bcf86cd799439011',
+        content: 'Test comment',
+        author: tooLongAuthor,
+      };
+
+      const comment = new CommentModel(commentData);
+
+      await expect(comment.save()).rejects.toThrow();
+    });
+
+    it('should accept author with exactly 100 characters', async () => {
+      const maxAuthor = 'A'.repeat(100);
+      const commentData = {
+        ticketId: '507f1f77bcf86cd799439011',
+        content: 'Test comment',
+        author: maxAuthor,
+      };
+
+      const comment = new CommentModel(commentData);
+      const savedComment = await comment.save();
+
+      expect(savedComment.author).toBe(maxAuthor);
+      expect(savedComment.author.length).toBe(100);
     });
   });
 });
