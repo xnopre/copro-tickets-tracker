@@ -53,6 +53,8 @@ describe('AddCommentForm', () => {
 
   describe('Form submission', () => {
     it('should create comment successfully when form is valid', async () => {
+      const mockCreatedAt = new Date('2025-01-15T10:30:00.000Z');
+
       server.use(
         http.post('/api/tickets/:id/comments', async () => {
           return HttpResponse.json({
@@ -60,7 +62,7 @@ describe('AddCommentForm', () => {
             ticketId: ticketId,
             content: 'Test comment',
             author: 'Jean Martin',
-            createdAt: new Date().toISOString(),
+            createdAt: mockCreatedAt.toISOString(),
           });
         })
       );
@@ -81,12 +83,14 @@ describe('AddCommentForm', () => {
         expect(screen.getByText('Commentaire ajouté avec succès !')).toBeInTheDocument();
       });
 
-      await waitFor(
-        () => {
-          expect(mockOnCommentAdded).toHaveBeenCalledTimes(1);
-        },
-        { timeout: 1000 }
-      );
+      expect(mockOnCommentAdded).toHaveBeenCalledTimes(1);
+      expect(mockOnCommentAdded).toHaveBeenCalledWith({
+        id: 'comment-1',
+        ticketId: ticketId,
+        content: 'Test comment',
+        author: 'Jean Martin',
+        createdAt: mockCreatedAt,
+      });
     });
 
     it('should clear form after successful submission', async () => {

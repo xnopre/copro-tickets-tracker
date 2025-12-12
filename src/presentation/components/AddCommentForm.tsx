@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { Comment } from '@/domain/entities/Comment';
 
 interface AddCommentFormProps {
   ticketId: string;
-  onCommentAdded: () => void;
+  onCommentAdded: (comment: Comment) => void;
 }
 
 export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentFormProps) {
@@ -46,14 +47,23 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
         throw new Error(data.error || "Erreur lors de l'ajout du commentaire");
       }
 
+      // Convertir la date ISO string en Date
+      const comment: Comment = {
+        ...data,
+        createdAt: new Date(data.createdAt),
+      };
+
       setSuccess(true);
       setContent('');
       setAuthor('');
 
+      // Ajouter le commentaire immédiatement (pas de race condition)
+      onCommentAdded(comment);
+
+      // Masquer le message de succès après 2 secondes
       setTimeout(() => {
         setSuccess(false);
-        onCommentAdded();
-      }, 500);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'ajout du commentaire");
     } finally {

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import TicketComments from './TicketComments';
+import { Comment } from '@/domain/entities/Comment';
 
 // Mock CommentList
 vi.mock('./CommentList', () => ({
@@ -17,9 +19,27 @@ vi.mock('./CommentList', () => ({
 
 // Mock AddCommentForm
 vi.mock('./AddCommentForm', () => ({
-  default: ({ ticketId, onCommentAdded }: { ticketId: string; onCommentAdded: () => void }) => (
+  default: ({
+    ticketId,
+    onCommentAdded,
+  }: {
+    ticketId: string;
+    onCommentAdded: (comment: Comment) => void;
+  }) => (
     <div data-testid="add-comment-form" data-ticket-id={ticketId}>
-      <button onClick={onCommentAdded}>Add Comment</button>
+      <button
+        onClick={() =>
+          onCommentAdded({
+            id: 'new-comment',
+            ticketId,
+            content: 'New comment',
+            author: 'Test User',
+            createdAt: new Date('2025-01-15T12:00:00.000Z'),
+          })
+        }
+      >
+        Add Comment
+      </button>
     </div>
   ),
 }));
@@ -220,5 +240,46 @@ describe('TicketComments', () => {
       const alert = screen.getByRole('alert');
       expect(alert).toBeInTheDocument();
     });
+  });
+
+  it('should add new comment to list without refetching when comment is added', async () => {
+    const mockComments = [
+      {
+        id: '1',
+        ticketId: '123',
+        content: 'Existing comment',
+        author: 'Jean Dupont',
+        createdAt: '2025-01-15T10:00:00.000Z',
+      },
+    ];
+
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      json: async () => mockComments,
+    } as Response);
+
+    render(<TicketComments ticketId="123" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Commentaires (1)')).toBeInTheDocument();
+    });
+
+    // Clear fetch mock to ensure no refetch happens
+    vi.mocked(global.fetch).mockClear();
+
+    // Click the Add Comment button (which triggers onCommentAdded with mock data)
+    const addButton = screen.getByText('Add Comment');
+    fireEvent.click(addButton);
+
+    // Should update count without refetching
+    await waitFor(() => {
+      expect(screen.getByText('Commentaires (2)')).toBeInTheDocument();
+    });
+
+    // Verify no fetch was called (no refetch)
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    // Verify the new comment is displayed
+    expect(screen.getByTestId('comment-new-comment')).toHaveTextContent('New comment');
   });
 });

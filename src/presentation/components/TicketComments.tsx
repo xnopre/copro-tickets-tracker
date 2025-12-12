@@ -40,6 +40,10 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
     fetchComments();
   }, [fetchComments]);
 
+  const handleCommentAdded = useCallback((newComment: Comment) => {
+    setComments(prevComments => [...prevComments, newComment]);
+  }, []);
+
   if (isLoading) {
     return (
       <div className="text-center py-8" role="status" aria-live="polite">
@@ -64,7 +68,7 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
 
       <div className="space-y-6">
         <CommentList comments={comments} />
-        <AddCommentForm ticketId={ticketId} onCommentAdded={fetchComments} />
+        <AddCommentForm ticketId={ticketId} onCommentAdded={handleCommentAdded} />
       </div>
     </section>
   );
