@@ -67,6 +67,47 @@ npm run lint
 npm run type-check
 ```
 
+## ⚠️ CHECKLIST DE FIN D'ÉTAPE (OBLIGATOIRE)
+
+Avant de considérer une étape comme terminée, vérifier SYSTÉMATIQUEMENT :
+
+### 1. Tests Unitaires Complets
+
+- [ ] Chaque nouveau fichier de code a son fichier `.test.ts` ou `.test.tsx`
+- [ ] Chaque fichier modifié a ses tests mis à jour
+- [ ] Les tests couvrent les cas nominaux ET les cas d'erreur
+- [ ] Tous les tests passent : `npm test`
+
+### 2. Validation Build
+
+- [ ] Type-check sans erreur : `npm run type-check`
+- [ ] Build réussi : `npm run build`
+
+### 3. Vérification Systématique des Tests Manquants
+
+**Commande de détection** :
+
+```bash
+# Liste tous les fichiers .ts/.tsx sans tests
+find src app -type f \( -name "*.ts" -o -name "*.tsx" \) \
+  ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "*.d.ts" \
+  ! -path "*/types/*" ! -path "*/entities/*" ! -path "*/value-objects/*"
+```
+
+**Pour chaque fichier listé**, vérifier qu'il rentre dans une exception :
+
+- Interface TypeScript pure (pas de logique)
+- Type/Value Object simple (pas de validation complexe)
+- Fichier de configuration
+
+**Si aucun des cas ci-dessus** → CRÉER LE TEST IMMÉDIATEMENT
+
+### 4. Comptage des Tests
+
+- Noter le nombre de tests AVANT l'étape
+- Vérifier que le nombre a augmenté APRÈS l'étape
+- **Minimum** : +1 test par nouveau fichier de code
+
 ## Configuration de la Base de Données
 
 Le projet utilise MongoDB via Mongoose. La connexion est configurée dans `src/infrastructure/database/`.
@@ -101,26 +142,63 @@ brew services start mongodb-community
 
 **Linux** : Suivre la doc officielle selon votre distribution
 
-## Tests
+## Tests - Règles Strictes
 
-- Tous les fichiers de code doivent avoir des tests unitaires
-- Les tests sont dans des fichiers `*.test.ts` ou `*.test.tsx`
-- Utiliser Vitest pour les tests unitaires
-- Utiliser React Testing Library pour les composants
-- Mocker les dépendances externes (database, API calls)
-- Ne pas tester les appels à console.log
+### Principe Absolu
 
-Structure de test recommandée :
+**AUCUN code ne doit être écrit sans tests correspondants.**
+
+### Fichiers qui DOIVENT avoir des tests
+
+Composants React, Use Cases, Services, Repositories, Schémas MongoDB, API Routes, Pages Next.js, Utils/Helpers
+
+### Fichiers SANS tests (exceptions)
+
+Interfaces pures, Types simples, Config
+
+### Convention de Nommage Stricte
+
+- **TOUJOURS** dans le même répertoire que le fichier source
+- `MyComponent.tsx` → `MyComponent.test.tsx`
+- `MyService.ts` → `MyService.test.ts`
+
+### Bonnes Pratiques
+
+**Structure AAA** (Arrange-Act-Assert) :
 
 ```typescript
 describe('MyComponent', () => {
   it('should do something', () => {
-    // Arrange
-    // Act
-    // Assert
+    // Arrange : préparer les données
+    const data = { ... };
+
+    // Act : exécuter l'action
+    const result = doSomething(data);
+
+    // Assert : vérifier le résultat
+    expect(result).toBe(expectedValue);
   });
 });
 ```
+
+**Assertions avec valeurs en dur** (pas de regexp ni calculs) :
+
+```typescript
+// ✅ BON
+expect(result.title).toBe('Mon titre');
+expect(result.createdAt).toEqual(new Date('2025-01-15T10:00:00.000Z'));
+
+// ❌ MAUVAIS
+expect(result.title).toMatch(/titre/);
+expect(result.createdAt).toBe(new Date());
+```
+
+**Frameworks et Outils** :
+
+- Vitest pour les tests unitaires
+- React Testing Library pour les composants
+- Mocker les dépendances externes (database, API calls)
+- Ne pas tester les appels à console.log
 
 ## Accessibilité (a11y)
 
@@ -324,11 +402,17 @@ Le projet est configuré pour être déployé sur Render.com :
 
 ## Notes Importantes
 
-- Toujours écrire les tests AVANT ou EN MÊME TEMPS que le code
-- Respecter la séparation des couches de l'architecture hexagonale
-- Les entities du domain ne doivent jamais importer de code infrastructure
+### Architecture
+
+- Respecter la séparation des couches hexagonales
+- Le Domain ne doit JAMAIS importer de code Infrastructure
 - Utiliser TypeScript strict mode (pas de `any`, toujours typer)
 - Préférer les functional components et hooks React
+
+### Workflow
+
+- Consulter la **CHECKLIST DE FIN D'ÉTAPE** avant de finaliser
+- Mettre à jour PLAN.md au fur et à mesure des implémentations
 
 ## Principes de Code Minimaliste
 
@@ -369,11 +453,19 @@ const config: NextConfig = {
 
 Si quelque chose n'est pas utilisé dans l'étape actuelle, il ne doit pas être dans le code.
 
-Autres règles :
+## Règles de Gestion du Projet
 
-- Mets toujours à jour le plan dans @PLAN.md au fur et à mesure que tu implémentes des étapes
-- Ajoute les informations dans le plan dans @PLAN.md lorsque je te demande quelque chose qui n'y était pas
-- Tu ne dois jamais commiter sur Git, je le ferai toujours moi-même
-- Tu dois toujours mettre à jour le plan lorsque tu as implémenté une étape et/ou traité des tâches
-- Supprimer toujours les imports inutiles
-- Pour les assertions dans les tests unitaires, utilise au maximum des valeurs en durs, et pas des regexp ou des calculs
+### PLAN.md
+
+- Toujours mettre à jour le plan au fur et à mesure des implémentations
+- Ajouter les nouvelles informations quand demandées
+
+### Git
+
+- Ne JAMAIS commiter (l'utilisateur le fait toujours lui-même)
+- Supprimer les imports inutiles avant de finaliser
+
+### Tests
+
+- Voir la section **"Tests - Règles Strictes"** ci-dessus
+- Utiliser des valeurs en dur dans les assertions (pas de regexp/calculs)
