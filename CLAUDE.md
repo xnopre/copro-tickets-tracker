@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Langage**: TypeScript (strict mode)
 - **UI**: React 19 (dernière version stable)
 - **Base de données**: MongoDB (MongoDB Atlas)
-- **Tests**: Vitest + React Testing Library
+- **Tests**: Vitest + React Testing Library + Playwright (E2E)
 - **Hébergement**: Render.com
 
 ### Architecture
@@ -54,10 +54,15 @@ npm install
 # Développement local
 npm run dev
 
-# Tests
-npm test                # Tous les tests
+# Tests unitaires et d'intégration
+npm test                # Tous les tests (Vitest)
 npm test -- <file>      # Test spécifique
 npm test -- --coverage  # Avec couverture
+
+# Tests E2E (Playwright)
+npm run test:e2e        # Lancer les tests e2e (headless)
+npm run test:e2e:ui     # Mode UI (interface graphique)
+npm run test:e2e:debug  # Mode debug (step-by-step)
 
 # Build
 npm run build

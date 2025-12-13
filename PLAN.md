@@ -17,6 +17,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 - [📦 Étape 0 : Application Minimale Déployable](#-étape-0--application-minimale-déployable)
 - [🚫 Étape 0b : Bloquer le Référencement par les Moteurs de Recherche](#-étape-0b--bloquer-le-référencement-par-les-moteurs-de-recherche)
+- [🧪 Étape 0c : Tests E2E et Vérification des Headers HTTP](#-étape-0c--tests-e2e-et-vérification-des-headers-http)
 - [🎨 Étape 1 : Liste Statique de Tickets](#-étape-1--liste-statique-de-tickets)
 - [🤖 Étape 2 : CI/CD avec GitHub Actions](#-étape-2--cicd-avec-github-actions)
 - [🤖 Étape 2b : Workflows GitHub avec Claude](#-étape-2b--workflows-github-avec-claude)
@@ -156,6 +157,50 @@ const nextConfig: NextConfig = {
 - **Header HTTP** : Protège même les ressources non-HTML (API, images, etc.)
 
 Cette triple protection garantit qu'aucun moteur de recherche n'indexera l'application.
+
+---
+
+## 🧪 Étape 0c : Tests E2E et Vérification des Headers HTTP
+
+**Objectif** : Valider automatiquement que les headers HTTP et robots.txt fonctionnent correctement
+
+### Ce qu'on livre
+
+- Infrastructure de tests End-to-End avec Playwright
+- Tests automatisés des headers `X-Robots-Tag`
+- Tests du fichier `robots.txt`
+- Intégration dans la CI/CD GitHub Actions
+
+### Tâches
+
+- [x] Installer Playwright (`@playwright/test`)
+- [x] Créer `playwright.config.ts`
+- [x] Créer `tests/e2e/headers.spec.ts` (tests headers HTTP + meta tags)
+- [x] Créer `tests/e2e/robots.spec.ts` (tests robots.txt)
+- [x] Créer `tests/e2e/smoke.spec.ts` (tests de fumée)
+- [x] Ajouter scripts npm (`test:e2e`, `test:e2e:ui`, `test:e2e:debug`)
+- [x] Mettre à jour `.gitignore` pour Playwright
+- [x] Intégrer dans `.github/workflows/ci.yml`
+- [x] Tester en local (`npm run test:e2e`)
+- [ ] Tester sur une PR
+
+### Validation
+
+- ✅ Les tests e2e passent en local (11/11 tests)
+- ✅ Header `X-Robots-Tag: noindex, nofollow` vérifié sur toutes les routes
+- ✅ `/robots.txt` accessible et contient `Disallow: /`
+- ✅ Meta tags `noindex, nofollow` présents dans le HTML
+- ⏳ Tests e2e passent dans GitHub Actions (à tester sur PR)
+
+### Notes techniques
+
+**Commandes Playwright** :
+
+```bash
+npm run test:e2e           # Lancer les tests e2e
+npm run test:e2e:ui        # Mode UI (interface graphique)
+npm run test:e2e:debug     # Mode debug
+```
 
 ---
 
