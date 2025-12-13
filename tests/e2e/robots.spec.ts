@@ -15,7 +15,7 @@ test.describe('robots.txt', () => {
   test('robots.txt should disallow all', async ({ request }) => {
     const response = await request.get('/robots.txt');
     const text = await response.text();
-    expect(text).toMatch(/User-[Aa]gent: \*/);
+    expect(text).toContain('User-agent: *');
     expect(text).toContain('Disallow: /');
   });
 });
