@@ -4,6 +4,10 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'CoTiTra',
   description: 'Copro Tickets Tracker - Gestion de tickets pour copropriété',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
