@@ -47,3 +47,14 @@ next-env.d.ts
 
 .DS_Store
 /tmp/
+/test-results/headers-HTTP-Headers-and-M-5ab3e-ts-Tag-header-on-API-routes-chromium/trace.zip
+/test-results/headers-HTTP-Headers-and-M-49d93-ts-Tag-header-on-all-routes-chromium/trace.zip
+/test-results/headers-HTTP-Headers-and-M-27918-bots-Tag-header-on-homepage-chromium/trace.zip
+/test-results/headers-HTTP-Headers-and-M-efa41-ave-meta-robots-tag-in-HTML-chromium/trace.zip
+/test-results/robots-robots-txt-robots-txt-should-disallow-all-chromium/trace.zip
+/test-results/robots-robots-txt-should-have-text-plain-content-type-chromium/trace.zip
+/test-results/robots-robots-txt-should-serve-robots-txt-chromium/trace.zip
+/test-results/smoke-Smoke-Tests-create-ticket-page-should-be-accessible-chromium/trace.zip
+/test-results/smoke-Smoke-Tests-homepage-should-load-successfully-chromium/trace.zip
+/test-results/smoke-Smoke-Tests-should-display-the-application-title-chromium/trace.zip
+/test-results/smoke-Smoke-Tests-should-display-ticket-list-chromium/trace.zip

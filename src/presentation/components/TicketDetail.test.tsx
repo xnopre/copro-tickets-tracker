@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import TicketDetail from './TicketDetail';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
@@ -71,6 +71,36 @@ describe('TicketDetail', () => {
       expect(badge).toHaveClass(bgClass, textClass);
     }
   );
+
+  describe('Edit button', () => {
+    it('should not render edit button when onEditClick is not provided', () => {
+      render(<TicketDetail ticket={mockTicket} />);
+      const editButton = screen.queryByRole('button', { name: /Modifier/ });
+      expect(editButton).not.toBeInTheDocument();
+    });
+
+    it('should render edit button when onEditClick is provided', () => {
+      const mockOnEditClick = vi.fn();
+      render(<TicketDetail ticket={mockTicket} onEditClick={mockOnEditClick} />);
+      const editButton = screen.getByRole('button', { name: /Modifier/ });
+      expect(editButton).toBeInTheDocument();
+    });
+
+    it('should call onEditClick when edit button is clicked', () => {
+      const mockOnEditClick = vi.fn();
+      render(<TicketDetail ticket={mockTicket} onEditClick={mockOnEditClick} />);
+      const editButton = screen.getByRole('button', { name: /Modifier/ });
+      fireEvent.click(editButton);
+      expect(mockOnEditClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('should have proper aria-label on edit button', () => {
+      const mockOnEditClick = vi.fn();
+      render(<TicketDetail ticket={mockTicket} onEditClick={mockOnEditClick} />);
+      const editButton = screen.getByLabelText('Modifier le titre et la description du ticket');
+      expect(editButton).toBeInTheDocument();
+    });
+  });
 
   describe('Accessibility', () => {
     it('should have proper aria-label on back link', () => {
