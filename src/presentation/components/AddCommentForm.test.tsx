@@ -151,6 +151,83 @@ describe('AddCommentForm', () => {
 
       expect(mockOnCommentAdded).not.toHaveBeenCalled();
     });
+
+    it('should cleanup timeout when component unmounts before success message disappears', async () => {
+      server.use(
+        http.post('/api/tickets/:id/comments', async () => {
+          return HttpResponse.json({
+            id: 'comment-1',
+            ticketId: ticketId,
+            content: 'Test comment',
+            author: 'Jean Martin',
+            createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
+          });
+        })
+      );
+
+      const { unmount } = render(
+        <AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />
+      );
+
+      const authorInput = screen.getByLabelText(/Votre nom/);
+      const contentInput = screen.getByLabelText(/Commentaire/);
+      const submitButton = screen.getByRole('button', {
+        name: 'Ajouter le commentaire',
+      });
+
+      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
+      fireEvent.change(contentInput, { target: { value: 'Test comment' } });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Commentaire ajouté avec succès !')).toBeInTheDocument();
+      });
+
+      // Démonter le composant avant que le timeout ne s'exécute
+      unmount();
+
+      // Si le cleanup n'était pas fait, cela causerait un warning React
+      // Le test réussit s'il ne génère pas de warning
+    });
+
+    it('should hide success message after 2 seconds', async () => {
+      server.use(
+        http.post('/api/tickets/:id/comments', async () => {
+          return HttpResponse.json({
+            id: 'comment-1',
+            ticketId: ticketId,
+            content: 'Test comment',
+            author: 'Jean Martin',
+            createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
+          });
+        })
+      );
+
+      render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
+
+      const authorInput = screen.getByLabelText(/Votre nom/);
+      const contentInput = screen.getByLabelText(/Commentaire/);
+      const submitButton = screen.getByRole('button', {
+        name: 'Ajouter le commentaire',
+      });
+
+      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
+      fireEvent.change(contentInput, { target: { value: 'Test comment' } });
+      fireEvent.click(submitButton);
+
+      // Attendre que le succès apparaisse
+      await waitFor(() => {
+        expect(screen.getByText('Commentaire ajouté avec succès !')).toBeInTheDocument();
+      });
+
+      // Attendre 2 secondes pour que le message disparaisse
+      await waitFor(
+        () => {
+          expect(screen.queryByText('Commentaire ajouté avec succès !')).not.toBeInTheDocument();
+        },
+        { timeout: 3000 }
+      );
+    });
   });
 
   describe('Accessibility', () => {

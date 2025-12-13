@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Comment } from '@/domain/entities/Comment';
 
 interface AddCommentFormProps {
@@ -14,6 +14,17 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Nettoyer le message de succès après 2 secondes
+  useEffect(() => {
+    if (!success) return;
+
+    const timeoutId = setTimeout(() => {
+      setSuccess(false);
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [success]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +70,6 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
 
       // Ajouter le commentaire immédiatement (pas de race condition)
       onCommentAdded(comment);
-
-      // Masquer le message de succès après 2 secondes
-      setTimeout(() => {
-        setSuccess(false);
-      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur lors de l'ajout du commentaire");
     } finally {
