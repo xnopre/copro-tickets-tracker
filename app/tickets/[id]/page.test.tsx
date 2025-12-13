@@ -27,6 +27,15 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+// Mock TicketComments component
+vi.mock('@/presentation/components/TicketComments', () => ({
+  default: ({ ticketId }: { ticketId: string }) => (
+    <div data-testid="ticket-comments" data-ticket-id={ticketId}>
+      TicketComments
+    </div>
+  ),
+}));
+
 describe('TicketPage', () => {
   const mockTicket: Ticket = {
     id: '123',
@@ -135,5 +144,17 @@ describe('TicketPage', () => {
     const main = container.querySelector('main');
     expect(main).toBeInTheDocument();
     expect(main).toHaveAttribute('aria-label', 'Détail du ticket');
+  });
+
+  it('should render TicketComments component with correct ticketId', async () => {
+    mockGetTicketById.mockResolvedValue(mockTicket);
+
+    const TicketPage = (await import('./page')).default;
+    const jsx = await TicketPage({ params: Promise.resolve({ id: '123' }) });
+    render(jsx);
+
+    const ticketComments = screen.getByTestId('ticket-comments');
+    expect(ticketComments).toBeInTheDocument();
+    expect(ticketComments).toHaveAttribute('data-ticket-id', '123');
   });
 });

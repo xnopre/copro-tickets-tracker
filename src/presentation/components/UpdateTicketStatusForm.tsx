@@ -1,27 +1,28 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { Ticket } from '@/domain/entities/Ticket';
 import { statusLabels } from '../constants/ticketDisplay';
 
 interface UpdateTicketStatusFormProps {
   ticketId: string;
   currentStatus: TicketStatus;
   currentAssignedTo: string | null;
+  onTicketUpdated: (ticket: Ticket) => void;
 }
 
 export default function UpdateTicketStatusForm({
   ticketId,
   currentStatus,
   currentAssignedTo,
+  onTicketUpdated,
 }: UpdateTicketStatusFormProps) {
   const [status, setStatus] = useState<TicketStatus>(currentStatus);
   const [assignedTo, setAssignedTo] = useState(currentAssignedTo || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const router = useRouter();
 
   const trimmedAssignedTo = assignedTo.trim();
 
@@ -52,8 +53,22 @@ export default function UpdateTicketStatusForm({
         throw new Error(data.error || 'Erreur lors de la mise à jour du ticket');
       }
 
+      // Convertir les dates ISO string en Date
+      const updatedTicket: Ticket = {
+        ...data,
+        createdAt: new Date(data.createdAt),
+        updatedAt: new Date(data.updatedAt),
+      };
+
       setSuccess(true);
-      router.refresh();
+
+      // Mettre à jour le ticket immédiatement (pas de race condition)
+      onTicketUpdated(updatedTicket);
+
+      // Masquer le message de succès après 2 secondes
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de la mise à jour du ticket');
     } finally {

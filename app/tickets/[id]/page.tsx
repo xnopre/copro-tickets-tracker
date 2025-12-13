@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
-import TicketDetail from '@/presentation/components/TicketDetail';
+import TicketDetailsWithUpdate from '@/presentation/components/TicketDetailsWithUpdate';
+import TicketComments from '@/presentation/components/TicketComments';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,9 @@ export default async function TicketPage({ params }: TicketPageProps) {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8" aria-label="Détail du ticket">
-      <div className="max-w-4xl mx-auto">
-        <TicketDetail ticket={ticket} />
+      <div className="max-w-4xl mx-auto space-y-8">
+        <TicketDetailsWithUpdate initialTicket={ticket} />
+        <TicketComments ticketId={id} />
       </div>
     </main>
   );

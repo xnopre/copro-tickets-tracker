@@ -119,7 +119,7 @@ describe('CreateTicketForm', () => {
       });
 
       expect(screen.getByText('Ticket créé avec succès !')).toBeInTheDocument();
-      expect(mockRouterPush).toHaveBeenCalledWith('/');
+      expect(mockRouterPush).toHaveBeenCalledWith('/tickets/123');
 
       vi.useRealTimers();
     });

@@ -1,16 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import TicketDetail from './TicketDetail';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-
-const mockRouterRefresh = vi.fn();
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    refresh: mockRouterRefresh,
-  }),
-}));
 
 describe('TicketDetail', () => {
   const mockTicket: Ticket = {
