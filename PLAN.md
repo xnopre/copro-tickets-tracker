@@ -16,6 +16,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 ## Sommaire
 
 - [📦 Étape 0 : Application Minimale Déployable](#-étape-0--application-minimale-déployable)
+- [🚫 Étape 0b : Bloquer le Référencement par les Moteurs de Recherche](#-étape-0b--bloquer-le-référencement-par-les-moteurs-de-recherche)
 - [🎨 Étape 1 : Liste Statique de Tickets](#-étape-1--liste-statique-de-tickets)
 - [🤖 Étape 2 : CI/CD avec GitHub Actions](#-étape-2--cicd-avec-github-actions)
 - [🤖 Étape 2b : Workflows GitHub avec Claude](#-étape-2b--workflows-github-avec-claude)
@@ -60,6 +61,101 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 
 - ✅ L'URL Render.com affiche "CoTiTra"
 - ✅ Le build passe sans erreur
+
+---
+
+## 🚫 Étape 0b : Bloquer le Référencement par les Moteurs de Recherche
+
+**Objectif** : Empêcher l'application déployée d'être référencée par les moteurs de recherche (Google, Bing, etc.)
+
+### Ce qu'on livre
+
+- Fichier robots.txt qui bloque tous les robots d'indexation
+- Meta tag noindex dans les métadonnées de l'application
+- Header HTTP X-Robots-Tag: noindex
+- L'application reste accessible par URL directe mais ne sera pas indexée
+
+### Tâches
+
+- [x] Créer le fichier `app/robots.ts` avec une fonction qui retourne la configuration robots.txt
+- [x] Ajouter la meta tag `robots: noindex, nofollow` dans `app/layout.tsx` (metadata)
+- [x] Configurer le header `X-Robots-Tag: noindex, nofollow` dans `next.config.ts`
+- [x] Tester en local que robots.txt est accessible (`http://localhost:3000/robots.txt`)
+- [x] Vérifier les headers HTTP en local (Outils dev → Network)
+- [ ] Déployer sur Render.com
+- [ ] Vérifier que robots.txt est accessible en production (`https://copro-tickets-tracker.onrender.com/robots.txt`)
+- [ ] Vérifier les headers HTTP en production
+
+### Validation
+
+- ✅ `/robots.txt` affiche `User-agent: * Disallow: /`
+- ✅ Le HTML contient `<meta name="robots" content="noindex, nofollow">`
+- ✅ Les réponses HTTP contiennent le header `X-Robots-Tag: noindex, nofollow`
+- ✅ L'application reste accessible et fonctionnelle
+- ⏳ Déployé en production (en attente du push git)
+
+### Notes techniques
+
+**robots.txt via Next.js** :
+
+Next.js 15 permet de générer robots.txt dynamiquement via un fichier `app/robots.ts` :
+
+```typescript
+import { MetadataRoute } from 'next';
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: '*',
+      disallow: '/',
+    },
+  };
+}
+```
+
+**Meta tag robots** :
+
+Dans `app/layout.tsx`, ajouter dans les métadonnées :
+
+```typescript
+export const metadata: Metadata = {
+  // ... autres métadonnées
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+```
+
+**Header HTTP X-Robots-Tag** :
+
+Dans `next.config.ts`, ajouter :
+
+```typescript
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+**Pourquoi trois méthodes ?**
+
+- **robots.txt** : Standard universel, tous les robots le respectent
+- **Meta tag** : Backup pour les pages HTML, lu par les robots qui analysent le contenu
+- **Header HTTP** : Protège même les ressources non-HTML (API, images, etc.)
+
+Cette triple protection garantit qu'aucun moteur de recherche n'indexera l'application.
 
 ---
 
