@@ -1,12 +1,6 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('HTTP Headers and Meta Tags', () => {
-  test('should have X-Robots-Tag header on homepage', async ({ page }) => {
-    const response = await page.goto('/');
-    expect(response?.status()).toBe(200);
-    expect(response?.headers()['x-robots-tag']).toBe('noindex, nofollow');
-  });
-
   test('should have X-Robots-Tag header on all routes', async ({ page }) => {
     const routes = ['/', '/tickets/new'];
 
