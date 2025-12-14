@@ -58,3 +58,5 @@ next-env.d.ts
 /test-results/smoke-Smoke-Tests-homepage-should-load-successfully-chromium/trace.zip
 /test-results/smoke-Smoke-Tests-should-display-the-application-title-chromium/trace.zip
 /test-results/smoke-Smoke-Tests-should-display-ticket-list-chromium/trace.zip
+/test-results/.last-run.json
+/playwright-report/index.html

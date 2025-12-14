@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Ticket } from '@/domain/entities/Ticket';
 import TicketDetail from './TicketDetail';
-import UpdateTicketStatusForm from './UpdateTicketStatusForm';
 import EditTicketForm from './EditTicketForm';
 
 type ViewMode = 'view' | 'edit';
@@ -24,10 +23,6 @@ export default function TicketDetailsWithUpdate({ initialTicket }: TicketDetails
     setMode('view');
   };
 
-  const handleTicketUpdated = (updatedTicket: Ticket) => {
-    setTicket(updatedTicket);
-  };
-
   const handleTicketContentUpdated = (updatedTicket: Ticket) => {
     setTicket(updatedTicket);
     setMode('view');
@@ -36,20 +31,14 @@ export default function TicketDetailsWithUpdate({ initialTicket }: TicketDetails
   return (
     <>
       {mode === 'view' ? (
-        <>
-          <TicketDetail ticket={ticket} onEditClick={handleEditClick} />
-          <UpdateTicketStatusForm
-            ticketId={ticket.id}
-            currentStatus={ticket.status}
-            currentAssignedTo={ticket.assignedTo}
-            onTicketUpdated={handleTicketUpdated}
-          />
-        </>
+        <TicketDetail ticket={ticket} onEditClick={handleEditClick} />
       ) : (
         <EditTicketForm
           ticketId={ticket.id}
           currentTitle={ticket.title}
           currentDescription={ticket.description}
+          currentStatus={ticket.status}
+          currentAssignedTo={ticket.assignedTo}
           onTicketUpdated={handleTicketContentUpdated}
           onCancel={handleCancelEdit}
         />

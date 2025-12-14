@@ -13,6 +13,8 @@ describe('EditTicketForm', () => {
     ticketId: '123',
     currentTitle: 'Original Title',
     currentDescription: 'Original Description',
+    currentStatus: TicketStatus.NEW,
+    currentAssignedTo: 'John Doe',
     onTicketUpdated: mockOnTicketUpdated,
     onCancel: mockOnCancel,
   };
@@ -32,6 +34,16 @@ describe('EditTicketForm', () => {
       expect(descriptionInput.value).toBe('Original Description');
       expect(screen.getByRole('button', { name: 'Enregistrer' })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Annuler/ })).toBeInTheDocument();
+    });
+
+    it('should render form with pre-filled status and assignedTo', () => {
+      render(<EditTicketForm {...defaultProps} />);
+
+      const statusSelect = screen.getByLabelText(/Statut/) as HTMLSelectElement;
+      const assignedToInput = screen.getByLabelText(/Personne assignée/) as HTMLInputElement;
+
+      expect(statusSelect.value).toBe(TicketStatus.NEW);
+      expect(assignedToInput.value).toBe('John Doe');
     });
   });
 
@@ -127,22 +139,57 @@ describe('EditTicketForm', () => {
         ).toBeInTheDocument();
       });
     });
+
+    it('should show error when assignedTo is empty', async () => {
+      render(<EditTicketForm {...defaultProps} />);
+
+      const assignedToInput = screen.getByLabelText(/Personne assignée/);
+      fireEvent.change(assignedToInput, { target: { value: '' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Le nom de la personne assignée est requis')).toBeInTheDocument();
+      });
+
+      expect(mockOnTicketUpdated).not.toHaveBeenCalled();
+    });
+
+    it('should show error when assignedTo is only whitespace', async () => {
+      render(<EditTicketForm {...defaultProps} />);
+
+      const assignedToInput = screen.getByLabelText(/Personne assignée/);
+      fireEvent.change(assignedToInput, { target: { value: '   ' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('Le nom de la personne assignée est requis')).toBeInTheDocument();
+      });
+
+      expect(mockOnTicketUpdated).not.toHaveBeenCalled();
+    });
   });
 
   describe('Form submission', () => {
-    it('should update ticket successfully and call onTicketUpdated', async () => {
+    it('should update ticket successfully and call onTicketUpdated with all fields', async () => {
       const mockUpdatedTicket = {
         id: '123',
         title: 'Updated Title',
         description: 'Updated Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jane Smith',
         createdAt: new Date('2025-01-15T10:00:00Z').toISOString(),
         updatedAt: new Date('2025-01-15T11:00:00Z').toISOString(),
       };
 
+      let requestBody: any = null;
+
       server.use(
-        http.patch('/api/tickets/123', async () => {
+        http.patch('/api/tickets/123', async ({ request }) => {
+          requestBody = await request.json();
           return HttpResponse.json(mockUpdatedTicket);
         })
       );
@@ -151,14 +198,25 @@ describe('EditTicketForm', () => {
 
       const titleInput = screen.getByLabelText(/Titre/);
       const descriptionInput = screen.getByLabelText(/Description/);
+      const statusSelect = screen.getByLabelText(/Statut/);
+      const assignedToInput = screen.getByLabelText(/Personne assignée/);
       const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
 
       fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
       fireEvent.change(descriptionInput, { target: { value: 'Updated Description' } });
+      fireEvent.change(statusSelect, { target: { value: TicketStatus.IN_PROGRESS } });
+      fireEvent.change(assignedToInput, { target: { value: 'Jane Smith' } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
         expect(screen.getByText('Ticket mis à jour avec succès !')).toBeInTheDocument();
+      });
+
+      expect(requestBody).toEqual({
+        title: 'Updated Title',
+        description: 'Updated Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jane Smith',
       });
 
       expect(mockOnTicketUpdated).toHaveBeenCalledTimes(1);
@@ -167,8 +225,8 @@ describe('EditTicketForm', () => {
           id: '123',
           title: 'Updated Title',
           description: 'Updated Description',
-          status: TicketStatus.NEW,
-          assignedTo: null,
+          status: TicketStatus.IN_PROGRESS,
+          assignedTo: 'Jane Smith',
         })
       );
     });
@@ -181,7 +239,7 @@ describe('EditTicketForm', () => {
             title: 'Updated Title',
             description: 'Updated Description',
             status: TicketStatus.NEW,
-            assignedTo: null,
+            assignedTo: 'John Doe',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           });
@@ -192,6 +250,8 @@ describe('EditTicketForm', () => {
 
       const titleInput = screen.getByLabelText(/Titre/) as HTMLInputElement;
       const descriptionInput = screen.getByLabelText(/Description/) as HTMLTextAreaElement;
+      const statusSelect = screen.getByLabelText(/Statut/) as HTMLSelectElement;
+      const assignedToInput = screen.getByLabelText(/Personne assignée/) as HTMLInputElement;
       const submitButton = screen.getByRole('button', { name: 'Enregistrer' }) as HTMLButtonElement;
       const cancelButton = screen.getByRole('button', { name: /Annuler/ }) as HTMLButtonElement;
 
@@ -203,6 +263,8 @@ describe('EditTicketForm', () => {
       expect(cancelButton.disabled).toBe(true);
       expect(titleInput.disabled).toBe(true);
       expect(descriptionInput.disabled).toBe(true);
+      expect(statusSelect.disabled).toBe(true);
+      expect(assignedToInput.disabled).toBe(true);
       expect(screen.getByText('Enregistrement en cours...')).toBeInTheDocument();
 
       await waitFor(() => {
@@ -288,9 +350,13 @@ describe('EditTicketForm', () => {
 
       const titleInput = screen.getByLabelText(/Titre/);
       const descriptionInput = screen.getByLabelText(/Description/);
+      const statusSelect = screen.getByLabelText(/Statut/);
+      const assignedToInput = screen.getByLabelText(/Personne assignée/);
 
       expect(titleInput).toHaveAttribute('aria-required', 'true');
       expect(descriptionInput).toHaveAttribute('aria-required', 'true');
+      expect(statusSelect).toHaveAttribute('aria-required', 'true');
+      expect(assignedToInput).toHaveAttribute('aria-required', 'true');
     });
 
     it('should have role="alert" and aria-live="assertive" on error messages', async () => {
@@ -341,6 +407,21 @@ describe('EditTicketForm', () => {
         const status = screen.getByRole('status');
         expect(status).toBeInTheDocument();
         expect(status).toHaveTextContent('Ticket mis à jour avec succès !');
+      });
+    });
+
+    it('should have aria-invalid on assignedTo when validation fails', async () => {
+      render(<EditTicketForm {...defaultProps} />);
+
+      const assignedToInput = screen.getByLabelText(/Personne assignée/);
+      fireEvent.change(assignedToInput, { target: { value: '' } });
+
+      const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
+      fireEvent.click(submitButton);
+
+      await waitFor(() => {
+        expect(assignedToInput).toHaveAttribute('aria-invalid', 'true');
+        expect(assignedToInput).toHaveAttribute('aria-describedby', 'form-error');
       });
     });
 

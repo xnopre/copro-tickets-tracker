@@ -2,11 +2,15 @@
 
 import { useState } from 'react';
 import { Ticket } from '@/domain/entities/Ticket';
+import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { statusLabels } from '@/presentation/constants/ticketDisplay';
 
 interface EditTicketFormProps {
   ticketId: string;
   currentTitle: string;
   currentDescription: string;
+  currentStatus: TicketStatus;
+  currentAssignedTo: string | null;
   onTicketUpdated: (ticket: Ticket) => void;
   onCancel: () => void;
 }
@@ -15,11 +19,15 @@ export default function EditTicketForm({
   ticketId,
   currentTitle,
   currentDescription,
+  currentStatus,
+  currentAssignedTo,
   onTicketUpdated,
   onCancel,
 }: EditTicketFormProps) {
   const [title, setTitle] = useState(currentTitle);
   const [description, setDescription] = useState(currentDescription);
+  const [status, setStatus] = useState<TicketStatus>(currentStatus);
+  const [assignedTo, setAssignedTo] = useState(currentAssignedTo || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -49,6 +57,12 @@ export default function EditTicketForm({
       return;
     }
 
+    const trimmedAssignedTo = assignedTo.trim();
+    if (!trimmedAssignedTo) {
+      setError('Le nom de la personne assignée est requis');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -57,7 +71,12 @@ export default function EditTicketForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, description }),
+        body: JSON.stringify({
+          title: title.trim(),
+          description: description.trim(),
+          status,
+          assignedTo: trimmedAssignedTo,
+        }),
       });
 
       const data = await response.json();
@@ -122,6 +141,45 @@ export default function EditTicketForm({
             aria-required="true"
             aria-invalid={hasError && !description.trim()}
             aria-describedby={hasError && !description.trim() ? 'form-error' : undefined}
+            autoComplete="off"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="edit-status" className="block text-sm font-medium text-gray-700 mb-2">
+            Statut <span aria-label="requis">*</span>
+          </label>
+          <select
+            id="edit-status"
+            value={status}
+            onChange={e => setStatus(e.target.value as TicketStatus)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isSubmitting}
+            aria-required="true"
+          >
+            {Object.values(TicketStatus).map(statusValue => (
+              <option key={statusValue} value={statusValue}>
+                {statusLabels[statusValue]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="edit-assignedTo" className="block text-sm font-medium text-gray-700 mb-2">
+            Personne assignée <span aria-label="requis">*</span>
+          </label>
+          <input
+            type="text"
+            id="edit-assignedTo"
+            value={assignedTo}
+            onChange={e => setAssignedTo(e.target.value)}
+            placeholder="Nom de la personne en charge"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isSubmitting}
+            aria-required="true"
+            aria-invalid={hasError && !assignedTo.trim()}
+            aria-describedby={hasError && !assignedTo.trim() ? 'form-error' : undefined}
             autoComplete="off"
           />
         </div>
