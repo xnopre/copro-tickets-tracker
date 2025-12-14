@@ -31,7 +31,14 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-version: '8.0'
+
       - name: Run E2E tests
+        env:
+          MONGODB_URI: mongodb://localhost:27017/cotitra-test
         run: npm run test:e2e
 
       - name: Upload Playwright report
