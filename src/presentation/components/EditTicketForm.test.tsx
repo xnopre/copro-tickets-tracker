@@ -140,7 +140,26 @@ describe('EditTicketForm', () => {
       });
     });
 
-    it('should show error when assignedTo is empty', async () => {
+    it('should allow submission with empty assignedTo (sends null)', async () => {
+      const mockUpdatedTicket = {
+        id: '123',
+        title: 'Updated Title',
+        description: 'Updated Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        createdAt: new Date('2025-01-15T10:00:00Z').toISOString(),
+        updatedAt: new Date('2025-01-15T11:00:00Z').toISOString(),
+      };
+
+      let requestBody: any = null;
+
+      server.use(
+        http.patch('/api/tickets/123', async ({ request }) => {
+          requestBody = await request.json();
+          return HttpResponse.json(mockUpdatedTicket);
+        })
+      );
+
       render(<EditTicketForm {...defaultProps} />);
 
       const assignedToInput = screen.getByLabelText(/Personne assignée/);
@@ -150,26 +169,11 @@ describe('EditTicketForm', () => {
       fireEvent.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Le nom de la personne assignée est requis')).toBeInTheDocument();
+        expect(screen.getByText('Ticket mis à jour avec succès !')).toBeInTheDocument();
       });
 
-      expect(mockOnTicketUpdated).not.toHaveBeenCalled();
-    });
-
-    it('should show error when assignedTo is only whitespace', async () => {
-      render(<EditTicketForm {...defaultProps} />);
-
-      const assignedToInput = screen.getByLabelText(/Personne assignée/);
-      fireEvent.change(assignedToInput, { target: { value: '   ' } });
-
-      const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('Le nom de la personne assignée est requis')).toBeInTheDocument();
-      });
-
-      expect(mockOnTicketUpdated).not.toHaveBeenCalled();
+      expect(requestBody.assignedTo).toBeNull();
+      expect(mockOnTicketUpdated).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -356,7 +360,7 @@ describe('EditTicketForm', () => {
       expect(titleInput).toHaveAttribute('aria-required', 'true');
       expect(descriptionInput).toHaveAttribute('aria-required', 'true');
       expect(statusSelect).toHaveAttribute('aria-required', 'true');
-      expect(assignedToInput).toHaveAttribute('aria-required', 'true');
+      expect(assignedToInput).not.toHaveAttribute('aria-required', 'true');
     });
 
     it('should have role="alert" and aria-live="assertive" on error messages', async () => {
@@ -407,21 +411,6 @@ describe('EditTicketForm', () => {
         const status = screen.getByRole('status');
         expect(status).toBeInTheDocument();
         expect(status).toHaveTextContent('Ticket mis à jour avec succès !');
-      });
-    });
-
-    it('should have aria-invalid on assignedTo when validation fails', async () => {
-      render(<EditTicketForm {...defaultProps} />);
-
-      const assignedToInput = screen.getByLabelText(/Personne assignée/);
-      fireEvent.change(assignedToInput, { target: { value: '' } });
-
-      const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(assignedToInput).toHaveAttribute('aria-invalid', 'true');
-        expect(assignedToInput).toHaveAttribute('aria-describedby', 'form-error');
       });
     });
 

@@ -14,7 +14,12 @@ export class UpdateTicket {
     if (data.title !== undefined) trimmedData.title = data.title.trim();
     if (data.description !== undefined) trimmedData.description = data.description.trim();
     if (data.status !== undefined) trimmedData.status = data.status;
-    if (data.assignedTo !== undefined) trimmedData.assignedTo = data.assignedTo.trim();
+    if (data.assignedTo !== undefined) {
+      trimmedData.assignedTo =
+        typeof data.assignedTo === 'string' && data.assignedTo.trim()
+          ? data.assignedTo.trim()
+          : null;
+    }
 
     return await this.ticketRepository.update(id, trimmedData);
   }
@@ -58,13 +63,6 @@ export class UpdateTicket {
     if (data.status !== undefined) {
       if (!Object.values(TicketStatus).includes(data.status)) {
         throw new ValidationError('Statut invalide');
-      }
-    }
-
-    // Valider assignedTo si présent
-    if (data.assignedTo !== undefined) {
-      if (typeof data.assignedTo !== 'string' || data.assignedTo.trim() === '') {
-        throw new ValidationError('Le nom de la personne assignée est obligatoire');
       }
     }
   }

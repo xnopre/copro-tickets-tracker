@@ -252,24 +252,50 @@ describe('UpdateTicket', () => {
       ).rejects.toThrow('Statut invalide');
     });
 
-    it('should throw error when assignedTo is empty', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+    it('should convert empty assignedTo to null', async () => {
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
 
-      await expect(
-        useCase.execute('1', {
-          assignedTo: '',
-        })
-      ).rejects.toThrow('Le nom de la personne assignée est obligatoire');
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+
+      const useCase = new UpdateTicket(mockRepository);
+      await useCase.execute('1', {
+        assignedTo: '',
+      });
+
+      expect(mockRepository.update).toHaveBeenCalledWith('1', {
+        assignedTo: null,
+      });
     });
 
-    it('should throw error when assignedTo is only whitespace', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+    it('should convert whitespace-only assignedTo to null', async () => {
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
 
-      await expect(
-        useCase.execute('1', {
-          assignedTo: '   ',
-        })
-      ).rejects.toThrow('Le nom de la personne assignée est obligatoire');
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+
+      const useCase = new UpdateTicket(mockRepository);
+      await useCase.execute('1', {
+        assignedTo: '   ',
+      });
+
+      expect(mockRepository.update).toHaveBeenCalledWith('1', {
+        assignedTo: null,
+      });
     });
   });
 

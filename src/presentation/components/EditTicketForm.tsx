@@ -57,11 +57,7 @@ export default function EditTicketForm({
       return;
     }
 
-    const trimmedAssignedTo = assignedTo.trim();
-    if (!trimmedAssignedTo) {
-      setError('Le nom de la personne assignée est requis');
-      return;
-    }
+    const trimmedAssignedTo = assignedTo.trim() || null;
 
     setIsSubmitting(true);
 
@@ -167,7 +163,7 @@ export default function EditTicketForm({
 
         <div className="mb-4">
           <label htmlFor="edit-assignedTo" className="block text-sm font-medium text-gray-700 mb-2">
-            Personne assignée <span aria-label="requis">*</span>
+            Personne assignée
           </label>
           <input
             type="text"
@@ -177,7 +173,6 @@ export default function EditTicketForm({
             placeholder="Nom de la personne en charge"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isSubmitting}
-            aria-required="true"
             aria-invalid={hasError && !assignedTo.trim()}
             aria-describedby={hasError && !assignedTo.trim() ? 'form-error' : undefined}
             autoComplete="off"

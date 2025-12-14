@@ -19,5 +19,5 @@ export interface UpdateTicketData {
   title?: string;
   description?: string;
   status?: TicketStatus;
-  assignedTo?: string;
+  assignedTo?: string | null;
 }
