@@ -1,6 +1,7 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
+import { TicketStatus } from '../value-objects/TicketStatus';
 
 export class UpdateTicket {
   constructor(private ticketRepository: ITicketRepository) {}
@@ -50,6 +51,20 @@ export class UpdateTicket {
       }
       if (data.description.trim().length > 5000) {
         throw new ValidationError('La description ne doit pas dépasser 5000 caractères');
+      }
+    }
+
+    // Valider status si présent
+    if (data.status !== undefined) {
+      if (!Object.values(TicketStatus).includes(data.status)) {
+        throw new ValidationError('Statut invalide');
+      }
+    }
+
+    // Valider assignedTo si présent
+    if (data.assignedTo !== undefined) {
+      if (typeof data.assignedTo !== 'string' || data.assignedTo.trim() === '') {
+        throw new ValidationError('Le nom de la personne assignée est obligatoire');
       }
     }
   }

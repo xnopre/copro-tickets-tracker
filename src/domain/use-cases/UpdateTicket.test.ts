@@ -241,6 +241,36 @@ describe('UpdateTicket', () => {
         })
       ).rejects.toThrow('La description ne doit pas dépasser 5000 caractères');
     });
+
+    it('should throw error when status is invalid', async () => {
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          status: 'INVALID_STATUS' as TicketStatus,
+        })
+      ).rejects.toThrow('Statut invalide');
+    });
+
+    it('should throw error when assignedTo is empty', async () => {
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          assignedTo: '',
+        })
+      ).rejects.toThrow('Le nom de la personne assignée est obligatoire');
+    });
+
+    it('should throw error when assignedTo is only whitespace', async () => {
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          assignedTo: '   ',
+        })
+      ).rejects.toThrow('Le nom de la personne assignée est obligatoire');
+    });
   });
 
   describe('Ticket not found', () => {

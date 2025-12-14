@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
-import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { ValidationError } from '@/domain/errors/ValidationError';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -40,73 +40,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json();
     const { title, description, status, assignedTo } = body;
 
-    // Validation : au moins un champ requis
-    if (
-      title === undefined &&
-      description === undefined &&
-      status === undefined &&
-      assignedTo === undefined
-    ) {
-      return NextResponse.json({ error: 'Au moins un champ doit être fourni' }, { status: 400 });
-    }
-
-    // Construire updateData avec seulement les champs fournis
-    const updateData: {
-      title?: string;
-      description?: string;
-      status?: TicketStatus;
-      assignedTo?: string;
-    } = {};
-
-    // Valider et ajouter title si fourni
-    if (title !== undefined) {
-      if (typeof title !== 'string' || title.trim().length === 0) {
-        return NextResponse.json({ error: 'Le titre est requis' }, { status: 400 });
-      }
-      if (title.trim().length > 200) {
-        return NextResponse.json(
-          { error: 'Le titre ne doit pas dépasser 200 caractères' },
-          { status: 400 }
-        );
-      }
-      updateData.title = title.trim();
-    }
-
-    // Valider et ajouter description si fournie
-    if (description !== undefined) {
-      if (typeof description !== 'string' || description.trim().length === 0) {
-        return NextResponse.json({ error: 'La description est requise' }, { status: 400 });
-      }
-      if (description.trim().length > 5000) {
-        return NextResponse.json(
-          { error: 'La description ne doit pas dépasser 5000 caractères' },
-          { status: 400 }
-        );
-      }
-      updateData.description = description.trim();
-    }
-
-    // Valider status si fourni
-    if (status !== undefined) {
-      if (!Object.values(TicketStatus).includes(status)) {
-        return NextResponse.json({ error: 'Statut invalide' }, { status: 400 });
-      }
-      updateData.status = status;
-    }
-
-    // Valider assignedTo si fourni
-    if (assignedTo !== undefined) {
-      if (typeof assignedTo !== 'string' || assignedTo.trim() === '') {
-        return NextResponse.json(
-          { error: 'Le nom de la personne assignée est obligatoire' },
-          { status: 400 }
-        );
-      }
-      updateData.assignedTo = assignedTo.trim();
-    }
-
     const ticketService = ServiceFactory.getTicketService();
-    const ticket = await ticketService.updateTicket(id, updateData);
+    const ticket = await ticketService.updateTicket(id, {
+      title,
+      description,
+      status,
+      assignedTo,
+    });
 
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trouvé' }, { status: 404 });
@@ -114,6 +54,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return NextResponse.json(ticket);
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     if (error instanceof InvalidIdError) {
       return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
     }

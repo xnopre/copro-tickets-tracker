@@ -8,6 +8,7 @@ import { CreateTicket } from '@/domain/use-cases/CreateTicket';
 import { GetTickets } from '@/domain/use-cases/GetTickets';
 import { GetTicketById } from '@/domain/use-cases/GetTicketById';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
+import { ValidationError } from '@/domain/errors/ValidationError';
 
 vi.mock('@/application/services/ServiceFactory');
 
@@ -153,11 +154,17 @@ describe('PATCH /api/tickets/[id]', () => {
       });
       expect(mockTicketService.updateTicket).toHaveBeenCalledWith('123', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Jean Dupont',
+        assignedTo: '  Jean Dupont  ',
+        title: undefined,
+        description: undefined,
       });
     });
 
     it('should return 400 when status is invalid', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Statut invalide')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -174,6 +181,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when assignedTo is empty string or only whitespace', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Le nom de la personne assignée est obligatoire')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -223,12 +234,18 @@ describe('PATCH /api/tickets/[id]', () => {
         updatedAt: mockUpdatedTicket.updatedAt.toISOString(),
       });
       expect(mockTicketService.updateTicket).toHaveBeenCalledWith('123', {
-        title: 'Updated Title',
-        description: 'Updated Description',
+        title: '  Updated Title  ',
+        description: '  Updated Description  ',
+        status: undefined,
+        assignedTo: undefined,
       });
     });
 
     it('should return 400 when title is empty', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Le titre est requis')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -245,6 +262,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when title is only whitespace', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Le titre est requis')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -261,6 +282,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when title exceeds 200 characters', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Le titre ne doit pas dépasser 200 caractères')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -277,6 +302,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when description is empty', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('La description est requise')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -293,6 +322,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when description is only whitespace', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('La description est requise')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -309,6 +342,10 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when description exceeds 5000 characters', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('La description ne doit pas dépasser 5000 caractères')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -370,6 +407,10 @@ describe('PATCH /api/tickets/[id]', () => {
 
   describe('Validation', () => {
     it('should return 400 when no fields provided', async () => {
+      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
+        new ValidationError('Au moins un champ doit être fourni pour la mise à jour')
+      );
+
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({}),
@@ -380,7 +421,7 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'Au moins un champ doit être fourni' });
+      expect(data).toEqual({ error: 'Au moins un champ doit être fourni pour la mise à jour' });
     });
   });
 
