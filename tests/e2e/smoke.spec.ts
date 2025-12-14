@@ -8,17 +8,19 @@ test.describe('Smoke Tests', () => {
 
   test('should display the application title', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('h1')).toContainText('CoTiTra');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('CoTiTra');
   });
 
   test('should display ticket list', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('h2:has-text("Tickets")')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tickets' })).toBeVisible();
   });
 
   test('create ticket page should be accessible', async ({ page }) => {
     const response = await page.goto('/tickets/new');
     expect(response?.status()).toBe(200);
-    await expect(page.locator('h1:has-text("Créer un nouveau ticket")')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Créer un nouveau ticket' })
+    ).toBeVisible();
   });
 });

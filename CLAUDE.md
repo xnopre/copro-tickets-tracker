@@ -205,6 +205,103 @@ expect(result.createdAt).toBe(new Date());
 - Mocker les dépendances externes (database, API calls)
 - Ne pas tester les appels à console.log
 
+## Tests E2E (Playwright) - Règles de Sélection
+
+### Ordre de Priorité des Sélecteurs
+
+Suivre la hiérarchie Playwright (du plus robuste au plus fragile) :
+
+1. **`page.getByRole()`** - PRÉFÉRÉ
+   - Utilise les rôles ARIA et l'accessibilité
+   - Résiste aux changements de structure DOM
+   - Exemple : `page.getByRole('heading', { level: 1 })`
+
+2. **`page.getByLabel()`** - Pour les formulaires
+   - Utilise les labels associés
+   - Exemple : `page.getByLabel('Titre')`
+
+3. **`page.getByText()`** - Pour le contenu textuel
+   - Éviter si possible (sensible à i18n)
+   - Exemple : `page.getByText('Créer un ticket')`
+
+4. **`page.getByTestId()`** - EN DERNIER RECOURS
+   - Uniquement si aucune alternative sémantique
+   - Ajouter `data-testid` au composant
+   - Exemple : `page.getByTestId('ticket-form')`
+
+5. **`page.locator()`** - ÉVITER
+   - Exception : éléments non-interactifs (meta tags)
+   - Jamais pour les éléments d'interface
+
+### Exemples Concrets
+
+**✅ BON** :
+
+```typescript
+// Utilise le rôle sémantique
+await page.getByRole('heading', { level: 1 }).toContainText('CoTiTra');
+await page.getByRole('button', { name: 'Créer un ticket' }).click();
+await page.getByLabel('Titre').fill('Mon ticket');
+```
+
+**❌ MAUVAIS** :
+
+```typescript
+// Sélecteurs fragiles
+await page.locator('h1').toContainText('CoTiTra'); // Generic tag
+await page.locator('.btn-primary').click(); // CSS class
+await page.locator('#title-input').fill('Mon ticket'); // ID selector
+await page.locator('h2:has-text("Tickets")').toBeVisible(); // Text-based
+```
+
+### Gestion de l'Internationalisation (i18n)
+
+Si l'application est traduite à l'avenir :
+
+#### Option A : Fichier de Constantes (Recommandé)
+
+```typescript
+// tests/e2e/constants.ts
+export const TEXTS = {
+  fr: {
+    HOMEPAGE_TITLE: 'CoTiTra',
+    TICKETS_HEADING: 'Tickets',
+    CREATE_TICKET_HEADING: 'Créer un nouveau ticket',
+  },
+  en: {
+    HOMEPAGE_TITLE: 'CoTiTra',
+    TICKETS_HEADING: 'Tickets',
+    CREATE_TICKET_HEADING: 'Create a new ticket',
+  },
+};
+
+// Dans les tests :
+const locale = 'fr'; // depuis env ou config
+await page.getByRole('heading', { name: TEXTS[locale].TICKETS_HEADING }).toBeVisible();
+```
+
+#### Option B : Sélecteurs Sans Texte
+
+```typescript
+// Préférer
+await page.getByRole('heading', { level: 2 }).first().toBeVisible();
+
+// Plutôt que
+await page.getByRole('heading', { name: 'Tickets' }).toBeVisible();
+```
+
+#### Option C : data-testid pour Éléments Critiques
+
+```typescript
+// Composant :
+<h2 id="tickets-heading" data-testid="tickets-heading">Tickets</h2>
+
+// Test :
+await page.getByTestId('tickets-heading').toBeVisible();
+```
+
+**Recommandation** : Commencer avec l'Option A (constantes) quand i18n sera implémenté.
+
 ## Accessibilité (a11y)
 
 ### Principes obligatoires
