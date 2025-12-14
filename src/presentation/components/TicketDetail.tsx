@@ -5,9 +5,10 @@ import { formatTicketDateTime } from '@/presentation/utils/ticketFormatters';
 
 interface TicketDetailProps {
   ticket: Ticket;
+  onEditClick?: () => void;
 }
 
-export default function TicketDetail({ ticket }: TicketDetailProps) {
+export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps) {
   const formattedCreatedAt = formatTicketDateTime(ticket.createdAt);
   const formattedUpdatedAt = formatTicketDateTime(ticket.updatedAt);
 
@@ -26,12 +27,23 @@ export default function TicketDetail({ ticket }: TicketDetailProps) {
       <header className="mb-6">
         <div className="flex justify-between items-start mb-4">
           <h1 className="text-3xl font-bold text-gray-900">{ticket.title}</h1>
-          <span
-            className={`px-4 py-2 rounded-full text-sm font-medium ${statusColors[ticket.status]}`}
-            aria-label={`Statut du ticket : ${statusLabels[ticket.status]}`}
-          >
-            {statusLabels[ticket.status]}
-          </span>
+          <div className="flex items-center gap-3">
+            {onEditClick && (
+              <button
+                onClick={onEditClick}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                aria-label="Modifier le titre et la description du ticket"
+              >
+                Modifier
+              </button>
+            )}
+            <span
+              className={`px-4 py-2 rounded-full text-sm font-medium ${statusColors[ticket.status]}`}
+              aria-label={`Statut du ticket : ${statusLabels[ticket.status]}`}
+            >
+              {statusLabels[ticket.status]}
+            </span>
+          </div>
         </div>
       </header>
 

@@ -16,6 +16,8 @@ export interface CreateTicketData {
 }
 
 export interface UpdateTicketData {
-  status: TicketStatus;
-  assignedTo: string;
+  title?: string;
+  description?: string;
+  status?: TicketStatus;
+  assignedTo?: string | null;
 }

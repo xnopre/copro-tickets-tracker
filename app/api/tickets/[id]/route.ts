@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
-import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { ValidationError } from '@/domain/errors/ValidationError';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -38,24 +38,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   try {
     const body = await request.json();
-    const { status, assignedTo } = body;
-
-    // Validation côté serveur
-    if (!status || !Object.values(TicketStatus).includes(status)) {
-      return NextResponse.json({ error: 'Statut invalide ou manquant' }, { status: 400 });
-    }
-
-    if (!assignedTo || typeof assignedTo !== 'string' || assignedTo.trim() === '') {
-      return NextResponse.json(
-        { error: 'Le nom de la personne assignée est obligatoire' },
-        { status: 400 }
-      );
-    }
+    const { title, description, status, assignedTo } = body;
 
     const ticketService = ServiceFactory.getTicketService();
     const ticket = await ticketService.updateTicket(id, {
+      title,
+      description,
       status,
-      assignedTo: assignedTo.trim(),
+      assignedTo,
     });
 
     if (!ticket) {
@@ -64,6 +54,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return NextResponse.json(ticket);
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     if (error instanceof InvalidIdError) {
       return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
     }
