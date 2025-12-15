@@ -50,14 +50,10 @@ export class MongoTicketRepository implements ITicketRepository {
       throw new InvalidIdError(id);
     }
 
-    const document = await TicketModel.findByIdAndUpdate(
-      id,
-      {
-        status: data.status,
-        assignedTo: data.assignedTo,
-      },
-      { new: true, runValidators: true }
-    );
+    const document = await TicketModel.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!document) {
       return null;
