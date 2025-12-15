@@ -11,6 +11,7 @@ describe('TicketCard', () => {
     description: 'This is a test ticket description',
     status: TicketStatus.NEW,
     assignedTo: null,
+    archived: false,
     createdAt: new Date('2025-01-15'),
     updatedAt: new Date('2025-01-20'),
   };

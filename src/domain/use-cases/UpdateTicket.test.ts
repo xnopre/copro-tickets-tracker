@@ -9,6 +9,7 @@ describe('UpdateTicket', () => {
     findById: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    archive: vi.fn(),
   };
 
   describe('Update status and assignedTo', () => {
@@ -19,6 +20,7 @@ describe('UpdateTicket', () => {
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'John Doe',
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
@@ -45,6 +47,7 @@ describe('UpdateTicket', () => {
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'John Doe',
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
@@ -72,6 +75,7 @@ describe('UpdateTicket', () => {
         description: 'Updated Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
@@ -98,6 +102,7 @@ describe('UpdateTicket', () => {
         description: 'Updated Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
@@ -123,6 +128,7 @@ describe('UpdateTicket', () => {
         description: 'Original Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
@@ -149,6 +155,7 @@ describe('UpdateTicket', () => {
         description: 'New Description',
         status: TicketStatus.RESOLVED,
         assignedTo: 'Jane Smith',
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T12:00:00.000Z'),
       };
@@ -259,6 +266,7 @@ describe('UpdateTicket', () => {
         description: 'Test Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
@@ -282,6 +290,7 @@ describe('UpdateTicket', () => {
         description: 'Test Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };

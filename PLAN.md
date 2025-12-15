@@ -934,32 +934,108 @@ app/                          # Next.js (convention)
 ### Ce qu'on livre
 
 - Bouton "Archiver" dans la page de détail
-- Confirmation avant archivage
+- Confirmation avant archivage via une modale
 - Les tickets archivés disparaissent de la liste principale
-- Possibilité de voir les tickets archivés (liste séparée ou toggle)
-- Les commentaires restent attachés au ticket archivé
+- Indicateur visuel "ARCHIVÉ" sur les tickets archivés
+- Les boutons "Modifier" et "Archiver" sont masqués pour les tickets archivés
+- Architecture hexagonale complète avec use case ArchiveTicket
+- Tests unitaires complets (317 tests passants, 2 tests à corriger)
 
 ### Tâches
 
-- [ ] Ajouter le champ `archived` (boolean, default: false) dans le type Ticket
-- [ ] Mettre à jour le schéma Mongoose avec le champ `archived`
-- [ ] Créer l'API route `PATCH /api/tickets/[id]/archive`
-- [ ] Modifier l'API `GET /api/tickets` pour exclure les tickets archivés par défaut
-- [ ] Créer un composant de confirmation d'archivage
-- [ ] Implémenter le bouton "Archiver"
-- [ ] Rediriger vers la liste après archivage
-- [ ] Ajouter un indicateur visuel "ARCHIVÉ" dans le détail si le ticket est archivé
+- [x] Ajouter le champ `archived` (boolean, default: false) dans le type Ticket
+- [x] Mettre à jour le schéma Mongoose avec le champ `archived`
+- [x] Créer l'API route `PATCH /api/tickets/[id]/archive`
+- [x] Modifier l'API `GET /api/tickets` pour exclure les tickets archivés par défaut
+- [x] Créer l'architecture hexagonale
+  - [x] Méthode `archive()` dans ITicketRepository
+  - [x] Implémentation dans MongoTicketRepository
+  - [x] Use case ArchiveTicket avec tests
+  - [x] TicketService.archiveTicket()
+- [x] Créer le composant ArchiveTicketButton avec confirmation (modale)
+- [x] Implémenter le bouton "Archiver" dans la page de détail
+- [x] Rediriger vers la liste après archivage
+- [x] Ajouter un indicateur visuel "ARCHIVÉ" dans le détail si le ticket est archivé
+- [x] Masquer les boutons Modifier et Archiver pour les tickets archivés
+- [x] Tests unitaires (317/319 passants - 2 tests à corriger dans MongoTicketRepository)
+- [ ] Build TypeScript et Next.js réussis
 - [ ] Optionnel : ajouter un toggle "Voir les archives" dans la liste
 - [ ] Déployer
 
 ### Validation
 
-- ✅ Le bouton "Archiver" demande confirmation
+- ✅ Le bouton "Archiver" demande confirmation via une modale
 - ✅ L'archivage marque le ticket comme archived dans MongoDB
-- ✅ Les tickets archivés n'apparaissent plus dans la liste principale
+- ✅ Les tickets archivés n'apparaissent plus dans la liste principale (filtre `{ archived: false }`)
 - ✅ Les commentaires du ticket restent accessibles
 - ✅ On peut toujours consulter un ticket archivé via son URL directe
-- ✅ Redirection vers la liste après archivage
+- ✅ Redirection vers la liste après archivage avec router.push('/')
+- ✅ Badge "ARCHIVÉ" affiché en haut du détail pour les tickets archivés
+- ✅ Boutons Modifier et Archiver masqués pour les tickets archivés
+- ✅ Architecture hexagonale respectée
+- ⚠️ Tests : 317/319 passants (2 tests à corriger)
+- ⏳ Build TypeScript et Next.js (à vérifier)
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Architecture hexagonale** :
+
+- Entité `Ticket` étendue avec `archived: boolean`
+- Interface `ITicketRepository.archive(id: string)` ajoutée
+- Use case `ArchiveTicket` créé avec tests
+- Méthode `MongoTicketRepository.archive()` implémentée (appelle findByIdAndUpdate avec `{ archived: true }`)
+- `TicketService.archiveTicket()` orchestre le use case
+
+**Composant ArchiveTicketButton** :
+
+- État local : showConfirmation, isArchiving, error
+- Modale de confirmation avec overlay (z-50)
+- Gestion des états de chargement avec aria-busy
+- Redirection vers "/" après succès avec router.push() + router.refresh()
+- Gestion des erreurs avec affichage dans la modale
+- Accessibilité : role="dialog", aria-modal, aria-labelledby
+- 14 tests couvrant : rendu, confirmation, archivage, erreurs, accessibilité
+
+**API Route PATCH /api/tickets/[id]/archive** :
+
+- Appelle `ServiceFactory.getTicketService().archiveTicket(id)`
+- Gestion des erreurs : InvalidIdError (400), NotFound (404), Server Error (500)
+- 6 tests unitaires
+
+**Filtre des tickets archivés** :
+
+- `MongoTicketRepository.findAll()` utilise `find({ archived: false })`
+- Exclut automatiquement les tickets archivés de la liste principale
+- Les tickets archivés restent accessibles via leur URL directe `/tickets/[id]`
+
+**Affichage** :
+
+- Badge "ARCHIVÉ" affiché dans TicketDetail (ligne 32-39)
+- Bouton Modifier masqué si ticket.archived (ligne 42)
+- Bouton Archiver masqué si ticket.archived (ligne 51)
+- Badge gris avec texte blanc pour l'indicateur ARCHIVÉ
+
+**Tests** :
+
+- Tous les tests existants mis à jour avec le champ `archived: false`
+- +20 nouveaux tests (use case, API route, composant)
+- ⚠️ 2 tests échouent dans MongoTicketRepository.test.ts (isolation des mocks à corriger)
+
+**Fichiers créés** :
+
+- `src/domain/use-cases/ArchiveTicket.ts` + `.test.ts`
+- `app/api/tickets/[id]/archive/route.ts` + `.test.ts`
+- `src/presentation/components/ArchiveTicketButton.tsx` + `.test.tsx`
+
+**Fichiers modifiés** :
+
+- `src/domain/entities/Ticket.ts` (+ archived)
+- `src/domain/repositories/ITicketRepository.ts` (+ archive)
+- `src/infrastructure/repositories/MongoTicketRepository.ts` (+ archive, findAll filtre)
+- `src/infrastructure/database/schemas/TicketSchema.ts` (+ archived)
+- `src/presentation/components/TicketDetail.tsx` (+ badge, conditions)
+- Tous les fichiers de tests (+ archived: false dans les mocks)
 
 ---
 

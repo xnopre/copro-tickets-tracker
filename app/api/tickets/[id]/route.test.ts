@@ -38,6 +38,7 @@ describe('GET /api/tickets/[id]', () => {
       description: 'Test Description',
       status: TicketStatus.NEW,
       assignedTo: null,
+      archived: false,
       createdAt: new Date('2025-01-15T10:00:00Z'),
       updatedAt: new Date('2025-01-15T10:00:00Z'),
     };
@@ -128,6 +129,7 @@ describe('PATCH /api/tickets/[id]', () => {
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'Jean Dupont',
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
         updatedAt: new Date('2025-01-15T11:00:00Z'),
       };
@@ -209,6 +211,7 @@ describe('PATCH /api/tickets/[id]', () => {
         description: 'Updated Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
         updatedAt: new Date('2025-01-15T11:30:00Z'),
       };
@@ -370,6 +373,7 @@ describe('PATCH /api/tickets/[id]', () => {
         description: 'New Description',
         status: TicketStatus.RESOLVED,
         assignedTo: 'Marie Martin',
+        archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
         updatedAt: new Date('2025-01-15T12:00:00Z'),
       };

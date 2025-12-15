@@ -55,6 +55,7 @@ vi.mock('./EditTicketForm', () => ({
             description: 'Updated Description',
             status: TicketStatus.IN_PROGRESS,
             assignedTo: 'Updated Person',
+            archived: false,
             createdAt: new Date('2025-01-10T10:00:00.000Z'),
             updatedAt: new Date('2025-01-15T14:00:00.000Z'),
           })
@@ -74,6 +75,7 @@ describe('TicketDetailsWithUpdate', () => {
     description: 'Test Description',
     status: TicketStatus.NEW,
     assignedTo: null,
+    archived: false,
     createdAt: new Date('2025-01-10T10:00:00.000Z'),
     updatedAt: new Date('2025-01-10T10:00:00.000Z'),
   };
@@ -159,6 +161,7 @@ describe('TicketDetailsWithUpdate', () => {
         description: 'Original Description',
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'John Doe',
+        archived: false,
         createdAt: new Date('2025-01-10T10:00:00.000Z'),
         updatedAt: new Date('2025-01-10T10:00:00.000Z'),
       };

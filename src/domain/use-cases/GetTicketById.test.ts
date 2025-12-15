@@ -9,6 +9,7 @@ describe('GetTicketById', () => {
     findById: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    archive: vi.fn(),
   };
 
   it('should return a ticket when found', async () => {
@@ -18,6 +19,7 @@ describe('GetTicketById', () => {
       description: 'Description 1',
       status: TicketStatus.NEW,
       assignedTo: null,
+      archived: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

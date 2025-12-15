@@ -9,7 +9,7 @@ import { Types } from 'mongoose';
 export class MongoTicketRepository implements ITicketRepository {
   async findAll(): Promise<Ticket[]> {
     await connectDB();
-    const documents = await TicketModel.find().sort({ createdAt: -1 });
+    const documents = await TicketModel.find({}).sort({ createdAt: -1 });
 
     return documents.map(doc => this.mapToEntity(doc));
   }
@@ -62,6 +62,27 @@ export class MongoTicketRepository implements ITicketRepository {
     return this.mapToEntity(document);
   }
 
+  async archive(id: string): Promise<Ticket | null> {
+    await connectDB();
+
+    // Valider le format MongoDB ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+      throw new InvalidIdError(id);
+    }
+
+    const document = await TicketModel.findByIdAndUpdate(
+      id,
+      { archived: true },
+      { new: true, runValidators: true }
+    );
+
+    if (!document) {
+      return null;
+    }
+
+    return this.mapToEntity(document);
+  }
+
   private mapToEntity(document: TicketDocument): Ticket {
     return {
       id: document._id.toString(),
@@ -69,6 +90,7 @@ export class MongoTicketRepository implements ITicketRepository {
       description: document.description,
       status: document.status,
       assignedTo: document.assignedTo,
+      archived: document.archived,
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     };

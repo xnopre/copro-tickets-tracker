@@ -14,6 +14,7 @@ describe('TicketService', () => {
       findById: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
+      archive: vi.fn(),
     };
     ticketService = new TicketService(mockRepository);
   });
@@ -27,6 +28,7 @@ describe('TicketService', () => {
           description: 'Description 1',
           status: TicketStatus.NEW,
           assignedTo: null,
+          archived: false,
           createdAt: new Date('2025-01-15'),
           updatedAt: new Date('2025-01-15'),
         },
@@ -36,6 +38,7 @@ describe('TicketService', () => {
           description: 'Description 2',
           status: TicketStatus.IN_PROGRESS,
           assignedTo: 'Jean Martin',
+          archived: false,
           createdAt: new Date('2025-01-16'),
           updatedAt: new Date('2025-01-16'),
         },
@@ -72,6 +75,7 @@ describe('TicketService', () => {
         description: 'New Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -145,6 +149,7 @@ describe('TicketService', () => {
         description: 'Spaced Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -168,6 +173,7 @@ describe('TicketService', () => {
         description: 'Test Description',
         status: TicketStatus.NEW,
         assignedTo: null,
+        archived: false,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-15'),
       };
@@ -205,6 +211,7 @@ describe('TicketService', () => {
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'Jean Martin',
+        archived: false,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-16'),
       };
@@ -245,6 +252,7 @@ describe('TicketService', () => {
         description: 'Fix the login issue',
         status: TicketStatus.RESOLVED,
         assignedTo: 'Marie Dupont',
+        archived: false,
         createdAt: new Date('2025-01-10'),
         updatedAt: new Date('2025-01-16'),
       };
@@ -268,6 +276,7 @@ describe('TicketService', () => {
         description: 'Task completed successfully',
         status: TicketStatus.CLOSED,
         assignedTo: 'Admin',
+        archived: false,
         createdAt: new Date('2025-01-05'),
         updatedAt: new Date('2025-01-16'),
       };

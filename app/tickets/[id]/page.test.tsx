@@ -43,6 +43,7 @@ describe('TicketPage', () => {
     description: "L'ascenseur est en panne depuis hier",
     status: TicketStatus.IN_PROGRESS,
     assignedTo: 'Jean Dupont',
+    archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),
     updatedAt: new Date('2025-01-20T14:45:00'),
   };
@@ -97,6 +98,7 @@ describe('TicketPage', () => {
       id: '456',
       status: TicketStatus.NEW,
       assignedTo: null,
+      archived: false,
     };
 
     mockGetTicketById.mockResolvedValue(newTicket);

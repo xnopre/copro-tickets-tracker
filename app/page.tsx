@@ -1,4 +1,4 @@
-import TicketList from '@/presentation/components/TicketList';
+import TicketListWithArchiveToggle from '@/presentation/components/TicketListWithArchiveToggle';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import Link from 'next/link';
 
@@ -29,7 +29,7 @@ export default async function Home() {
               + Créer un ticket
             </Link>
           </div>
-          <TicketList tickets={tickets} />
+          <TicketListWithArchiveToggle tickets={tickets} />
         </section>
       </div>
     </main>
