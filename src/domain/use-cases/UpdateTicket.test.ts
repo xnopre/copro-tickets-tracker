@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UpdateTicket } from './UpdateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { TicketStatus } from '../value-objects/TicketStatus';
@@ -12,8 +12,23 @@ describe('UpdateTicket', () => {
     archive: vi.fn(),
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   describe('Update status and assignedTo', () => {
     it('should update status and assignedTo successfully', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Test Ticket',
@@ -25,6 +40,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -34,6 +50,7 @@ describe('UpdateTicket', () => {
       });
 
       expect(result).toEqual(mockTicket);
+      expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
         assignedTo: 'John Doe',
@@ -41,6 +58,17 @@ describe('UpdateTicket', () => {
     });
 
     it('should trim assignedTo', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Test Ticket',
@@ -52,6 +80,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -69,6 +98,17 @@ describe('UpdateTicket', () => {
 
   describe('Update title and description', () => {
     it('should update title and description successfully', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Old Title',
+        description: 'Old Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Updated Title',
@@ -80,6 +120,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -96,6 +137,17 @@ describe('UpdateTicket', () => {
     });
 
     it('should trim title and description', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Old Title',
+        description: 'Old Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Updated Title',
@@ -107,6 +159,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -122,6 +175,17 @@ describe('UpdateTicket', () => {
     });
 
     it('should update only title', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Old Title',
+        description: 'Original Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'New Title',
@@ -133,6 +197,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:30:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -149,6 +214,17 @@ describe('UpdateTicket', () => {
 
   describe('Update all fields', () => {
     it('should update all fields together', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Old Title',
+        description: 'Old Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'New Title',
@@ -160,6 +236,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T12:00:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -260,6 +337,17 @@ describe('UpdateTicket', () => {
     });
 
     it('should convert empty assignedTo to null', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: 'John Doe',
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Test Ticket',
@@ -271,6 +359,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -284,6 +373,17 @@ describe('UpdateTicket', () => {
     });
 
     it('should convert whitespace-only assignedTo to null', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: 'John Doe',
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
       const mockTicket = {
         id: '1',
         title: 'Test Ticket',
@@ -295,6 +395,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
       const useCase = new UpdateTicket(mockRepository);
@@ -310,7 +411,7 @@ describe('UpdateTicket', () => {
 
   describe('Ticket not found', () => {
     it('should return null when ticket not found', async () => {
-      vi.mocked(mockRepository.update).mockResolvedValue(null);
+      vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
       const useCase = new UpdateTicket(mockRepository);
       const result = await useCase.execute('999', {
@@ -318,6 +419,80 @@ describe('UpdateTicket', () => {
       });
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('Archived ticket', () => {
+    it('should throw error when trying to update an archived ticket', async () => {
+      const archivedTicket = {
+        id: '1',
+        title: 'Archived Ticket',
+        description: 'This ticket is archived',
+        status: TicketStatus.CLOSED,
+        assignedTo: null,
+        archived: true,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
+
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          title: 'New Title',
+        })
+      ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
+
+      expect(mockRepository.findById).toHaveBeenCalledWith('1');
+      expect(mockRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw error when trying to update status of archived ticket', async () => {
+      const archivedTicket = {
+        id: '1',
+        title: 'Archived Ticket',
+        description: 'This ticket is archived',
+        status: TicketStatus.CLOSED,
+        assignedTo: null,
+        archived: true,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
+
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          status: TicketStatus.IN_PROGRESS,
+        })
+      ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
+    });
+
+    it('should throw error when trying to update assignedTo of archived ticket', async () => {
+      const archivedTicket = {
+        id: '1',
+        title: 'Archived Ticket',
+        description: 'This ticket is archived',
+        status: TicketStatus.CLOSED,
+        assignedTo: null,
+        archived: true,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
+
+      const useCase = new UpdateTicket(mockRepository);
+
+      await expect(
+        useCase.execute('1', {
+          assignedTo: 'John Doe',
+        })
+      ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
     });
   });
 });

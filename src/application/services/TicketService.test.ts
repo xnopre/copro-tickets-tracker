@@ -205,6 +205,17 @@ describe('TicketService', () => {
         assignedTo: 'Jean Martin',
       };
 
+      const existingTicket: Ticket = {
+        id: '123',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15'),
+        updatedAt: new Date('2025-01-15'),
+      };
+
       const mockUpdatedTicket: Ticket = {
         id: '123',
         title: 'Test Ticket',
@@ -216,11 +227,13 @@ describe('TicketService', () => {
         updatedAt: new Date('2025-01-16'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
 
       const result = await ticketService.updateTicket('123', updateData);
 
       expect(result).toEqual(mockUpdatedTicket);
+      expect(mockRepository.findById).toHaveBeenCalledWith('123');
       expect(mockRepository.update).toHaveBeenCalledWith('123', updateData);
       expect(mockRepository.update).toHaveBeenCalledTimes(1);
     });
@@ -231,19 +244,30 @@ describe('TicketService', () => {
         assignedTo: 'Jean Martin',
       };
 
-      vi.mocked(mockRepository.update).mockResolvedValue(null);
+      vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
       const result = await ticketService.updateTicket('non-existent-id', updateData);
 
       expect(result).toBeNull();
-      expect(mockRepository.update).toHaveBeenCalledWith('non-existent-id', updateData);
-      expect(mockRepository.update).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findById).toHaveBeenCalledWith('non-existent-id');
+      expect(mockRepository.update).not.toHaveBeenCalled();
     });
 
     it('should update ticket status to RESOLVED', async () => {
       const updateData = {
         status: TicketStatus.RESOLVED,
         assignedTo: 'Marie Dupont',
+      };
+
+      const existingTicket: Ticket = {
+        id: '456',
+        title: 'Bug Fix',
+        description: 'Fix the login issue',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Marie Dupont',
+        archived: false,
+        createdAt: new Date('2025-01-10'),
+        updatedAt: new Date('2025-01-15'),
       };
 
       const mockUpdatedTicket: Ticket = {
@@ -257,6 +281,7 @@ describe('TicketService', () => {
         updatedAt: new Date('2025-01-16'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
 
       const result = await ticketService.updateTicket('456', updateData);
@@ -270,6 +295,17 @@ describe('TicketService', () => {
         assignedTo: 'Admin',
       };
 
+      const existingTicket: Ticket = {
+        id: '789',
+        title: 'Completed Task',
+        description: 'Task completed successfully',
+        status: TicketStatus.RESOLVED,
+        assignedTo: 'Admin',
+        archived: false,
+        createdAt: new Date('2025-01-05'),
+        updatedAt: new Date('2025-01-15'),
+      };
+
       const mockUpdatedTicket: Ticket = {
         id: '789',
         title: 'Completed Task',
@@ -281,6 +317,7 @@ describe('TicketService', () => {
         updatedAt: new Date('2025-01-16'),
       };
 
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockUpdatedTicket);
 
       const result = await ticketService.updateTicket('789', updateData);
