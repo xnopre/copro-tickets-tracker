@@ -87,6 +87,38 @@ describe('TicketListWithArchiveToggle', () => {
       expect(screen.getByText('Archived Ticket 2')).toBeInTheDocument();
     });
 
+    it('should display archived tickets at the end when toggle is checked', async () => {
+      const user = userEvent.setup();
+      render(<TicketListWithArchiveToggle tickets={mockTickets} />);
+
+      const checkbox = screen.getByRole('checkbox', { name: 'Afficher les tickets archivés' });
+      await user.click(checkbox);
+
+      const ticketTitles = screen
+        .getAllByRole('link')
+        .map(link => link.querySelector('h3')?.textContent);
+
+      const activeTicketsCount = ticketTitles.filter(
+        title => title === 'Active Ticket 1' || title === 'Active Ticket 2'
+      ).length;
+      const archivedTicketsCount = ticketTitles.filter(
+        title => title === 'Archived Ticket 1' || title === 'Archived Ticket 2'
+      ).length;
+
+      expect(activeTicketsCount).toBe(2);
+      expect(archivedTicketsCount).toBe(2);
+
+      const activeTicket1Index = ticketTitles.indexOf('Active Ticket 1');
+      const activeTicket2Index = ticketTitles.indexOf('Active Ticket 2');
+      const archivedTicket1Index = ticketTitles.indexOf('Archived Ticket 1');
+      const archivedTicket2Index = ticketTitles.indexOf('Archived Ticket 2');
+
+      expect(activeTicket1Index).toBeLessThan(archivedTicket1Index);
+      expect(activeTicket1Index).toBeLessThan(archivedTicket2Index);
+      expect(activeTicket2Index).toBeLessThan(archivedTicket1Index);
+      expect(activeTicket2Index).toBeLessThan(archivedTicket2Index);
+    });
+
     it('should hide archived tickets when toggle is unchecked after being checked', async () => {
       const user = userEvent.setup();
       render(<TicketListWithArchiveToggle tickets={mockTickets} />);

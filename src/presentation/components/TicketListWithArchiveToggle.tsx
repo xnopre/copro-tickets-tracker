@@ -13,6 +13,11 @@ export default function TicketListWithArchiveToggle({ tickets }: TicketListWithA
 
   const filteredTickets = showArchived ? tickets : tickets.filter(ticket => !ticket.archived);
 
+  const sortedTickets = [...filteredTickets].sort((a, b) => {
+    if (a.archived === b.archived) return 0;
+    return a.archived ? 1 : -1;
+  });
+
   return (
     <div>
       <div className="mb-4 flex items-center gap-2">
@@ -31,7 +36,7 @@ export default function TicketListWithArchiveToggle({ tickets }: TicketListWithA
           <span>Voir les archives</span>
         </label>
       </div>
-      <TicketList tickets={filteredTickets} />
+      <TicketList tickets={sortedTickets} />
     </div>
   );
 }
