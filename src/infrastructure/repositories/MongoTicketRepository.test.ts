@@ -405,5 +405,107 @@ describe('MongoTicketRepository', () => {
         updatedAt: updatedDate,
       });
     });
+
+    it('should update ticket title', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        title: 'Updated Title',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Updated Title',
+        description: 'Original Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        createdAt: new Date('2025-01-01T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-20T15:30:00.000Z'),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).not.toBeNull();
+      expect(result?.title).toBe('Updated Title');
+      expect(TicketModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        validObjectId,
+        { title: 'Updated Title' },
+        { new: true, runValidators: true }
+      );
+    });
+
+    it('should update ticket description', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        description: 'Updated Description',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'Original Title',
+        description: 'Updated Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        createdAt: new Date('2025-01-01T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-20T15:30:00.000Z'),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).not.toBeNull();
+      expect(result?.description).toBe('Updated Description');
+      expect(TicketModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        validObjectId,
+        { description: 'Updated Description' },
+        { new: true, runValidators: true }
+      );
+    });
+
+    it('should update multiple fields simultaneously', async () => {
+      const validObjectId = '507f1f77bcf86cd799439011';
+      const updateData = {
+        title: 'New Title',
+        description: 'New Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+      };
+
+      const mockDocument = {
+        _id: validObjectId,
+        title: 'New Title',
+        description: 'New Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+        createdAt: new Date('2025-01-01T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-20T15:30:00.000Z'),
+      };
+
+      vi.mocked(TicketModel.findByIdAndUpdate).mockResolvedValue(mockDocument as any);
+
+      const result = await repository.update(validObjectId, updateData);
+
+      expect(result).toEqual({
+        id: validObjectId,
+        title: 'New Title',
+        description: 'New Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: 'Jean Dupont',
+        createdAt: mockDocument.createdAt,
+        updatedAt: mockDocument.updatedAt,
+      });
+      expect(TicketModel.findByIdAndUpdate).toHaveBeenCalledWith(
+        validObjectId,
+        {
+          title: 'New Title',
+          description: 'New Description',
+          status: TicketStatus.IN_PROGRESS,
+          assignedTo: 'Jean Dupont',
+        },
+        { new: true, runValidators: true }
+      );
+    });
   });
 });
