@@ -58,6 +58,53 @@ describe('TicketCard', () => {
     });
   });
 
+  describe('Archived tickets', () => {
+    it('should display archived badge when ticket is archived', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      render(<TicketCard ticket={archivedTicket} />);
+
+      const archivedBadge = screen.getByLabelText('Ticket archivé');
+      expect(archivedBadge).toBeInTheDocument();
+      expect(archivedBadge).toHaveClass('bg-gray-200', 'text-gray-700');
+      expect(archivedBadge).toHaveTextContent('Archivé');
+    });
+
+    it('should not display archived badge when ticket is not archived', () => {
+      render(<TicketCard ticket={mockTicket} />);
+
+      const archivedBadge = screen.queryByLabelText('Ticket archivé');
+      expect(archivedBadge).not.toBeInTheDocument();
+    });
+
+    it('should apply visual styling for archived tickets', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      const { container } = render(<TicketCard ticket={archivedTicket} />);
+
+      const article = container.querySelector('article');
+      expect(article).toHaveClass('opacity-70', 'border-2', 'border-gray-300');
+    });
+
+    it('should not apply archived styling for non-archived tickets', () => {
+      const { container } = render(<TicketCard ticket={mockTicket} />);
+
+      const article = container.querySelector('article');
+      expect(article).not.toHaveClass('opacity-70');
+      expect(article).not.toHaveClass('border-2');
+      expect(article).not.toHaveClass('border-gray-300');
+    });
+
+    it('should include archived status in aria-label', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      render(<TicketCard ticket={archivedTicket} />);
+
+      const link = screen.getByRole('link');
+      expect(link).toHaveAttribute(
+        'aria-label',
+        'Voir le ticket : Test Ticket - Statut : Nouveau - Archivé'
+      );
+    });
+  });
+
   describe('Accessibility', () => {
     it('should have proper accessibility attributes and semantic elements', () => {
       const { container } = render(<TicketCard ticket={mockTicket} />);
