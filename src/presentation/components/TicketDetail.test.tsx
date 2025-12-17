@@ -4,6 +4,12 @@ import TicketDetail from './TicketDetail';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
+vi.mock('./ArchiveTicketButton', () => ({
+  default: ({ ticketId }: { ticketId: string }) => (
+    <button aria-label="Archiver le ticket">Archiver</button>
+  ),
+}));
+
 describe('TicketDetail', () => {
   const mockTicket: Ticket = {
     id: '1',
@@ -11,6 +17,7 @@ describe('TicketDetail', () => {
     description: 'This is a detailed test ticket description',
     status: TicketStatus.NEW,
     assignedTo: null,
+    archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),
     updatedAt: new Date('2025-01-20T14:45:00'),
   };
@@ -99,6 +106,44 @@ describe('TicketDetail', () => {
       render(<TicketDetail ticket={mockTicket} onEditClick={mockOnEditClick} />);
       const editButton = screen.getByLabelText('Modifier le titre et la description du ticket');
       expect(editButton).toBeInTheDocument();
+    });
+  });
+
+  describe('Archive functionality', () => {
+    it('should show archive button for non-archived tickets', () => {
+      const mockOnEditClick = vi.fn();
+      render(<TicketDetail ticket={mockTicket} onEditClick={mockOnEditClick} />);
+      const archiveButton = screen.getByRole('button', { name: /archiver le ticket/i });
+      expect(archiveButton).toBeInTheDocument();
+    });
+
+    it('should not show archive button for archived tickets', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      render(<TicketDetail ticket={archivedTicket} />);
+      const archiveButton = screen.queryByRole('button', { name: /archiver le ticket/i });
+      expect(archiveButton).not.toBeInTheDocument();
+    });
+
+    it('should show ARCHIVÉ indicator for archived tickets', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      render(<TicketDetail ticket={archivedTicket} />);
+      const indicator = screen.getByLabelText('Ce ticket est archivé');
+      expect(indicator).toBeInTheDocument();
+      expect(indicator).toHaveTextContent('ARCHIVÉ');
+    });
+
+    it('should not show ARCHIVÉ indicator for non-archived tickets', () => {
+      render(<TicketDetail ticket={mockTicket} />);
+      const indicator = screen.queryByLabelText('Ce ticket est archivé');
+      expect(indicator).not.toBeInTheDocument();
+    });
+
+    it('should not show edit button for archived tickets', () => {
+      const archivedTicket = { ...mockTicket, archived: true };
+      const mockOnEditClick = vi.fn();
+      render(<TicketDetail ticket={archivedTicket} onEditClick={mockOnEditClick} />);
+      const editButton = screen.queryByRole('button', { name: /modifier/i });
+      expect(editButton).not.toBeInTheDocument();
     });
   });
 

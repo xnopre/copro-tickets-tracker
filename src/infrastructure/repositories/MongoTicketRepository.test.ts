@@ -96,6 +96,7 @@ describe('MongoTicketRepository', () => {
 
       await repository.findAll();
 
+      expect(TicketModel.find).toHaveBeenCalledWith({});
       expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
     });
   });

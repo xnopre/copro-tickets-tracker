@@ -5,4 +5,5 @@ export interface ITicketRepository {
   findById(id: string): Promise<Ticket | null>;
   create(data: CreateTicketData): Promise<Ticket>;
   update(id: string, data: UpdateTicketData): Promise<Ticket | null>;
+  archive(id: string): Promise<Ticket | null>;
 }

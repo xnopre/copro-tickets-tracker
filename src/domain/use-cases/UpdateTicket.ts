@@ -9,6 +9,16 @@ export class UpdateTicket {
   async execute(id: string, data: UpdateTicketData): Promise<Ticket | null> {
     this.validateData(data);
 
+    // Vérifier que le ticket existe et n'est pas archivé
+    const existingTicket = await this.ticketRepository.findById(id);
+    if (!existingTicket) {
+      return null;
+    }
+
+    if (existingTicket.archived) {
+      throw new ValidationError('Un ticket archivé ne peut pas être modifié');
+    }
+
     // Prepare trimmed data
     const trimmedData: UpdateTicketData = {};
     if (data.title !== undefined) trimmedData.title = data.title.trim();

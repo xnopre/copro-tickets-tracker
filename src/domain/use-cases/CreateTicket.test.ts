@@ -9,6 +9,7 @@ describe('CreateTicket', () => {
     findById: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
+    archive: vi.fn(),
   };
 
   it('should create a ticket with valid data', async () => {
@@ -18,6 +19,7 @@ describe('CreateTicket', () => {
       description: 'Test Description',
       status: TicketStatus.NEW,
       assignedTo: null,
+      archived: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -44,6 +46,7 @@ describe('CreateTicket', () => {
       description: 'Test Description',
       status: TicketStatus.NEW,
       assignedTo: null,
+      archived: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

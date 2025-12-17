@@ -6,6 +6,7 @@ export interface TicketDocument extends Document {
   description: string;
   status: TicketStatus;
   assignedTo: string | null;
+  archived: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -30,6 +31,11 @@ const ticketSchema = new Schema<TicketDocument>(
     assignedTo: {
       type: String,
       default: null,
+    },
+    archived: {
+      type: Boolean,
+      default: false,
+      required: true,
     },
   },
   {
