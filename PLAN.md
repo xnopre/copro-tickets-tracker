@@ -935,18 +935,20 @@ app/                          # Next.js (convention)
 
 - Bouton "Archiver" dans la page de détail
 - Confirmation avant archivage via une modale
-- Les tickets archivés disparaissent de la liste principale
-- Indicateur visuel "ARCHIVÉ" sur les tickets archivés
+- Toggle "Voir les archives" pour afficher/masquer les tickets archivés
+- Les tickets archivés sont affichés en fin de liste (tri automatique)
+- Badge "Archivé" visible dans les cartes de la liste et dans le détail
+- Style visuel distinct pour les tickets archivés (opacité 70%, bordure grise)
 - Les boutons "Modifier" et "Archiver" sont masqués pour les tickets archivés
+- Protection API : interdiction de modifier un ticket archivé
 - Architecture hexagonale complète avec use case ArchiveTicket
-- Tests unitaires complets (317 tests passants, 2 tests à corriger)
+- Tests unitaires complets (342 tests passants)
 
 ### Tâches
 
 - [x] Ajouter le champ `archived` (boolean, default: false) dans le type Ticket
 - [x] Mettre à jour le schéma Mongoose avec le champ `archived`
 - [x] Créer l'API route `PATCH /api/tickets/[id]/archive`
-- [x] Modifier l'API `GET /api/tickets` pour exclure les tickets archivés par défaut
 - [x] Créer l'architecture hexagonale
   - [x] Méthode `archive()` dans ITicketRepository
   - [x] Implémentation dans MongoTicketRepository
@@ -957,24 +959,34 @@ app/                          # Next.js (convention)
 - [x] Rediriger vers la liste après archivage
 - [x] Ajouter un indicateur visuel "ARCHIVÉ" dans le détail si le ticket est archivé
 - [x] Masquer les boutons Modifier et Archiver pour les tickets archivés
-- [x] Tests unitaires (317/319 passants - 2 tests à corriger dans MongoTicketRepository)
-- [ ] Build TypeScript et Next.js réussis
-- [ ] Optionnel : ajouter un toggle "Voir les archives" dans la liste
+- [x] Ajouter un badge "Archivé" dans les cartes de la liste (TicketCard)
+- [x] Ajouter un style visuel distinct (opacité 70%, bordure grise)
+- [x] Implémenter le toggle "Voir les archives" dans la liste
+- [x] Créer le composant TicketListWithArchiveToggle
+- [x] Trier les tickets pour afficher les archivés en fin de liste
+- [x] Ajouter la protection API : interdire modification d'un ticket archivé (UpdateTicket use case)
+- [x] Tests unitaires complets (342 tests passants)
+- [x] Build TypeScript et Next.js réussis
 - [ ] Déployer
 
 ### Validation
 
 - ✅ Le bouton "Archiver" demande confirmation via une modale
 - ✅ L'archivage marque le ticket comme archived dans MongoDB
-- ✅ Les tickets archivés n'apparaissent plus dans la liste principale (filtre `{ archived: false }`)
+- ✅ Toggle "Voir les archives" fonctionne (masque/affiche les tickets archivés)
+- ✅ Les tickets archivés sont affichés en fin de liste (tri automatique)
+- ✅ Badge "Archivé" visible dans les cartes de la liste (TicketCard)
+- ✅ Style visuel distinct pour les tickets archivés (opacité 70%, bordure grise)
 - ✅ Les commentaires du ticket restent accessibles
 - ✅ On peut toujours consulter un ticket archivé via son URL directe
 - ✅ Redirection vers la liste après archivage avec router.push('/')
 - ✅ Badge "ARCHIVÉ" affiché en haut du détail pour les tickets archivés
 - ✅ Boutons Modifier et Archiver masqués pour les tickets archivés
+- ✅ Protection API : impossible de modifier un ticket archivé (ValidationError)
 - ✅ Architecture hexagonale respectée
-- ⚠️ Tests : 317/319 passants (2 tests à corriger)
-- ⏳ Build TypeScript et Next.js (à vérifier)
+- ✅ Tous les tests passent (342/342)
+- ✅ Build TypeScript réussi
+- ✅ Build Next.js réussi
 - ⏳ Déployé en production (en attente)
 
 ### Notes techniques
@@ -984,7 +996,9 @@ app/                          # Next.js (convention)
 - Entité `Ticket` étendue avec `archived: boolean`
 - Interface `ITicketRepository.archive(id: string)` ajoutée
 - Use case `ArchiveTicket` créé avec tests
+- Use case `UpdateTicket` enrichi avec vérification anti-modification des tickets archivés (lignes 18-20)
 - Méthode `MongoTicketRepository.archive()` implémentée (appelle findByIdAndUpdate avec `{ archived: true }`)
+- `MongoTicketRepository.findAll()` retourne TOUS les tickets (le tri/filtre est géré côté UI)
 - `TicketService.archiveTicket()` orchestre le use case
 
 **Composant ArchiveTicketButton** :
@@ -1003,38 +1017,37 @@ app/                          # Next.js (convention)
 - Gestion des erreurs : InvalidIdError (400), NotFound (404), Server Error (500)
 - 6 tests unitaires
 
-**Filtre des tickets archivés** :
-
-- `MongoTicketRepository.findAll()` utilise `find({ archived: false })`
-- Exclut automatiquement les tickets archivés de la liste principale
-- Les tickets archivés restent accessibles via leur URL directe `/tickets/[id]`
-
 **Affichage** :
 
-- Badge "ARCHIVÉ" affiché dans TicketDetail (ligne 32-39)
-- Bouton Modifier masqué si ticket.archived (ligne 42)
-- Bouton Archiver masqué si ticket.archived (ligne 51)
-- Badge gris avec texte blanc pour l'indicateur ARCHIVÉ
+- Badge "ARCHIVÉ" affiché dans TicketDetail (pour les tickets archivés)
+- Badge "Archivé" affiché dans TicketCard (liste) avec style gris
+- Bouton Modifier masqué si ticket.archived
+- Bouton Archiver masqué si ticket.archived
+- Style visuel dans TicketCard : `opacity-70 border-2 border-gray-300`
 
 **Tests** :
 
 - Tous les tests existants mis à jour avec le champ `archived: false`
-- +20 nouveaux tests (use case, API route, composant)
-- ⚠️ 2 tests échouent dans MongoTicketRepository.test.ts (isolation des mocks à corriger)
+- +25 nouveaux tests (use case, API route, composants)
+- 342 tests passants au total
 
 **Fichiers créés** :
 
 - `src/domain/use-cases/ArchiveTicket.ts` + `.test.ts`
 - `app/api/tickets/[id]/archive/route.ts` + `.test.ts`
 - `src/presentation/components/ArchiveTicketButton.tsx` + `.test.tsx`
+- `src/presentation/components/TicketListWithArchiveToggle.tsx` (composant avec toggle)
 
 **Fichiers modifiés** :
 
 - `src/domain/entities/Ticket.ts` (+ archived)
 - `src/domain/repositories/ITicketRepository.ts` (+ archive)
-- `src/infrastructure/repositories/MongoTicketRepository.ts` (+ archive, findAll filtre)
+- `src/domain/use-cases/UpdateTicket.ts` (+ vérification anti-modification si archivé)
+- `src/infrastructure/repositories/MongoTicketRepository.ts` (+ archive, findAll retourne tous les tickets)
 - `src/infrastructure/database/schemas/TicketSchema.ts` (+ archived)
 - `src/presentation/components/TicketDetail.tsx` (+ badge, conditions)
+- `src/presentation/components/TicketCard.tsx` (+ badge Archivé, style visuel)
+- `app/page.tsx` (utilise TicketListWithArchiveToggle)
 - Tous les fichiers de tests (+ archived: false dans les mocks)
 
 ---
