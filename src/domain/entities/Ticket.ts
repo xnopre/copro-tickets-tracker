@@ -1,11 +1,12 @@
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { UserPublic } from './User';
 
 export interface Ticket {
   id: string;
   title: string;
   description: string;
   status: TicketStatus;
-  assignedTo: string | null;
+  assignedTo: UserPublic | null;
   archived: boolean;
   createdAt: Date;
   updatedAt: Date;

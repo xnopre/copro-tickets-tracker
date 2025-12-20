@@ -70,6 +70,7 @@ npm run build
 # Linting
 npm run lint
 npm run type-check
+npm run lint
 ```
 
 ## ⚠️ CHECKLIST DE FIN D'ÉTAPE (OBLIGATOIRE)
@@ -86,6 +87,7 @@ Avant de considérer une étape comme terminée, vérifier SYSTÉMATIQUEMENT :
 ### 2. Validation Build
 
 - [ ] Type-check sans erreur : `npm run type-check`
+- [ ] Lint sans erreur : `npm run lint`
 - [ ] Build réussi : `npm run build`
 
 ### 3. Vérification Systématique des Tests Manquants
@@ -106,12 +108,6 @@ find src app -type f \( -name "*.ts" -o -name "*.tsx" \) \
 - Fichier de configuration
 
 **Si aucun des cas ci-dessus** → CRÉER LE TEST IMMÉDIATEMENT
-
-### 4. Comptage des Tests
-
-- Noter le nombre de tests AVANT l'étape
-- Vérifier que le nombre a augmenté APRÈS l'étape
-- **Minimum** : +1 test par nouveau fichier de code
 
 ## Configuration de la Base de Données
 

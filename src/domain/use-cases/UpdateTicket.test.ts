@@ -2,6 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UpdateTicket } from './UpdateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { UserPublic } from '../entities/User';
+
+const mockUser: UserPublic = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'John',
+  lastName: 'Doe',
+};
+
+const mockUser2: UserPublic = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'Jane',
+  lastName: 'Smith',
+};
 
 describe('UpdateTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -34,7 +47,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -46,14 +59,14 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(mockRepository);
       const result = await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser.id,
       });
 
       expect(result).toEqual(mockTicket);
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser.id,
       });
     });
 
@@ -74,7 +87,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -86,12 +99,12 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(mockRepository);
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: '  John Doe  ',
+        assignedTo: `  ${mockUser.id}  `,
       });
 
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser.id,
       });
     });
   });
@@ -230,7 +243,7 @@ describe('UpdateTicket', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.RESOLVED,
-        assignedTo: 'Jane Smith',
+        assignedTo: mockUser2,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T12:00:00.000Z'),
@@ -244,7 +257,7 @@ describe('UpdateTicket', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.RESOLVED,
-        assignedTo: 'Jane Smith',
+        assignedTo: mockUser2.id,
       });
 
       expect(result).toEqual(mockTicket);
@@ -252,7 +265,7 @@ describe('UpdateTicket', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.RESOLVED,
-        assignedTo: 'Jane Smith',
+        assignedTo: mockUser2.id,
       });
     });
   });
@@ -342,7 +355,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
@@ -378,7 +391,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
@@ -490,7 +503,7 @@ describe('UpdateTicket', () => {
 
       await expect(
         useCase.execute('1', {
-          assignedTo: 'John Doe',
+          assignedTo: mockUser.id,
         })
       ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
     });

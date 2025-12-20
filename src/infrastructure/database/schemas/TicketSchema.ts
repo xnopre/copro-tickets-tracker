@@ -1,11 +1,11 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models, Document, Types } from 'mongoose';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
 export interface TicketDocument extends Document {
   title: string;
   description: string;
   status: TicketStatus;
-  assignedTo: string | null;
+  assignedTo: Types.ObjectId | null;
   archived: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -29,7 +29,8 @@ const ticketSchema = new Schema<TicketDocument>(
       required: true,
     },
     assignedTo: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       default: null,
     },
     archived: {

@@ -8,19 +8,40 @@ import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 const mockOnTicketUpdated = vi.fn();
 const mockOnCancel = vi.fn();
 
+// Mock users data
+const mockUsers = [
+  {
+    id: '1',
+    firstName: 'John',
+    lastName: 'Doe',
+  },
+  {
+    id: '2',
+    firstName: 'Jane',
+    lastName: 'Smith',
+  },
+];
+
 describe('EditTicketForm', () => {
   const defaultProps = {
     ticketId: '123',
     currentTitle: 'Original Title',
     currentDescription: 'Original Description',
     currentStatus: TicketStatus.NEW,
-    currentAssignedTo: 'John Doe',
+    currentAssignedTo: '1',
     onTicketUpdated: mockOnTicketUpdated,
     onCancel: mockOnCancel,
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
+
+    // Mock /api/users endpoint
+    server.use(
+      http.get('/api/users', () => {
+        return HttpResponse.json(mockUsers);
+      })
+    );
   });
 
   describe('Rendering', () => {
@@ -36,14 +57,18 @@ describe('EditTicketForm', () => {
       expect(screen.getByRole('button', { name: /Annuler/ })).toBeInTheDocument();
     });
 
-    it('should render form with pre-filled status and assignedTo', () => {
+    it('should render form with pre-filled status and assignedTo', async () => {
       render(<EditTicketForm {...defaultProps} />);
 
       const statusSelect = screen.getByLabelText(/Statut/) as HTMLSelectElement;
-      const assignedToInput = screen.getByLabelText(/Personne assignée/) as HTMLInputElement;
+
+      // Wait for users to load
+      await waitFor(() => {
+        const assignedToSelect = screen.getByLabelText(/Personne assignée/) as HTMLSelectElement;
+        expect(assignedToSelect.value).toBe('1');
+      });
 
       expect(statusSelect.value).toBe(TicketStatus.NEW);
-      expect(assignedToInput.value).toBe('John Doe');
     });
   });
 
@@ -184,7 +209,7 @@ describe('EditTicketForm', () => {
         title: 'Updated Title',
         description: 'Updated Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Jane Smith',
+        assignedTo: null,
         createdAt: new Date('2025-01-15T10:00:00Z').toISOString(),
         updatedAt: new Date('2025-01-15T11:00:00Z').toISOString(),
       };
@@ -203,13 +228,13 @@ describe('EditTicketForm', () => {
       const titleInput = screen.getByLabelText(/Titre/);
       const descriptionInput = screen.getByLabelText(/Description/);
       const statusSelect = screen.getByLabelText(/Statut/);
-      const assignedToInput = screen.getByLabelText(/Personne assignée/);
+      const assignedToSelect = screen.getByLabelText(/Personne assignée/);
       const submitButton = screen.getByRole('button', { name: 'Enregistrer' });
 
       fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
       fireEvent.change(descriptionInput, { target: { value: 'Updated Description' } });
       fireEvent.change(statusSelect, { target: { value: TicketStatus.IN_PROGRESS } });
-      fireEvent.change(assignedToInput, { target: { value: 'Jane Smith' } });
+      fireEvent.change(assignedToSelect, { target: { value: '' } });
       fireEvent.click(submitButton);
 
       await waitFor(() => {
@@ -220,7 +245,7 @@ describe('EditTicketForm', () => {
         title: 'Updated Title',
         description: 'Updated Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Jane Smith',
+        assignedTo: null,
       });
 
       expect(mockOnTicketUpdated).toHaveBeenCalledTimes(1);
@@ -230,7 +255,7 @@ describe('EditTicketForm', () => {
           title: 'Updated Title',
           description: 'Updated Description',
           status: TicketStatus.IN_PROGRESS,
-          assignedTo: 'Jane Smith',
+          assignedTo: null,
         })
       );
     });
@@ -243,7 +268,7 @@ describe('EditTicketForm', () => {
             title: 'Updated Title',
             description: 'Updated Description',
             status: TicketStatus.NEW,
-            assignedTo: 'John Doe',
+            assignedTo: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           });

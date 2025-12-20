@@ -38,7 +38,7 @@ export default function TicketDetailsWithUpdate({ initialTicket }: TicketDetails
           currentTitle={ticket.title}
           currentDescription={ticket.description}
           currentStatus={ticket.status}
-          currentAssignedTo={ticket.assignedTo}
+          currentAssignedTo={ticket.assignedTo?.id || ''}
           onTicketUpdated={handleTicketContentUpdated}
           onCancel={handleCancelEdit}
         />

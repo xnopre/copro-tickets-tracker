@@ -70,7 +70,9 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
         {ticket.assignedTo && (
           <div className="mb-4 text-sm">
             <span className="font-semibold text-gray-700">Assigné à :</span>
-            <p className="text-gray-600">{ticket.assignedTo}</p>
+            <p className="text-gray-600">
+              {ticket.assignedTo.firstName} {ticket.assignedTo.lastName}
+            </p>
           </div>
         )}
         <div className="grid grid-cols-2 gap-4 text-sm">

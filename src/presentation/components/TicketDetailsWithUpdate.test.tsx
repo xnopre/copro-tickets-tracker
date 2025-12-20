@@ -1,10 +1,15 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { http, HttpResponse } from 'msw';
-import { server } from '../../../vitest.setup';
 import TicketDetailsWithUpdate from './TicketDetailsWithUpdate';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { UserPublic } from '@/domain/entities/User';
+
+const mockUser: UserPublic = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'John',
+  lastName: 'Doe',
+};
 
 // Mock TicketDetail
 vi.mock('./TicketDetail', () => ({
@@ -13,7 +18,9 @@ vi.mock('./TicketDetail', () => ({
       <h1>{ticket.title}</h1>
       <p>{ticket.description}</p>
       <span data-testid="ticket-status">{ticket.status}</span>
-      <span data-testid="ticket-assigned-to">{ticket.assignedTo}</span>
+      <span data-testid="ticket-assigned-to">
+        {ticket.assignedTo ? `${ticket.assignedTo.firstName} ${ticket.assignedTo.lastName}` : ''}
+      </span>
       {onEditClick && (
         <button onClick={onEditClick} data-testid="edit-button">
           Modifier
@@ -54,7 +61,7 @@ vi.mock('./EditTicketForm', () => ({
             title: 'Updated Title',
             description: 'Updated Description',
             status: TicketStatus.IN_PROGRESS,
-            assignedTo: 'Updated Person',
+            assignedTo: mockUser,
             archived: false,
             createdAt: new Date('2025-01-10T10:00:00.000Z'),
             updatedAt: new Date('2025-01-15T14:00:00.000Z'),
@@ -149,7 +156,7 @@ describe('TicketDetailsWithUpdate', () => {
         expect(screen.getByText('Updated Title')).toBeInTheDocument();
         expect(screen.getByText('Updated Description')).toBeInTheDocument();
         expect(screen.getByTestId('ticket-status')).toHaveTextContent(TicketStatus.IN_PROGRESS);
-        expect(screen.getByTestId('ticket-assigned-to')).toHaveTextContent('Updated Person');
+        expect(screen.getByTestId('ticket-assigned-to')).toHaveTextContent('John Doe');
         expect(screen.queryByTestId('edit-form')).not.toBeInTheDocument();
       });
     });
@@ -160,7 +167,7 @@ describe('TicketDetailsWithUpdate', () => {
         title: 'Original Title',
         description: 'Original Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'John Doe',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-10T10:00:00.000Z'),
         updatedAt: new Date('2025-01-10T10:00:00.000Z'),
@@ -174,7 +181,7 @@ describe('TicketDetailsWithUpdate', () => {
       expect(screen.getByText('Editing Title: Original Title')).toBeInTheDocument();
       expect(screen.getByText('Editing Description: Original Description')).toBeInTheDocument();
       expect(screen.getByText('Editing Status: IN_PROGRESS')).toBeInTheDocument();
-      expect(screen.getByText('Editing Assigned To: John Doe')).toBeInTheDocument();
+      expect(screen.getByText('Editing Assigned To: 507f1f77bcf86cd799439017')).toBeInTheDocument();
       expect(screen.getByTestId('edit-form')).toHaveAttribute('data-ticket-id', '456');
     });
   });

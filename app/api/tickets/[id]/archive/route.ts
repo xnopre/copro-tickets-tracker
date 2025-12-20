@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
 
   try {

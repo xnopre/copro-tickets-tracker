@@ -2,6 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket } from '@/domain/entities/Ticket';
+import { UserPublic } from '@/domain/entities/User';
+
+const mockUser: UserPublic = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'Jean',
+  lastName: 'Dupont',
+};
+
+const mockUser2: UserPublic = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'Marie',
+  lastName: 'Martin',
+};
 
 // Mock ServiceFactory
 const mockGetTicketById = vi.fn();
@@ -42,7 +55,7 @@ describe('TicketPage', () => {
     title: "Réparer l'ascenseur",
     description: "L'ascenseur est en panne depuis hier",
     status: TicketStatus.IN_PROGRESS,
-    assignedTo: 'Jean Dupont',
+    assignedTo: mockUser,
     archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),
     updatedAt: new Date('2025-01-20T14:45:00'),
@@ -119,7 +132,7 @@ describe('TicketPage', () => {
       ...mockTicket,
       id: '789',
       status: TicketStatus.RESOLVED,
-      assignedTo: 'Marie Martin',
+      assignedTo: mockUser2,
     };
 
     mockGetTicketById.mockResolvedValue(resolvedTicket);

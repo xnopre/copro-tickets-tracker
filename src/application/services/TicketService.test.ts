@@ -3,6 +3,25 @@ import { TicketService } from './TicketService';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
+import { UserPublic } from '@/domain/entities/User';
+
+const mockUser: UserPublic = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'Jean',
+  lastName: 'Martin',
+};
+
+const mockUser2: UserPublic = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'Marie',
+  lastName: 'Dupont',
+};
+
+const mockUser3: UserPublic = {
+  id: '507f1f77bcf86cd799439018',
+  firstName: 'Admin',
+  lastName: 'User',
+};
 
 describe('TicketService', () => {
   let mockRepository: ITicketRepository;
@@ -37,7 +56,7 @@ describe('TicketService', () => {
           title: 'Ticket 2',
           description: 'Description 2',
           status: TicketStatus.IN_PROGRESS,
-          assignedTo: 'Jean Martin',
+          assignedTo: mockUser,
           archived: false,
           createdAt: new Date('2025-01-16'),
           updatedAt: new Date('2025-01-16'),
@@ -221,7 +240,7 @@ describe('TicketService', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Jean Martin',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-16'),
@@ -264,7 +283,7 @@ describe('TicketService', () => {
         title: 'Bug Fix',
         description: 'Fix the login issue',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Marie Dupont',
+        assignedTo: mockUser2,
         archived: false,
         createdAt: new Date('2025-01-10'),
         updatedAt: new Date('2025-01-15'),
@@ -275,7 +294,7 @@ describe('TicketService', () => {
         title: 'Bug Fix',
         description: 'Fix the login issue',
         status: TicketStatus.RESOLVED,
-        assignedTo: 'Marie Dupont',
+        assignedTo: mockUser2,
         archived: false,
         createdAt: new Date('2025-01-10'),
         updatedAt: new Date('2025-01-16'),
@@ -300,7 +319,7 @@ describe('TicketService', () => {
         title: 'Completed Task',
         description: 'Task completed successfully',
         status: TicketStatus.RESOLVED,
-        assignedTo: 'Admin',
+        assignedTo: mockUser3,
         archived: false,
         createdAt: new Date('2025-01-05'),
         updatedAt: new Date('2025-01-15'),
@@ -311,7 +330,7 @@ describe('TicketService', () => {
         title: 'Completed Task',
         description: 'Task completed successfully',
         status: TicketStatus.CLOSED,
-        assignedTo: 'Admin',
+        assignedTo: mockUser3,
         archived: false,
         createdAt: new Date('2025-01-05'),
         updatedAt: new Date('2025-01-16'),
