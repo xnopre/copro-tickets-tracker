@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Comment } from '@/domain/entities/Comment';
+import Button from '@/presentation/components/ui/Button';
+import Input from '@/presentation/components/ui/Input';
 
 interface AddCommentFormProps {
   ticketId: string;
@@ -84,19 +86,14 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Ajouter un commentaire</h3>
       <form onSubmit={handleSubmit} aria-label="Formulaire d'ajout de commentaire">
         <div className="mb-4">
-          <label htmlFor="author" className="mb-2 block text-sm font-medium text-gray-700">
-            Votre nom <span aria-label="requis">*</span>
-          </label>
-          <input
+          <Input
             type="text"
             id="author"
+            label="Votre nom"
             value={author}
             onChange={e => setAuthor(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             disabled={isSubmitting}
-            aria-required="true"
-            aria-invalid={hasError && !author.trim()}
-            aria-describedby={hasError && !author.trim() ? 'form-error' : undefined}
+            required
             autoComplete="name"
           />
         </div>
@@ -140,14 +137,9 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          aria-busy={isSubmitting}
-        >
+        <Button type="submit" disabled={isSubmitting} className="w-full" aria-busy={isSubmitting}>
           {isSubmitting ? 'Ajout en cours...' : 'Ajouter le commentaire'}
-        </button>
+        </Button>
       </form>
     </div>
   );

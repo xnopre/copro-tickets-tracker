@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { Ticket } from '@/domain/entities/Ticket';
-import { statusColors, statusLabels } from '@/presentation/constants/ticketDisplay';
+import { statusLabels } from '@/presentation/constants/ticketDisplay';
 import { formatTicketDateTime } from '@/presentation/utils/ticketFormatters';
 import ArchiveTicketButton from './ArchiveTicketButton';
+import Button from '@/presentation/components/ui/Button';
+import Badge from '@/presentation/components/ui/Badge';
+import { getStatusBadgeVariant } from '@/presentation/utils/statusBadgeVariant';
 
 interface TicketDetailProps {
   ticket: Ticket;
@@ -30,31 +33,34 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{ticket.title}</h1>
             {ticket.archived && (
-              <span
-                className="mt-2 inline-block rounded bg-gray-600 px-3 py-1 text-sm font-medium text-white"
+              <Badge
+                variant="gray-dark"
+                size="sm"
+                rounded={false}
+                className="mt-2 inline-block"
                 aria-label="Ce ticket est archivé"
               >
                 ARCHIVÉ
-              </span>
+              </Badge>
             )}
           </div>
           <div className="flex items-center gap-3">
             {!ticket.archived && onEditClick && (
-              <button
+              <Button
                 onClick={onEditClick}
-                className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                 aria-label="Modifier le titre et la description du ticket"
               >
                 Modifier
-              </button>
+              </Button>
             )}
             {!ticket.archived && <ArchiveTicketButton ticketId={ticket.id} />}
-            <span
-              className={`rounded-full px-4 py-2 text-sm font-medium ${statusColors[ticket.status]}`}
+            <Badge
+              variant={getStatusBadgeVariant(ticket.status)}
+              size="sm"
               aria-label={`Statut du ticket : ${statusLabels[ticket.status]}`}
             >
               {statusLabels[ticket.status]}
-            </span>
+            </Badge>
           </div>
         </div>
       </header>

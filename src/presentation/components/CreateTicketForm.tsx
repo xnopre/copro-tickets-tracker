@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '@/presentation/components/ui/Button';
+import Input from '@/presentation/components/ui/Input';
 
 export default function CreateTicketForm() {
   const [title, setTitle] = useState('');
@@ -61,19 +63,14 @@ export default function CreateTicketForm() {
     <div className="rounded-lg bg-white p-6 shadow-md">
       <form onSubmit={handleSubmit} aria-label="Formulaire de création de ticket">
         <div className="mb-4">
-          <label htmlFor="title" className="mb-2 block text-sm font-medium text-gray-700">
-            Titre <span aria-label="requis">*</span>
-          </label>
-          <input
+          <Input
             type="text"
             id="title"
+            label="Titre"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             disabled={isSubmitting}
-            aria-required="true"
-            aria-invalid={hasError && !title.trim()}
-            aria-describedby={hasError && !title.trim() ? 'form-error' : undefined}
+            required
             autoComplete="off"
           />
         </div>
@@ -117,14 +114,9 @@ export default function CreateTicketForm() {
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          aria-busy={isSubmitting}
-        >
+        <Button type="submit" disabled={isSubmitting} className="w-full" aria-busy={isSubmitting}>
           {isSubmitting ? 'Création en cours...' : 'Créer le ticket'}
-        </button>
+        </Button>
       </form>
     </div>
   );
