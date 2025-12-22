@@ -72,7 +72,42 @@ Application web de gestion de tickets pour copropriété.
    MONGODB_URI=mongodb://localhost:27017/cotitra
    ```
 
-5. **Ajouter des tickets de test dans la base de données**
+5. **Ajouter des données de test dans la base de données**
+
+   **a) Créer des utilisateurs de test** :
+
+   Les utilisateurs sont définis dans un fichier JSON :
+   - Par défaut : `scripts/users.json` (fichier commité avec des données d'exemple)
+   - Configuration locale : `scripts/users.local.json` (ignoré par git, prioritaire si présent)
+
+   Pour utiliser vos propres utilisateurs sans modifier le fichier commité :
+
+   ```bash
+   cp scripts/users.json scripts/users.local.json
+   # Puis éditez scripts/users.local.json avec vos données
+   ```
+
+   Pour peupler la base de données avec ces utilisateurs :
+
+   ```bash
+   npm run seed:users
+   ```
+
+   Ce script va :
+   - Chercher `scripts/users.local.json` en priorité, sinon `scripts/users.json`
+   - Supprimer les utilisateurs existants de la base de données
+   - Créer les nouveaux utilisateurs
+   - Afficher la liste des utilisateurs créés
+
+   **Pour créer des utilisateurs en production (MongoDB Atlas)** :
+
+   ```bash
+   MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/cotitra npm run seed:users
+   ```
+
+   Remplacez l'URL par votre URL MongoDB Atlas complète.
+
+   **b) Créer des tickets de test** :
 
    Pour peupler la base de données avec des tickets d'exemple :
 
@@ -81,9 +116,9 @@ Application web de gestion de tickets pour copropriété.
    ```
 
    Ce script va :
-   - Supprimer les tickets existants
-   - Créer 4 tickets de démonstration avec différents statuts
-   - Afficher un résumé des tickets créés
+   - Supprimer les utilisateurs et tickets existants
+   - Créer 4 utilisateurs et 5 tickets de démonstration
+   - Afficher un résumé des données créées
 
 6. **Lancer le serveur de développement**
 
@@ -105,7 +140,8 @@ npm start              # Démarrer le serveur de production
 npm run lint           # Linter le code avec ESLint
 npm run type-check     # Vérifier les types TypeScript
 npm test               # Lancer les tests
-npm run seed           # Peupler la base de données avec des tickets de test
+npm run seed           # Peupler la base de données avec utilisateurs et tickets
+npm run seed:users     # Créer uniquement les utilisateurs de test
 npm run mongodb:start  # Démarrer MongoDB (macOS)
 npm run mongodb:stop   # Arrêter MongoDB (macOS)
 ```

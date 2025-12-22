@@ -38,6 +38,9 @@ yarn-error.log*
 .env*.local
 .env
 
+# Local seed data files
+scripts/users.local.json
+
 # Vercel
 .vercel
 

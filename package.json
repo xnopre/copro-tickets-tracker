@@ -21,6 +21,7 @@
     "mongodb:start": "brew services start mongodb/brew/mongodb-community",
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
     "seed": "tsx scripts/seed.ts",
+    "seed:users": "tsx scripts/seed_user.ts",
     "renovate:trigger": "gh workflow run renovate.yml"
   },
   "repository": {
