@@ -6,7 +6,8 @@
     "dev:stop": "lsof -ti:3000 | xargs kill -9 || echo 'No process running on port 3000'",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -20,6 +21,7 @@
     "mongodb:start": "brew services start mongodb/brew/mongodb-community",
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
     "seed": "tsx scripts/seed.ts",
+    "seed:users": "tsx scripts/seed_user.ts",
     "renovate:trigger": "gh workflow run renovate.yml"
   },
   "repository": {

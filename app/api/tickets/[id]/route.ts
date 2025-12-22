@@ -3,7 +3,7 @@ import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {

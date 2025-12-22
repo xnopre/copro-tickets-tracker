@@ -5,7 +5,7 @@ import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 
 vi.mock('./ArchiveTicketButton', () => ({
-  default: ({ ticketId }: { ticketId: string }) => (
+  default: ({ ticketId: _ticketId }: { ticketId: string }) => (
     <button aria-label="Archiver le ticket">Archiver</button>
   ),
 }));

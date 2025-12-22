@@ -2,6 +2,13 @@ import { describe, it, expect, vi } from 'vitest';
 import { GetTickets } from './GetTickets';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { UserPublic } from '../entities/User';
+
+const mockUser: UserPublic = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'Jean',
+  lastName: 'Martin',
+};
 
 describe('GetTickets', () => {
   const mockRepository: ITicketRepository = {
@@ -29,7 +36,7 @@ describe('GetTickets', () => {
         title: 'Ticket 2',
         description: 'Description 2',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: 'Jean Martin',
+        assignedTo: mockUser,
         archived: false,
         createdAt: new Date(),
         updatedAt: new Date(),

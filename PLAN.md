@@ -30,10 +30,11 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [💬 Étape 7 : Ajouter des Commentaires](#-étape-7--ajouter-des-commentaires)
 - [✏️ Étape 8 : Modifier un Ticket](#️-étape-8--modifier-un-ticket)
 - [📦 Étape 9 : Archiver un Ticket](#-étape-9--archiver-un-ticket)
-- [🎯 Étape 10 : Filtrer par Statut](#-étape-10--filtrer-par-statut)
-- [🔍 Étape 11 : Recherche de Tickets](#-étape-11--recherche-de-tickets)
-- [📊 Étape 12 : Dashboard avec Statistiques](#-étape-12--dashboard-avec-statistiques)
-- [🎨 Étape 13 : Polish UX/UI](#-étape-13--polish-uxui)
+- [👥 Étape 10 : Liste des Utilisateurs](#-étape-10--liste-des-utilisateurs)
+- [🎯 Étape 11 : Filtrer par Statut](#-étape-11--filtrer-par-statut)
+- [🔍 Étape 12 : Recherche de Tickets](#-étape-12--recherche-de-tickets)
+- [📊 Étape 13 : Dashboard avec Statistiques](#-étape-13--dashboard-avec-statistiques)
+- [🎨 Étape 14 : Polish UX/UI](#-étape-14--polish-uxui)
 - [🚀 Étapes Futures (Optionnelles)](#-étapes-futures-optionnelles)
 - [📝 Notes Importantes](#-notes-importantes)
 
@@ -1052,7 +1053,148 @@ app/                          # Next.js (convention)
 
 ---
 
-## 🎯 Étape 10 : Filtrer par Statut
+## 👥 Étape 10 : Liste des Utilisateurs
+
+**Objectif** : Créer une gestion des utilisateurs et remplacer l'assignation par texte libre par une sélection d'utilisateur
+
+### Ce qu'on livre
+
+- Entité User dans MongoDB avec nom, prénom, email, mot de passe
+- Architecture hexagonale complète pour les utilisateurs
+- API pour récupérer la liste des utilisateurs
+- Modification du champ `assignedTo` pour référencer un User (ObjectId)
+- Formulaire d'assignation avec liste déroulante d'utilisateurs
+- Script seed pour créer des utilisateurs de test
+- Tests unitaires complets
+
+### Tâches
+
+- [x] Créer l'entité User dans le domain
+  - [x] Interface User avec id, firstName, lastName, email, password
+  - [x] Interface CreateUserData
+- [x] Créer le schéma Mongoose pour User
+  - [x] Champs : firstName, lastName, email (unique), password
+  - [x] Index sur email
+  - [x] Timestamps (createdAt, updatedAt)
+- [x] Créer l'architecture hexagonale pour User
+  - [x] Interface IUserRepository (findAll, findById, findByEmail, create)
+  - [x] MongoUserRepository
+  - [x] Use cases GetUsers, GetUserById, CreateUser
+  - [x] UserService
+  - [x] ServiceFactory.getUserService()
+- [x] Créer les API routes
+  - [x] GET /api/users (liste des utilisateurs)
+  - [x] GET /api/users/[id] (détail d'un utilisateur)
+- [x] Modifier l'entité Ticket
+  - [x] Changer assignedTo de `string | null` vers `string | null` (ObjectId)
+  - [x] Ajouter une méthode/propriété pour récupérer les infos de l'utilisateur assigné
+- [x] Modifier le schéma Mongoose Ticket
+  - [x] Changer assignedTo pour référencer User (type: ObjectId, ref: 'User')
+  - [x] Ajouter populate() dans les requêtes pour récupérer les données de l'utilisateur
+- [x] Modifier le composant EditTicketForm (anciennement UpdateTicketStatusForm)
+  - [x] Remplacer le champ texte par un `<select>` avec la liste des utilisateurs
+  - [x] Récupérer la liste des users via l'API
+  - [x] Afficher "Prénom Nom" dans les options
+- [x] Modifier l'affichage de l'utilisateur assigné
+  - [x] Dans TicketCard : afficher "Assigné à : Prénom Nom"
+  - [x] Dans TicketDetail : afficher "Assigné à : Prénom Nom"
+- [x] Créer un script seed pour les utilisateurs
+  - [x] Créer 4 utilisateurs de test
+  - [x] Mettre à jour le seed des tickets pour référencer ces users
+- [x] Mettre à jour tous les tests
+  - [x] Tests User (use cases, repository, service, API routes) - 37 tests
+  - [x] Tests Ticket (mise à jour avec références User)
+  - [x] Tests composants (EditTicketForm avec select)
+- [x] Build TypeScript et Next.js
+- [ ] Déployer
+
+### Validation
+
+- ✅ On peut créer des utilisateurs dans MongoDB
+- ✅ La liste des utilisateurs est accessible via API
+- ✅ Le formulaire d'assignation affiche une liste déroulante
+- ✅ L'assignation crée une référence MongoDB vers User
+- ✅ Le nom complet de l'utilisateur s'affiche dans les tickets
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent
+- ✅ Build TypeScript et Next.js réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Schéma User** :
+
+```typescript
+{
+  firstName: string;
+  lastName: string;
+  email: string; // unique
+  password: string; // hashé (bcrypt)
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+**Référence dans Ticket** :
+
+```typescript
+// Avant
+assignedTo: string | null;
+
+// Après
+assignedTo: ObjectId | null; // référence vers User
+```
+
+**Population Mongoose** :
+
+Les requêtes doivent utiliser `.populate('assignedTo')` pour récupérer les données de l'utilisateur.
+
+**Affichage** :
+
+Format : "Prénom Nom" (ex: "Jean Dupont")
+
+**Sécurité** :
+
+- Ne JAMAIS renvoyer le mot de passe dans les API
+- Hacher les mots de passe avec bcrypt avant stockage
+- Pour cette étape, on stocke les mots de passe (sans authentification)
+- L'authentification sera implémentée dans une étape future
+
+**Fichiers créés** (20 nouveaux fichiers) :
+
+```
+src/domain/entities/User.ts
+src/domain/repositories/IUserRepository.ts
+src/domain/use-cases/CreateUser.ts + .test.ts
+src/domain/use-cases/GetUsers.ts + .test.ts
+src/domain/use-cases/GetUserById.ts + .test.ts
+src/infrastructure/database/schemas/UserSchema.ts + .test.ts
+src/infrastructure/repositories/MongoUserRepository.ts + .test.ts
+src/application/services/UserService.ts + .test.ts
+app/api/users/route.ts + .test.ts
+app/api/users/[id]/route.ts + .test.ts
+```
+
+**Fichiers modifiés** (10 fichiers) :
+
+```
+PLAN.md
+src/domain/entities/Ticket.ts (+ assignedUser)
+src/infrastructure/database/schemas/TicketSchema.ts (ref User)
+src/infrastructure/repositories/MongoTicketRepository.ts (populate)
+src/application/services/ServiceFactory.ts (+ getUserService)
+src/presentation/components/EditTicketForm.tsx (select au lieu d'input)
+src/presentation/components/EditTicketForm.test.tsx (MSW mock)
+src/presentation/components/TicketCard.tsx (assignedUser display)
+src/presentation/components/TicketDetail.tsx (assignedUser display)
+scripts/seed.ts (création users)
+```
+
+**Tests** : +37 nouveaux tests (use cases: 13, service: 4, repository: 11, API routes: 7, schema: 5)
+
+---
+
+## 🎯 Étape 11 : Filtrer par Statut
 
 **Objectif** : Permettre de filtrer la liste des tickets par statut
 
@@ -1080,7 +1222,7 @@ app/                          # Next.js (convention)
 
 ---
 
-## 🔍 Étape 11 : Recherche de Tickets
+## 🔍 Étape 12 : Recherche de Tickets
 
 **Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
 
@@ -1108,7 +1250,7 @@ app/                          # Next.js (convention)
 
 ---
 
-## 📊 Étape 12 : Dashboard avec Statistiques
+## 📊 Étape 13 : Dashboard avec Statistiques
 
 **Objectif** : Afficher un résumé des tickets sur la page d'accueil
 
@@ -1136,7 +1278,7 @@ app/                          # Next.js (convention)
 
 ---
 
-## 🎨 Étape 13 : Polish UX/UI
+## 🎨 Étape 14 : Polish UX/UI
 
 **Objectif** : Améliorer l'expérience utilisateur
 

@@ -122,16 +122,17 @@ describe('Ticket Schema', () => {
     });
 
     it('should create a ticket with assignedTo', async () => {
+      const validUserId = new mongoose.Types.ObjectId();
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
-        assignedTo: 'Jean Martin',
+        assignedTo: validUserId,
       };
 
       const ticket = new TicketModel(ticketData);
       const savedTicket = await ticket.save();
 
-      expect(savedTicket.assignedTo).toBe('Jean Martin');
+      expect(savedTicket.assignedTo).toEqual(validUserId);
     });
 
     it('should allow updating assignedTo', async () => {
@@ -146,10 +147,11 @@ describe('Ticket Schema', () => {
 
       expect(savedTicket.assignedTo).toBeNull();
 
-      savedTicket.assignedTo = 'Marie Dubois';
+      const newUserId = new mongoose.Types.ObjectId();
+      savedTicket.assignedTo = newUserId;
       const updatedTicket = await savedTicket.save();
 
-      expect(updatedTicket.assignedTo).toBe('Marie Dubois');
+      expect(updatedTicket.assignedTo).toEqual(newUserId);
     });
   });
 

@@ -3,6 +3,19 @@ import { describe, it, expect } from 'vitest';
 import TicketList from './TicketList';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { UserPublic } from '@/domain/entities/User';
+
+const mockUser1: UserPublic = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'Jean',
+  lastName: 'Martin',
+};
+
+const mockUser2: UserPublic = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'Marie',
+  lastName: 'Dubois',
+};
 
 describe('TicketList', () => {
   const mockTickets: Ticket[] = [
@@ -21,7 +34,7 @@ describe('TicketList', () => {
       title: 'Second Ticket',
       description: 'Second description',
       status: TicketStatus.IN_PROGRESS,
-      assignedTo: 'Jean Martin',
+      assignedTo: mockUser1,
       archived: false,
       createdAt: new Date('2025-01-16'),
       updatedAt: new Date('2025-01-16'),
@@ -31,7 +44,7 @@ describe('TicketList', () => {
       title: 'Third Ticket',
       description: 'Third description',
       status: TicketStatus.RESOLVED,
-      assignedTo: 'Marie Dubois',
+      assignedTo: mockUser2,
       archived: false,
       createdAt: new Date('2025-01-17'),
       updatedAt: new Date('2025-01-17'),
