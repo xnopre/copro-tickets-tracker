@@ -11,7 +11,7 @@ interface EditTicketFormProps {
   currentTitle: string;
   currentDescription: string;
   currentStatus: TicketStatus;
-  currentAssignedTo: string | null;
+  currentAssignedTo: UserPublic | null;
   onTicketUpdated: (ticket: Ticket) => void;
   onCancel: () => void;
 }
@@ -28,7 +28,7 @@ export default function EditTicketForm({
   const [title, setTitle] = useState(currentTitle);
   const [description, setDescription] = useState(currentDescription);
   const [status, setStatus] = useState<TicketStatus>(currentStatus);
-  const [assignedTo, setAssignedTo] = useState(currentAssignedTo || '');
+  const [assignedTo, setAssignedTo] = useState(currentAssignedTo?.id || '');
   const [users, setUsers] = useState<UserPublic[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);

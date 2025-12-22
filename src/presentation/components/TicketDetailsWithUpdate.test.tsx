@@ -45,7 +45,7 @@ vi.mock('./EditTicketForm', () => ({
     currentTitle: string;
     currentDescription: string;
     currentStatus: TicketStatus;
-    currentAssignedTo: string | null;
+    currentAssignedTo: UserPublic | null;
     onTicketUpdated: (ticket: Ticket) => void;
     onCancel: () => void;
   }) => (
@@ -53,7 +53,7 @@ vi.mock('./EditTicketForm', () => ({
       <p>Editing Title: {currentTitle}</p>
       <p>Editing Description: {currentDescription}</p>
       <p>Editing Status: {currentStatus}</p>
-      <p>Editing Assigned To: {currentAssignedTo || 'None'}</p>
+      <p>Editing Assigned To: {currentAssignedTo?.id || 'None'}</p>
       <button
         onClick={() =>
           onTicketUpdated({

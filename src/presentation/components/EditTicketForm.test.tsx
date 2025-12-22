@@ -28,7 +28,7 @@ describe('EditTicketForm', () => {
     currentTitle: 'Original Title',
     currentDescription: 'Original Description',
     currentStatus: TicketStatus.NEW,
-    currentAssignedTo: '1',
+    currentAssignedTo: { id: '1', firstName: 'John', lastName: 'Doe' },
     onTicketUpdated: mockOnTicketUpdated,
     onCancel: mockOnCancel,
   };
