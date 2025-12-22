@@ -26,25 +26,21 @@ async function seed() {
         firstName: 'Jean',
         lastName: 'Martin',
         email: 'jean.martin@example.com',
-        password: 'password123', // En production, utiliser bcrypt pour hasher
       },
       {
         firstName: 'Marie',
         lastName: 'Dubois',
         email: 'marie.dubois@example.com',
-        password: 'password123',
       },
       {
         firstName: 'Pierre',
         lastName: 'Lefebvre',
         email: 'pierre.lefebvre@example.com',
-        password: 'password123',
       },
       {
         firstName: 'Sophie',
         lastName: 'Bernard',
         email: 'sophie.bernard@example.com',
-        password: 'password123',
       },
     ];
 
