@@ -8,15 +8,15 @@ interface TicketListProps {
 export default function TicketList({ tickets }: TicketListProps) {
   if (tickets.length === 0) {
     return (
-      <div className="text-center py-12" role="status" aria-live="polite">
-        <p className="text-gray-500 text-lg">Aucun ticket à afficher</p>
+      <div className="py-12 text-center" role="status" aria-live="polite">
+        <p className="text-lg text-gray-500">Aucun ticket à afficher</p>
       </div>
     );
   }
 
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
       role="list"
       aria-label={`Liste de ${tickets.length} ticket${tickets.length > 1 ? 's' : ''}`}
     >

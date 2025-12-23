@@ -8,7 +8,7 @@ interface CommentListProps {
 export default function CommentList({ comments }: CommentListProps) {
   if (comments.length === 0) {
     return (
-      <div className="text-center py-8" role="status" aria-live="polite">
+      <div className="py-8 text-center" role="status" aria-live="polite">
         <p className="text-gray-500">Aucun commentaire pour le moment</p>
       </div>
     );

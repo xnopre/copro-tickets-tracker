@@ -14,11 +14,11 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
   const formattedUpdatedAt = formatTicketDateTime(ticket.updatedAt);
 
   return (
-    <article className="bg-white rounded-lg shadow-lg p-8">
+    <article className="rounded-lg bg-white p-8 shadow-lg">
       <nav className="mb-6" aria-label="Navigation de retour">
         <Link
           href="/"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          className="inline-flex items-center rounded text-sm font-medium text-blue-600 hover:text-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
           aria-label="Retour à la liste des tickets"
         >
           ← Retour à la liste
@@ -26,12 +26,12 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
       </nav>
 
       <header className="mb-6">
-        <div className="flex justify-between items-start mb-4">
+        <div className="mb-4 flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{ticket.title}</h1>
             {ticket.archived && (
               <span
-                className="inline-block mt-2 px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded"
+                className="mt-2 inline-block rounded bg-gray-600 px-3 py-1 text-sm font-medium text-white"
                 aria-label="Ce ticket est archivé"
               >
                 ARCHIVÉ
@@ -42,7 +42,7 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
             {!ticket.archived && onEditClick && (
               <button
                 onClick={onEditClick}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className="rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                 aria-label="Modifier le titre et la description du ticket"
               >
                 Modifier
@@ -50,7 +50,7 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
             )}
             {!ticket.archived && <ArchiveTicketButton ticketId={ticket.id} />}
             <span
-              className={`px-4 py-2 rounded-full text-sm font-medium ${statusColors[ticket.status]}`}
+              className={`rounded-full px-4 py-2 text-sm font-medium ${statusColors[ticket.status]}`}
               aria-label={`Statut du ticket : ${statusLabels[ticket.status]}`}
             >
               {statusLabels[ticket.status]}
@@ -60,10 +60,10 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
       </header>
 
       <section className="mb-6" aria-labelledby="description-heading">
-        <h2 id="description-heading" className="text-lg font-semibold text-gray-700 mb-2">
+        <h2 id="description-heading" className="mb-2 text-lg font-semibold text-gray-700">
           Description
         </h2>
-        <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{ticket.description}</p>
+        <p className="leading-relaxed whitespace-pre-wrap text-gray-600">{ticket.description}</p>
       </section>
 
       <footer className="border-t pt-4" aria-label="Informations supplémentaires">

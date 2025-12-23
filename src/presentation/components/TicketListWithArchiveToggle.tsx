@@ -23,14 +23,14 @@ export default function TicketListWithArchiveToggle({ tickets }: TicketListWithA
       <div className="mb-4 flex items-center gap-2">
         <label
           htmlFor="show-archived"
-          className="flex items-center gap-2 cursor-pointer text-gray-700"
+          className="flex cursor-pointer items-center gap-2 text-gray-700"
         >
           <input
             type="checkbox"
             id="show-archived"
             checked={showArchived}
             onChange={e => setShowArchived(e.target.checked)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
             aria-label="Afficher les tickets archivés"
           />
           <span>Voir les archives</span>
