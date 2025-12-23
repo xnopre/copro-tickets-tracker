@@ -47,7 +47,7 @@ export default function ArchiveTicketButton({ ticketId }: ArchiveTicketButtonPro
     <>
       <button
         onClick={handleArchiveClick}
-        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+        className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
         aria-label="Archiver le ticket"
       >
         Archiver
@@ -55,13 +55,13 @@ export default function ArchiveTicketButton({ ticketId }: ArchiveTicketButtonPro
 
       {showConfirmation && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black"
           role="dialog"
           aria-modal="true"
           aria-labelledby="archive-confirmation-title"
         >
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h2 id="archive-confirmation-title" className="text-xl font-bold mb-4">
+          <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6">
+            <h2 id="archive-confirmation-title" className="mb-4 text-xl font-bold">
               Confirmer l'archivage
             </h2>
             <p className="mb-6">
@@ -71,25 +71,25 @@ export default function ArchiveTicketButton({ ticketId }: ArchiveTicketButtonPro
 
             {error && (
               <div
-                className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded"
+                className="mb-4 rounded border border-red-400 bg-red-100 p-3 text-red-700"
                 role="alert"
               >
                 {error}
               </div>
             )}
 
-            <div className="flex gap-4 justify-end">
+            <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancelArchive}
                 disabled={isArchiving}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Annuler
               </button>
               <button
                 onClick={handleConfirmArchive}
                 disabled={isArchiving}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-busy={isArchiving}
               >
                 {isArchiving ? 'Archivage en cours...' : 'Confirmer'}

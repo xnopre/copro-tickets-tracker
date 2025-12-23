@@ -46,7 +46,7 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
 
   if (isLoading) {
     return (
-      <div className="text-center py-8" role="status" aria-live="polite">
+      <div className="py-8 text-center" role="status" aria-live="polite">
         <p className="text-gray-500">Chargement des commentaires...</p>
       </div>
     );
@@ -54,7 +54,7 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-md" role="alert">
+      <div className="rounded-md border border-red-400 bg-red-100 p-4 text-red-700" role="alert">
         {error}
       </div>
     );
@@ -62,7 +62,7 @@ export default function TicketComments({ ticketId }: TicketCommentsProps) {
 
   return (
     <section aria-labelledby="comments-heading">
-      <h2 id="comments-heading" className="text-2xl font-bold text-gray-900 mb-6">
+      <h2 id="comments-heading" className="mb-6 text-2xl font-bold text-gray-900">
         Commentaires ({comments.length})
       </h2>
 

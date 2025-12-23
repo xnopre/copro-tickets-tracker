@@ -20,7 +20,7 @@ export default async function TicketPage({ params }: TicketPageProps) {
 
   return (
     <main className="min-h-screen bg-gray-50 p-8" aria-label="Détail du ticket">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="mx-auto max-w-4xl space-y-8">
         <TicketDetailsWithUpdate initialTicket={ticket} />
         <TicketComments ticketId={id} />
       </div>
