@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import TicketDetailsWithUpdate from '@/presentation/components/TicketDetailsWithUpdate';
 import TicketComments from '@/presentation/components/TicketComments';
+import Container from '@/presentation/components/ui/Container';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,9 @@ export default async function TicketPage({ params }: TicketPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-8" aria-label="Détail du ticket">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <TicketDetailsWithUpdate initialTicket={ticket} />
-        <TicketComments ticketId={id} />
-      </div>
-    </main>
+    <Container className="space-y-8">
+      <TicketDetailsWithUpdate initialTicket={ticket} />
+      <TicketComments ticketId={id} />
+    </Container>
   );
 }

@@ -3,6 +3,7 @@
 import { Ticket } from '@/domain/entities/Ticket';
 import { useState } from 'react';
 import TicketList from './TicketList';
+import Checkbox from '@/presentation/components/ui/Checkbox';
 
 interface TicketListWithArchiveToggleProps {
   tickets: Ticket[];
@@ -21,20 +22,13 @@ export default function TicketListWithArchiveToggle({ tickets }: TicketListWithA
   return (
     <div>
       <div className="mb-4 flex items-center gap-2">
-        <label
-          htmlFor="show-archived"
-          className="flex cursor-pointer items-center gap-2 text-gray-700"
-        >
-          <input
-            type="checkbox"
-            id="show-archived"
-            checked={showArchived}
-            onChange={e => setShowArchived(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500"
-            aria-label="Afficher les tickets archivés"
-          />
-          <span>Voir les archives</span>
-        </label>
+        <Checkbox
+          id="show-archived"
+          checked={showArchived}
+          onChange={e => setShowArchived(e.target.checked)}
+          label="Voir les archives"
+          aria-label="Afficher les tickets archivés"
+        />
       </div>
       <TicketList tickets={sortedTickets} />
     </div>

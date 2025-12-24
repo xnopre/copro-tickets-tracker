@@ -154,11 +154,11 @@ describe('TicketPage', () => {
 
     const TicketPage = (await import('./page')).default;
     const jsx = await TicketPage({ params: Promise.resolve({ id: '123' }) });
-    const { container } = render(jsx);
+    render(jsx);
 
-    const main = container.querySelector('main');
-    expect(main).toBeInTheDocument();
-    expect(main).toHaveAttribute('aria-label', 'Détail du ticket');
+    // Check that the page renders ticket details with proper accessibility
+    expect(screen.getByText("Réparer l'ascenseur")).toBeInTheDocument();
+    expect(screen.getByLabelText('Statut du ticket : En cours')).toBeInTheDocument();
   });
 
   it('should render TicketComments component with correct ticketId', async () => {

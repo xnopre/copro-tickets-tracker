@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/presentation/components/ui/Link';
 
 export default function NotFound() {
   return (
@@ -19,7 +19,9 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
-          className="inline-block rounded-md bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          variant="button"
+          size="lg"
+          className="inline-block"
           aria-label="Retour à la liste des tickets"
         >
           Retour à la liste

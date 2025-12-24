@@ -80,17 +80,17 @@ describe('TicketCard', () => {
       const archivedTicket = { ...mockTicket, archived: true };
       const { container } = render(<TicketCard ticket={archivedTicket} />);
 
-      const article = container.querySelector('article');
-      expect(article).toHaveClass('opacity-70', 'border-2', 'border-gray-300');
+      const card = container.querySelector('.rounded-lg.bg-white');
+      expect(card).toHaveClass('opacity-70', 'border-2', 'border-gray-300');
     });
 
     it('should not apply archived styling for non-archived tickets', () => {
       const { container } = render(<TicketCard ticket={mockTicket} />);
 
-      const article = container.querySelector('article');
-      expect(article).not.toHaveClass('opacity-70');
-      expect(article).not.toHaveClass('border-2');
-      expect(article).not.toHaveClass('border-gray-300');
+      const card = container.querySelector('.rounded-lg.bg-white');
+      expect(card).not.toHaveClass('opacity-70');
+      expect(card).not.toHaveClass('border-2');
+      expect(card).not.toHaveClass('border-gray-300');
     });
 
     it('should include archived status in aria-label', () => {
@@ -118,8 +118,9 @@ describe('TicketCard', () => {
       const timeElements = screen.getAllByText(/Créé le|Modifié le/);
       expect(timeElements.length).toBeGreaterThan(0);
 
-      const article = container.querySelector('article');
-      expect(article).toBeInTheDocument();
+      const card = container.querySelector('.rounded-lg.bg-white');
+      expect(card).toBeInTheDocument();
+      expect(card).toHaveClass('cursor-pointer');
     });
   });
 });

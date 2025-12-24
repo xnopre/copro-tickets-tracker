@@ -42,10 +42,10 @@ describe('CommentCard', () => {
   });
 
   describe('Accessibility', () => {
-    it('should use article element for semantic HTML', () => {
+    it('should use Card component with bordered variant', () => {
       const { container } = render(<CommentCard comment={mockComment} />);
-      const article = container.querySelector('article');
-      expect(article).toBeInTheDocument();
+      const card = container.querySelector('.rounded-lg.bg-white.border.border-gray-200');
+      expect(card).toBeInTheDocument();
     });
 
     it('should use header element for comment header', () => {
