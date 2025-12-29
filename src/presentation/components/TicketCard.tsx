@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import { Ticket } from '@/domain/entities/Ticket';
-import { statusColors, statusLabels } from '@/presentation/constants/ticketDisplay';
+import { statusLabels } from '@/presentation/constants/ticketDisplay';
 import { formatTicketDate } from '@/presentation/utils/ticketFormatters';
+import Badge from '@/presentation/components/ui/Badge';
+import { getStatusBadgeVariant } from '@/presentation/utils/statusBadgeVariant';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -28,19 +30,16 @@ export default function TicketCard({ ticket }: TicketCardProps) {
           <h3 className="text-lg font-semibold text-gray-900">{ticket.title}</h3>
           <div className="flex gap-2">
             {ticket.archived && (
-              <span
-                className="rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700"
-                aria-label="Ticket archivé"
-              >
+              <Badge variant="gray-light" aria-label="Ticket archivé">
                 Archivé
-              </span>
+              </Badge>
             )}
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[ticket.status]}`}
+            <Badge
+              variant={getStatusBadgeVariant(ticket.status)}
               aria-label={`Statut : ${statusLabels[ticket.status]}`}
             >
               {statusLabels[ticket.status]}
-            </span>
+            </Badge>
           </div>
         </div>
         <p className="mb-4 text-sm text-gray-600">{ticket.description}</p>

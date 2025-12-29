@@ -5,6 +5,8 @@ import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { UserPublic } from '@/domain/entities/User';
 import { statusLabels } from '@/presentation/constants/ticketDisplay';
+import Button from '@/presentation/components/ui/Button';
+import Input from '@/presentation/components/ui/Input';
 
 interface EditTicketFormProps {
   ticketId: string;
@@ -127,19 +129,14 @@ export default function EditTicketForm({
     <div className="rounded-lg bg-white p-6 shadow-md">
       <form onSubmit={handleSubmit} aria-label="Formulaire de modification de ticket">
         <div className="mb-4">
-          <label htmlFor="edit-title" className="mb-2 block text-sm font-medium text-gray-700">
-            Titre <span aria-label="requis">*</span>
-          </label>
-          <input
+          <Input
             type="text"
             id="edit-title"
+            label="Titre"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             disabled={isSubmitting}
-            aria-required="true"
-            aria-invalid={hasError && !title.trim()}
-            aria-describedby={hasError && !title.trim() ? 'form-error' : undefined}
+            required
             autoComplete="off"
           />
         </div>
@@ -231,23 +228,19 @@ export default function EditTicketForm({
         )}
 
         <div className="flex gap-3">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="flex-1 rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            aria-busy={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting} className="flex-1" aria-busy={isSubmitting}>
             {isSubmitting ? 'Enregistrement en cours...' : 'Enregistrer'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="flex-1 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1"
             aria-label="Annuler la modification"
           >
             Annuler
-          </button>
+          </Button>
         </div>
       </form>
     </div>

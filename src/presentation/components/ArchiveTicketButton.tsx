@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Button from '@/presentation/components/ui/Button';
 
 interface ArchiveTicketButtonProps {
   ticketId: string;
@@ -45,13 +46,9 @@ export default function ArchiveTicketButton({ ticketId }: ArchiveTicketButtonPro
 
   return (
     <>
-      <button
-        onClick={handleArchiveClick}
-        className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-        aria-label="Archiver le ticket"
-      >
+      <Button variant="danger" onClick={handleArchiveClick} aria-label="Archiver le ticket">
         Archiver
-      </button>
+      </Button>
 
       {showConfirmation && (
         <div
@@ -79,21 +76,17 @@ export default function ArchiveTicketButton({ ticketId }: ArchiveTicketButtonPro
             )}
 
             <div className="flex justify-end gap-4">
-              <button
-                onClick={handleCancelArchive}
-                disabled={isArchiving}
-                className="rounded-lg bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-              >
+              <Button variant="secondary" onClick={handleCancelArchive} disabled={isArchiving}>
                 Annuler
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
                 onClick={handleConfirmArchive}
                 disabled={isArchiving}
-                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-busy={isArchiving}
               >
                 {isArchiving ? 'Archivage en cours...' : 'Confirmer'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

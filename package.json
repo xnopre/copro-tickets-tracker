@@ -38,6 +38,7 @@
   "homepage": "https://github.com/xnopre/copro-tickets-tracker#readme",
   "description": "",
   "dependencies": {
+    "clsx": "^2.1.1",
     "mongoose": "^9.0.0",
     "next": "^16.0.4",
     "react": "^19.2.0",
