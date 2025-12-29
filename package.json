@@ -22,7 +22,8 @@
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
     "seed": "tsx scripts/seed.ts",
     "seed:users": "tsx scripts/seed_user.ts",
-    "renovate:trigger": "gh workflow run renovate.yml"
+    "renovate:trigger": "gh workflow run renovate.yml",
+    "worktree": "bash scripts/worktree.sh"
   },
   "repository": {
     "type": "git",
