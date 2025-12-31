@@ -1,9 +1,10 @@
-import Link from 'next/link';
 import { Ticket } from '@/domain/entities/Ticket';
 import { statusLabels } from '@/presentation/constants/ticketDisplay';
 import { formatTicketDate } from '@/presentation/utils/ticketFormatters';
 import Badge from '@/presentation/components/ui/Badge';
 import { getStatusBadgeVariant } from '@/presentation/utils/statusBadgeVariant';
+import Card from '@/presentation/components/ui/Card';
+import Link from '@/presentation/components/ui/Link';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -18,13 +19,16 @@ export default function TicketCard({ ticket }: TicketCardProps) {
   return (
     <Link
       href={`/tickets/${ticket.id}`}
+      variant="unstyled"
       aria-label={`Voir le ticket : ${ticket.title} - Statut : ${statusLabels[ticket.status]}${archivedLabel}`}
-      className="rounded-lg focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+      className="rounded-lg"
     >
-      <article
-        className={`cursor-pointer rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg ${
-          ticket.archived ? 'border-2 border-gray-300 opacity-70' : ''
-        }`}
+      <Card
+        clickable
+        shadow="md"
+        padding="md"
+        className={ticket.archived ? 'border-2 border-gray-300 opacity-70' : ''}
+        data-testid="ticket-card"
       >
         <div className="mb-3 flex items-start justify-between">
           <h3 className="text-lg font-semibold text-gray-900">{ticket.title}</h3>
@@ -53,7 +57,7 @@ export default function TicketCard({ ticket }: TicketCardProps) {
           <time dateTime={ticket.createdAt.toISOString()}>Créé le {formattedCreatedAt}</time>
           <time dateTime={ticket.updatedAt.toISOString()}>Modifié le {formattedUpdatedAt}</time>
         </div>
-      </article>
+      </Card>
     </Link>
   );
 }

@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Ticket } from '@/domain/entities/Ticket';
 import { statusLabels } from '@/presentation/constants/ticketDisplay';
 import { formatTicketDateTime } from '@/presentation/utils/ticketFormatters';
@@ -6,6 +5,8 @@ import ArchiveTicketButton from './ArchiveTicketButton';
 import Button from '@/presentation/components/ui/Button';
 import Badge from '@/presentation/components/ui/Badge';
 import { getStatusBadgeVariant } from '@/presentation/utils/statusBadgeVariant';
+import Card from '@/presentation/components/ui/Card';
+import Link from '@/presentation/components/ui/Link';
 
 interface TicketDetailProps {
   ticket: Ticket;
@@ -17,11 +18,12 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
   const formattedUpdatedAt = formatTicketDateTime(ticket.updatedAt);
 
   return (
-    <article className="rounded-lg bg-white p-8 shadow-lg">
+    <Card padding="lg" shadow="lg">
       <nav className="mb-6" aria-label="Navigation de retour">
         <Link
           href="/"
-          className="inline-flex items-center rounded text-sm font-medium text-blue-600 hover:text-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+          variant="text"
+          className="inline-flex items-center text-sm font-medium"
           aria-label="Retour à la liste des tickets"
         >
           ← Retour à la liste
@@ -96,6 +98,6 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
           </div>
         </div>
       </footer>
-    </article>
+    </Card>
   );
 }

@@ -95,7 +95,11 @@ describe('Input', () => {
   it('should generate unique id when not provided', () => {
     const { container } = render(<Input label="Email" />);
     const input = container.querySelector('input');
-    expect(input?.id).toMatch(/^input-/);
+    const label = container.querySelector('label');
+
+    expect(input?.id).toBeTruthy();
+    expect(input?.id).not.toBe('');
+    expect(label?.htmlFor).toBe(input?.id);
   });
 
   it('should forward ref correctly', () => {

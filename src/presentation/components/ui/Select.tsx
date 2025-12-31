@@ -1,27 +1,27 @@
-import { InputHTMLAttributes, forwardRef, useId } from 'react';
+import { SelectHTMLAttributes, forwardRef, useId } from 'react';
 import clsx from 'clsx';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   helperText?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, className = '', id, required, ...props }, ref) => {
-    const inputId = id || useId();
+const Select = forwardRef<HTMLSelectElement, SelectProps>(
+  ({ label, error, helperText, className = '', id, required, children, ...props }, ref) => {
+    const selectId = id || useId();
 
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="mb-2 block text-sm font-medium text-gray-700">
+          <label htmlFor={selectId} className="mb-2 block text-sm font-medium text-gray-700">
             {label}
             {required && <span aria-label="requis"> *</span>}
           </label>
         )}
-        <input
+        <select
           ref={ref}
-          id={inputId}
+          id={selectId}
           className={clsx(
             'w-full rounded-md border px-3 py-2',
             'focus:ring-2 focus:outline-none',
@@ -34,17 +34,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           aria-required={required}
           aria-invalid={!!error}
           aria-describedby={
-            error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+            error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined
           }
           {...props}
-        />
+        >
+          {children}
+        </select>
         {error && (
-          <p id={`${inputId}-error`} className="mt-1 text-sm text-red-600" role="alert">
+          <p id={`${selectId}-error`} className="mt-1 text-sm text-red-600" role="alert">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p id={`${inputId}-helper`} className="mt-1 text-sm text-gray-500">
+          <p id={`${selectId}-helper`} className="mt-1 text-sm text-gray-500">
             {helperText}
           </p>
         )}
@@ -53,6 +55,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   }
 );
 
-Input.displayName = 'Input';
+Select.displayName = 'Select';
 
-export default Input;
+export default Select;

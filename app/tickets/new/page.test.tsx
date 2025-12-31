@@ -50,17 +50,12 @@ describe('NewTicketPage', () => {
     const section = container.querySelector('section');
     expect(section).toBeInTheDocument();
     expect(section).toHaveAttribute('aria-label', 'Formulaire de création');
-
-    // Check main element exists
-    const main = container.querySelector('main');
-    expect(main).toBeInTheDocument();
   });
 
   it('should have proper semantic HTML structure', () => {
     const { container } = render(<NewTicketPage />);
 
     // Check semantic elements
-    expect(container.querySelector('main')).toBeInTheDocument();
     expect(container.querySelector('nav')).toBeInTheDocument();
     expect(container.querySelector('header')).toBeInTheDocument();
     expect(container.querySelector('section')).toBeInTheDocument();

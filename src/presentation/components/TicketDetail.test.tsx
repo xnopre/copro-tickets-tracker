@@ -161,10 +161,10 @@ describe('TicketDetail', () => {
       expect(badge).toBeInTheDocument();
     });
 
-    it('should use semantic article element', () => {
+    it('should use Card component as wrapper', () => {
       const { container } = render(<TicketDetail ticket={mockTicket} />);
-      const article = container.querySelector('article');
-      expect(article).toBeInTheDocument();
+      const card = container.querySelector('.rounded-lg.bg-white.p-8.shadow-lg');
+      expect(card).toBeInTheDocument();
     });
 
     it('should use semantic nav element for back link', () => {

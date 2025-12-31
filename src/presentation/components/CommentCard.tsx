@@ -1,5 +1,6 @@
 import { Comment } from '@/domain/entities/Comment';
 import { formatTicketDateTime } from '../utils/ticketFormatters';
+import Card from '@/presentation/components/ui/Card';
 
 interface CommentCardProps {
   comment: Comment;
@@ -7,7 +8,7 @@ interface CommentCardProps {
 
 export default function CommentCard({ comment }: CommentCardProps) {
   return (
-    <article className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <Card variant="bordered" shadow="sm" padding="sm" data-testid="comment-card">
       <header className="mb-2 flex items-start justify-between">
         <p className="font-semibold text-gray-900">{comment.author}</p>
         <time dateTime={comment.createdAt.toISOString()} className="text-sm text-gray-500">
@@ -15,6 +16,6 @@ export default function CommentCard({ comment }: CommentCardProps) {
         </time>
       </header>
       <p className="whitespace-pre-wrap text-gray-700">{comment.content}</p>
-    </article>
+    </Card>
   );
 }

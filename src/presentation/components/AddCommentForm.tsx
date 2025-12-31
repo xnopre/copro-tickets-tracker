@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { Comment } from '@/domain/entities/Comment';
 import Button from '@/presentation/components/ui/Button';
 import Input from '@/presentation/components/ui/Input';
+import Textarea from '@/presentation/components/ui/Textarea';
+import Alert from '@/presentation/components/ui/Alert';
+import Card from '@/presentation/components/ui/Card';
 
 interface AddCommentFormProps {
   ticketId: string;
@@ -79,10 +82,8 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
     }
   };
 
-  const hasError = error !== null;
-
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <Card variant="bordered" shadow="sm">
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Ajouter un commentaire</h3>
       <form onSubmit={handleSubmit} aria-label="Formulaire d'ajout de commentaire">
         <div className="mb-4">
@@ -99,48 +100,30 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
         </div>
 
         <div className="mb-4">
-          <label htmlFor="content" className="mb-2 block text-sm font-medium text-gray-700">
-            Commentaire <span aria-label="requis">*</span>
-          </label>
-          <textarea
+          <Textarea
             id="content"
+            label="Commentaire"
             value={content}
             onChange={e => setContent(e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             disabled={isSubmitting}
-            aria-required="true"
-            aria-invalid={hasError && !content.trim()}
-            aria-describedby={hasError && !content.trim() ? 'form-error' : undefined}
+            required
             autoComplete="off"
           />
         </div>
 
         {error && (
-          <div
-            id="form-error"
-            className="mb-4 rounded-md border border-red-400 bg-red-100 p-3 text-sm text-red-700"
-            role="alert"
-            aria-live="assertive"
-          >
+          <Alert variant="error" id="form-error">
             {error}
-          </div>
+          </Alert>
         )}
 
-        {success && (
-          <div
-            className="mb-4 rounded-md border border-green-400 bg-green-100 p-3 text-sm text-green-700"
-            role="status"
-            aria-live="polite"
-          >
-            Commentaire ajouté avec succès !
-          </div>
-        )}
+        {success && <Alert variant="success">Commentaire ajouté avec succès !</Alert>}
 
         <Button type="submit" disabled={isSubmitting} className="w-full" aria-busy={isSubmitting}>
           {isSubmitting ? 'Ajout en cours...' : 'Ajouter le commentaire'}
         </Button>
       </form>
-    </div>
+    </Card>
   );
 }
