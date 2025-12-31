@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes, forwardRef, useId } from 'react';
 import clsx from 'clsx';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -9,7 +9,7 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, error, helperText, className = '', id, ...props }, ref) => {
-    const checkboxId = id || `checkbox-${Math.random().toString(36).slice(2, 9)}`;
+    const checkboxId = id || useId();
 
     return (
       <div className="flex items-start">
