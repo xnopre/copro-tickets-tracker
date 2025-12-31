@@ -13,16 +13,15 @@ BRANCH_NAME="$1"
 WORKTREE_PATH="../copro-tickets-tracker-$BRANCH_NAME"
 
 echo "📁 Création du worktree: $WORKTREE_PATH"
-echo "🌿 Branche: $BRANCH_NAME"
+echo "🌿 Branche: $BRANCH_NAME (basée sur main)"
 
-# Créer le worktree
-if ! git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME"; then
+# Créer le worktree à partir de la branche main
+if ! git worktree add "$WORKTREE_PATH" -b "$BRANCH_NAME" main; then
   echo "❌ Erreur lors de la création du worktree"
   exit 1
 fi
 
-echo "✅ Worktree créé avec succès"
-echo "🚀 Lancement de Claude dans $WORKTREE_PATH"
+echo "✅ Worktree créé avec succès dans $WORKTREE_PATH"
 
 # Naviguer dans le worktree et lancer Claude
-cd "$WORKTREE_PATH" && claude
+echo "cd $WORKTREE_PATH" pour travailler dans le worktree
