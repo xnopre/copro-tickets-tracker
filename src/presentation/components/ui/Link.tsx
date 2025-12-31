@@ -1,9 +1,12 @@
 import NextLink from 'next/link';
-import { AnchorHTMLAttributes, ReactNode } from 'react';
+import { AnchorHTMLAttributes, ComponentProps, ReactNode } from 'react';
 import clsx from 'clsx';
+import { UrlObject } from 'url';
+
+type NextLinkHref = ComponentProps<typeof NextLink>['href'];
 
 interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
-  href: string;
+  href: NextLinkHref | `/${string}` | UrlObject;
   variant?: 'text' | 'button' | 'unstyled';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
@@ -29,7 +32,7 @@ export default function Link({
 }: LinkProps) {
   return (
     <NextLink
-      href={href as any}
+      href={href as NextLinkHref}
       className={clsx(
         'rounded',
         focusStyles,
