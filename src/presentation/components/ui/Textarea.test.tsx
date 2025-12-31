@@ -101,7 +101,11 @@ describe('Textarea', () => {
   it('should generate unique id when not provided', () => {
     const { container } = render(<Textarea label="Description" />);
     const textarea = container.querySelector('textarea');
-    expect(textarea?.id).toMatch(/^textarea-/);
+    const label = container.querySelector('label');
+
+    expect(textarea?.id).toBeTruthy();
+    expect(textarea?.id).not.toBe('');
+    expect(label?.htmlFor).toBe(textarea?.id);
   });
 
   it('should forward ref correctly', () => {

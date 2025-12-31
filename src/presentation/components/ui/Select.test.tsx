@@ -152,7 +152,11 @@ describe('Select', () => {
       </Select>
     );
     const select = container.querySelector('select');
-    expect(select?.id).toMatch(/^select-/);
+    const label = container.querySelector('label');
+
+    expect(select?.id).toBeTruthy();
+    expect(select?.id).not.toBe('');
+    expect(label?.htmlFor).toBe(select?.id);
   });
 
   it('should forward ref correctly', () => {

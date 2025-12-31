@@ -79,7 +79,11 @@ describe('Checkbox', () => {
   it('should generate unique id when not provided', () => {
     const { container } = render(<Checkbox label="Accept" />);
     const checkbox = container.querySelector('input[type="checkbox"]');
-    expect(checkbox?.id).toMatch(/^checkbox-/);
+    const label = container.querySelector('label');
+
+    expect(checkbox?.id).toBeTruthy();
+    expect(checkbox?.id).not.toBe('');
+    expect(label?.htmlFor).toBe(checkbox?.id);
   });
 
   it('should forward ref correctly', () => {
