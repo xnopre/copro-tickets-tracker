@@ -43,8 +43,8 @@ describe('CommentCard', () => {
 
   describe('Accessibility', () => {
     it('should use Card component with bordered variant', () => {
-      const { container } = render(<CommentCard comment={mockComment} />);
-      const card = container.querySelector('.rounded-lg.bg-white.border.border-gray-200');
+      render(<CommentCard comment={mockComment} />);
+      const card = screen.getByTestId('comment-card');
       expect(card).toBeInTheDocument();
     });
 

@@ -8,7 +8,7 @@ interface CommentCardProps {
 
 export default function CommentCard({ comment }: CommentCardProps) {
   return (
-    <Card variant="bordered" shadow="sm" padding="sm">
+    <Card variant="bordered" shadow="sm" padding="sm" data-testid="comment-card">
       <header className="mb-2 flex items-start justify-between">
         <p className="font-semibold text-gray-900">{comment.author}</p>
         <time dateTime={comment.createdAt.toISOString()} className="text-sm text-gray-500">

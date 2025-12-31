@@ -78,16 +78,16 @@ describe('TicketCard', () => {
 
     it('should apply visual styling for archived tickets', () => {
       const archivedTicket = { ...mockTicket, archived: true };
-      const { container } = render(<TicketCard ticket={archivedTicket} />);
+      render(<TicketCard ticket={archivedTicket} />);
 
-      const card = container.querySelector('.rounded-lg.bg-white');
+      const card = screen.getByTestId('ticket-card');
       expect(card).toHaveClass('opacity-70', 'border-2', 'border-gray-300');
     });
 
     it('should not apply archived styling for non-archived tickets', () => {
-      const { container } = render(<TicketCard ticket={mockTicket} />);
+      render(<TicketCard ticket={mockTicket} />);
 
-      const card = container.querySelector('.rounded-lg.bg-white');
+      const card = screen.getByTestId('ticket-card');
       expect(card).not.toHaveClass('opacity-70');
       expect(card).not.toHaveClass('border-2');
       expect(card).not.toHaveClass('border-gray-300');
@@ -107,7 +107,7 @@ describe('TicketCard', () => {
 
   describe('Accessibility', () => {
     it('should have proper accessibility attributes and semantic elements', () => {
-      const { container } = render(<TicketCard ticket={mockTicket} />);
+      render(<TicketCard ticket={mockTicket} />);
 
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('aria-label', 'Voir le ticket : Test Ticket - Statut : Nouveau');
@@ -118,7 +118,7 @@ describe('TicketCard', () => {
       const timeElements = screen.getAllByText(/Créé le|Modifié le/);
       expect(timeElements.length).toBeGreaterThan(0);
 
-      const card = container.querySelector('.rounded-lg.bg-white');
+      const card = screen.getByTestId('ticket-card');
       expect(card).toBeInTheDocument();
       expect(card).toHaveClass('cursor-pointer');
     });

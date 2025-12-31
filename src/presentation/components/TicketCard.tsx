@@ -28,6 +28,7 @@ export default function TicketCard({ ticket }: TicketCardProps) {
         shadow="md"
         padding="md"
         className={ticket.archived ? 'border-2 border-gray-300 opacity-70' : ''}
+        data-testid="ticket-card"
       >
         <div className="mb-3 flex items-start justify-between">
           <h3 className="text-lg font-semibold text-gray-900">{ticket.title}</h3>
