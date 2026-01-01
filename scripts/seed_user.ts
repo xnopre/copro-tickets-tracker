@@ -14,10 +14,6 @@ async function seedUsers() {
     await mongoose.connect(MONGODB_URI!);
     console.log('Connected to MongoDB');
 
-    // Nettoyer les utilisateurs existants
-    await UserModel.deleteMany({});
-    console.log('Cleared existing users');
-
     // Lire les utilisateurs depuis le fichier JSON
     // Priorité: users.local.json (non commité) puis users.json
     const localFilePath = join(__dirname, 'users.local.json');
@@ -47,11 +43,32 @@ async function seedUsers() {
       }
     });
 
-    const createdUsers = await UserModel.insertMany(users);
-    console.log(`✅ Created ${createdUsers.length} users:`);
-    createdUsers.forEach(user => {
-      console.log(`  - ${user.firstName} ${user.lastName} (${user.email})`);
-    });
+    // Traiter chaque utilisateur (créer ou mettre à jour)
+    let createdCount = 0;
+    let updatedCount = 0;
+
+    for (const userData of users) {
+      const existingUser = await UserModel.findOne({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+      });
+
+      if (existingUser) {
+        // Mettre à jour l'utilisateur existant
+        await UserModel.updateOne({ _id: existingUser._id }, { $set: { email: userData.email } });
+        console.log(`🔄 Updated: ${userData.firstName} ${userData.lastName} (${userData.email})`);
+        updatedCount++;
+      } else {
+        // Créer un nouvel utilisateur
+        await UserModel.create(userData);
+        console.log(`➕ Created: ${userData.firstName} ${userData.lastName} (${userData.email})`);
+        createdCount++;
+      }
+    }
+
+    console.log(`\n✅ Summary:`);
+    console.log(`  - ${createdCount} user(s) created`);
+    console.log(`  - ${updatedCount} user(s) updated`);
 
     await mongoose.connection.close();
     console.log('Disconnected from MongoDB');
