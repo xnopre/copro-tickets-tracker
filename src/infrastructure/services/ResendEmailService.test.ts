@@ -49,7 +49,7 @@ describe('ResendEmailService', () => {
 
   describe('send', () => {
     it('should send email successfully', async () => {
-      mockSend.mockResolvedValue({ id: 'email_123' });
+      mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
       const service = new ResendEmailService();
 
@@ -70,7 +70,7 @@ describe('ResendEmailService', () => {
     });
 
     it('should send email to multiple recipients', async () => {
-      mockSend.mockResolvedValue({ id: 'email_123' });
+      mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
       const service = new ResendEmailService();
 
@@ -93,7 +93,34 @@ describe('ResendEmailService', () => {
       });
     });
 
-    it('should throw EmailServiceError on send failure', async () => {
+    it('should throw EmailServiceError when response contains error', async () => {
+      mockSend.mockResolvedValue({
+        data: null,
+        error: { message: 'Invalid API key' },
+      });
+
+      const service = new ResendEmailService();
+
+      await expect(
+        service.send({
+          to: [{ email: 'user@test.com', name: 'Test User' }],
+          subject: 'Test Email',
+          htmlContent: '<p>Test</p>',
+          textContent: 'Test',
+        })
+      ).rejects.toThrow(EmailServiceError);
+
+      await expect(
+        service.send({
+          to: [{ email: 'user@test.com', name: 'Test User' }],
+          subject: 'Test Email',
+          htmlContent: '<p>Test</p>',
+          textContent: 'Test',
+        })
+      ).rejects.toThrow("Échec d'envoi d'email: Invalid API key");
+    });
+
+    it('should throw EmailServiceError on exception', async () => {
       mockSend.mockRejectedValue(new Error('API Error'));
 
       const service = new ResendEmailService();
@@ -120,7 +147,7 @@ describe('ResendEmailService', () => {
 
   describe('sendSafe', () => {
     it('should return true on sendSafe success', async () => {
-      mockSend.mockResolvedValue({ id: 'email_123' });
+      mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
       const service = new ResendEmailService();
 

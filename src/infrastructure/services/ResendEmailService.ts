@@ -21,14 +21,26 @@ export class ResendEmailService implements IEmailService {
   }
 
   async send(data: EmailData): Promise<void> {
+    console.log(
+      `Envoi d'un mail [${data.subject}] à ${data.to.map(recipient => recipient.email).join(', ')}`
+    );
     try {
-      await this.resend.emails.send({
+      const response = await this.resend.emails.send({
         from: this.fromEmail,
         to: data.to.map(recipient => recipient.email),
         subject: data.subject,
         html: data.htmlContent,
         text: data.textContent,
       });
+
+      if (response.error) {
+        throw new EmailServiceError(
+          `Échec d'envoi d'email: ${response.error.message || 'Erreur inconnue'}`,
+          new Error(response.error.message)
+        );
+      }
+
+      console.log(`Email envoyé avec succès:`, response.data);
     } catch (error) {
       throw new EmailServiceError(
         `Échec d'envoi d'email: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
