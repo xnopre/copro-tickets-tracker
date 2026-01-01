@@ -32,6 +32,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [📦 Étape 9 : Archiver un Ticket](#-étape-9--archiver-un-ticket)
 - [👥 Étape 10 : Liste des Utilisateurs](#-étape-10--liste-des-utilisateurs)
 - [📧 Étape 11 : Notifier les Utilisateurs par Mail](#-étape-11--notifier-les-utilisateurs-par-mail)
+- [📧 Étape 11b : Service d'Envoi d'Emails Gmail](#-étape-11b--service-denvoi-demails-gmail)
 - [🎯 Étape 12 : Filtrer par Statut](#-étape-12--filtrer-par-statut)
 - [🔍 Étape 13 : Recherche de Tickets](#-étape-13--recherche-de-tickets)
 - [📊 Étape 14 : Dashboard avec Statistiques](#-étape-14--dashboard-avec-statistiques)
@@ -1384,6 +1385,196 @@ async execute(data: CreateTicketData): Promise<Ticket> {
 - Utiliser MockEmailService pour les tests unitaires
 - Vérifier que les emails sont appelés avec les bons paramètres
 - Tester que les erreurs d'envoi n'interrompent pas le flux
+
+---
+
+## 📧 Étape 11b : Service d'Envoi d'Emails Gmail
+
+**Objectif** : Ajouter Gmail comme service d'envoi d'emails alternatif à Resend (qui nécessite un nom de domaine)
+
+### Ce qu'on livre
+
+- Service d'envoi d'emails Gmail via Nodemailer
+- Architecture hexagonale respectée avec interchangeabilité des providers
+- Sélection du provider via variable d'environnement `EMAIL_PROVIDER`
+- Configuration simple avec mot de passe d'application Google
+- Tests unitaires complets (543 tests passants au total, +14 nouveaux tests)
+- Documentation de configuration Gmail
+
+### Tâches
+
+- [x] Installer les dépendances
+  - [x] `npm install nodemailer`
+  - [x] `npm install --save-dev @types/nodemailer`
+- [x] Créer l'implémentation Gmail
+  - [x] `src/infrastructure/services/GmailEmailService.ts` (implémente `IEmailService`)
+  - [x] Configuration Nodemailer avec Gmail SMTP
+  - [x] Validation des variables d'environnement (GMAIL_USER, GMAIL_APP_PASSWORD, FROM_EMAIL)
+- [x] Créer les tests unitaires
+  - [x] `src/infrastructure/services/GmailEmailService.test.ts` (9 tests)
+  - [x] Mock de nodemailer avec vi.mock()
+  - [x] Tests du constructeur, send(), sendSafe()
+- [x] Modifier ServiceFactory
+  - [x] Ajouter import de `GmailEmailService`
+  - [x] Logique de sélection via `EMAIL_PROVIDER` (gmail|resend)
+  - [x] Gestion des erreurs pour provider invalide
+  - [x] Défaut à Resend si non spécifié
+- [x] Mettre à jour les tests de ServiceFactory
+  - [x] Test retour GmailEmailService quand EMAIL_PROVIDER=gmail
+  - [x] Test retour ResendEmailService quand EMAIL_PROVIDER=resend
+  - [x] Test défaut à ResendEmailService si non défini
+  - [x] Test erreur si EMAIL_PROVIDER invalide
+- [x] Mettre à jour `.env.local.example`
+  - [x] Documentation des deux providers (Gmail et Resend)
+  - [x] Instructions de configuration Gmail
+  - [x] Variable `EMAIL_PROVIDER` pour choisir le service
+- [x] Validation complète
+  - [x] Type-check sans erreur
+  - [x] Lint sans erreur
+  - [x] Build Next.js réussi
+  - [x] Tous les tests passent (543 tests)
+- [ ] Déployer
+
+### Validation
+
+- ✅ GmailEmailService implémente correctement IEmailService
+- ✅ ServiceFactory retourne le bon service selon EMAIL_PROVIDER
+- ✅ Architecture hexagonale respectée (Domain inchangé)
+- ✅ Les templates existants fonctionnent avec Gmail
+- ✅ Tous les tests passent (543/543)
+- ✅ Type-check sans erreur
+- ✅ Lint sans erreur
+- ✅ Build Next.js réussi
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Service Gmail : Nodemailer**
+
+- Bibliothèque Node.js mature et bien documentée
+- Support natif de Gmail SMTP
+- Configuration simple avec mot de passe d'application Google
+- Pas besoin de Google Cloud Console / OAuth2
+
+**Configuration Gmail** :
+
+1. **Activer la validation en 2 étapes** :
+   - Aller sur https://myaccount.google.com
+   - Sécurité → Validation en 2 étapes
+   - Suivre les instructions
+
+2. **Créer un mot de passe d'application** :
+   - Retourner sur https://myaccount.google.com
+   - Sécurité → Validation en 2 étapes → Mots de passe des applications
+   - Sélectionner "Autre (nom personnalisé)"
+   - Entrer "CoTiTra"
+   - Cliquer sur "Générer"
+   - **Copier le mot de passe** (16 caractères)
+
+3. **Configurer `.env.local`** :
+   ```bash
+   EMAIL_PROVIDER=gmail
+   GMAIL_USER=votreemail@gmail.com
+   GMAIL_APP_PASSWORD=abcdefghijklmnop  # Mot de passe d'application (sans espaces)
+   FROM_EMAIL=votreemail@gmail.com
+   ```
+
+**Variables d'environnement** :
+
+```bash
+# Choix du provider
+EMAIL_PROVIDER=gmail  # ou 'resend' (défaut si non spécifié)
+
+# Gmail
+GMAIL_USER=votreemail@gmail.com
+GMAIL_APP_PASSWORD=mot_de_passe_application
+
+# Resend (alternative)
+RESEND_API_KEY=your_resend_api_key_here
+
+# Commun aux deux providers
+FROM_EMAIL=noreply@votredomaine.com
+```
+
+**Architecture hexagonale** :
+
+```typescript
+// Domain (inchangé)
+interface IEmailService {
+  send(data: EmailData): Promise<void>;
+  sendSafe(data: EmailData): Promise<boolean>;
+}
+
+// Infrastructure - Nouvel adapter Gmail
+class GmailEmailService implements IEmailService {
+  private transporter: nodemailer.Transporter;
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
+  }
+}
+
+// ServiceFactory - Sélection dynamique
+static getEmailService(): IEmailService {
+  if (NODE_ENV === 'test') return new MockEmailService();
+
+  const provider = process.env.EMAIL_PROVIDER || 'resend';
+  if (provider === 'gmail') return new GmailEmailService();
+  if (provider === 'resend') return new ResendEmailService();
+  throw new Error('EMAIL_PROVIDER invalide');
+}
+```
+
+**Avantages de Gmail** :
+
+- ✅ Gratuit (500 emails/jour pour comptes gratuits)
+- ✅ Pas besoin de nom de domaine
+- ✅ Configuration simple (juste email + mot de passe d'application)
+- ✅ Fiable et bien supporté
+
+**Limitations Gmail** :
+
+- Limite de 500 emails/jour (comptes gratuits)
+- Limite de 100 destinataires par email
+- Nécessite validation en 2 étapes et mot de passe d'application
+
+**Fichiers créés** (2 nouveaux fichiers) :
+
+```
+src/infrastructure/services/GmailEmailService.ts
+src/infrastructure/services/GmailEmailService.test.ts
+```
+
+**Fichiers modifiés** (3 fichiers) :
+
+```
+src/application/services/ServiceFactory.ts (+ import GmailEmailService, + logique sélection)
+src/application/services/ServiceFactory.test.ts (+ 5 nouveaux tests)
+.env.local.example (+ documentation Gmail)
+```
+
+**Tests** : +14 nouveaux tests (9 GmailEmailService, 5 ServiceFactory)
+
+**Sécurité** :
+
+- Ne JAMAIS commiter le mot de passe d'application dans Git
+- Utiliser `.env.local` (ignoré par Git)
+- Le mot de passe d'application est différent du mot de passe principal Gmail
+
+**Basculer entre providers** :
+
+```bash
+# Utiliser Gmail
+EMAIL_PROVIDER=gmail
+
+# Utiliser Resend
+EMAIL_PROVIDER=resend
+
+# Défaut (Resend)
+# EMAIL_PROVIDER non défini
+```
 
 ---
 

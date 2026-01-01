@@ -2,6 +2,7 @@ import { MongoTicketRepository } from '@/infrastructure/repositories/MongoTicket
 import { MongoCommentRepository } from '@/infrastructure/repositories/MongoCommentRepository';
 import { MongoUserRepository } from '@/infrastructure/repositories/MongoUserRepository';
 import { ResendEmailService } from '@/infrastructure/services/ResendEmailService';
+import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
 import { MockEmailService } from '@/infrastructure/services/__mocks__/MockEmailService';
 import { IEmailService } from '@/domain/services/IEmailService';
 import { TicketService } from './TicketService';
@@ -50,7 +51,17 @@ export class ServiceFactory {
       if (process.env.NODE_ENV === 'test') {
         this.emailService = new MockEmailService();
       } else {
-        this.emailService = new ResendEmailService();
+        const emailProvider = process.env.EMAIL_PROVIDER || 'resend';
+
+        if (emailProvider === 'gmail') {
+          this.emailService = new GmailEmailService();
+        } else if (emailProvider === 'resend') {
+          this.emailService = new ResendEmailService();
+        } else {
+          throw new Error(
+            `EMAIL_PROVIDER invalide: ${emailProvider}. Valeurs acceptées: 'gmail', 'resend'`
+          );
+        }
       }
     }
     return this.emailService;

@@ -39,7 +39,7 @@ yarn-error.log*
 .env
 
 # Local seed data files
-scripts/users.local.json
+scripts/users.local.*
 
 # Vercel
 .vercel
