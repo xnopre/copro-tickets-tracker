@@ -1,15 +1,16 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
-import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 
 export class CreateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService
+    private emailService: IEmailService,
+    private emailTemplateService: IEmailTemplateService
   ) {}
 
   async execute(data: CreateTicketData): Promise<Ticket> {
@@ -33,7 +34,7 @@ export class CreateTicket {
         return;
       }
 
-      const { subject, htmlContent, textContent } = EmailTemplates.ticketCreated(ticket);
+      const { subject, htmlContent, textContent } = this.emailTemplateService.ticketCreated(ticket);
 
       await this.emailService.sendSafe({
         to: users.map(user => ({

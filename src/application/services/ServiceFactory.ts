@@ -4,7 +4,9 @@ import { MongoUserRepository } from '@/infrastructure/repositories/MongoUserRepo
 import { ResendEmailService } from '@/infrastructure/services/ResendEmailService';
 import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
 import { MockEmailService } from '@/infrastructure/services/__mocks__/MockEmailService';
+import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { TicketService } from './TicketService';
 import { CommentService } from './CommentService';
 import { UserService } from './UserService';
@@ -14,13 +16,15 @@ export class ServiceFactory {
   private static commentService: CommentService | null = null;
   private static userService: UserService | null = null;
   private static emailService: IEmailService | null = null;
+  private static emailTemplateService: IEmailTemplateService | null = null;
 
   static getTicketService(): TicketService {
     if (!this.ticketService) {
       this.ticketService = new TicketService(
         new MongoTicketRepository(),
         new MongoUserRepository(),
-        this.getEmailService()
+        this.getEmailService(),
+        this.getEmailTemplateService()
       );
     }
     return this.ticketService;
@@ -32,7 +36,8 @@ export class ServiceFactory {
         new MongoCommentRepository(),
         new MongoTicketRepository(),
         new MongoUserRepository(),
-        this.getEmailService()
+        this.getEmailService(),
+        this.getEmailTemplateService()
       );
     }
     return this.commentService;
@@ -65,5 +70,12 @@ export class ServiceFactory {
       }
     }
     return this.emailService;
+  }
+
+  static getEmailTemplateService(): IEmailTemplateService {
+    if (!this.emailTemplateService) {
+      this.emailTemplateService = new EmailTemplates();
+    }
+    return this.emailTemplateService;
   }
 }

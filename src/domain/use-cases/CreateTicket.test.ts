@@ -3,6 +3,7 @@ import { CreateTicket } from './CreateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { TicketStatus } from '../value-objects/TicketStatus';
 
 describe('CreateTicket', () => {
@@ -22,6 +23,29 @@ describe('CreateTicket', () => {
   const mockEmailService: IEmailService = {
     send: vi.fn(),
     sendSafe: vi.fn(),
+  };
+
+  const mockEmailTemplateService: IEmailTemplateService = {
+    ticketCreated: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    ticketAssigned: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    ticketStatusChanged: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    commentAdded: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
   };
 
   beforeEach(() => {
@@ -53,7 +77,12 @@ describe('CreateTicket', () => {
     vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
     vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
 
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
     const result = await useCase.execute({
       title: 'Test Ticket',
       description: 'Test Description',
@@ -82,7 +111,12 @@ describe('CreateTicket', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
 
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
     await useCase.execute({
       title: '  Test Ticket  ',
       description: '  Test Description  ',
@@ -95,7 +129,12 @@ describe('CreateTicket', () => {
   });
 
   it('should throw error when title is empty', async () => {
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     await expect(
       useCase.execute({
@@ -106,7 +145,12 @@ describe('CreateTicket', () => {
   });
 
   it('should throw error when title exceeds 200 characters', async () => {
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     await expect(
       useCase.execute({
@@ -117,7 +161,12 @@ describe('CreateTicket', () => {
   });
 
   it('should throw error when description is empty', async () => {
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     await expect(
       useCase.execute({
@@ -128,7 +177,12 @@ describe('CreateTicket', () => {
   });
 
   it('should throw error when description exceeds 5000 characters', async () => {
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     await expect(
       useCase.execute({
@@ -155,7 +209,12 @@ describe('CreateTicket', () => {
 
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     const result = await useCase.execute({
       title: 'Test Ticket',
@@ -183,7 +242,12 @@ describe('CreateTicket', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
 
-    const useCase = new CreateTicket(mockRepository, mockUserRepository, mockEmailService);
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService
+    );
 
     await useCase.execute({
       title: 'Test Ticket',

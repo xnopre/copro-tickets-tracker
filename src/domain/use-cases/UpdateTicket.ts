@@ -1,16 +1,17 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 
 export class UpdateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService
+    private emailService: IEmailService,
+    private emailTemplateService: IEmailTemplateService
   ) {}
 
   async execute(id: string, data: UpdateTicketData): Promise<Ticket | null> {
@@ -78,7 +79,10 @@ export class UpdateTicket {
       return;
     }
 
-    const { subject, htmlContent, textContent } = EmailTemplates.ticketAssigned(ticket, assignee);
+    const { subject, htmlContent, textContent } = this.emailTemplateService.ticketAssigned(
+      ticket,
+      assignee
+    );
 
     await this.emailService.sendSafe({
       to: [
@@ -104,7 +108,7 @@ export class UpdateTicket {
       return;
     }
 
-    const { subject, htmlContent, textContent } = EmailTemplates.ticketStatusChanged(
+    const { subject, htmlContent, textContent } = this.emailTemplateService.ticketStatusChanged(
       ticket,
       oldStatus,
       newStatus

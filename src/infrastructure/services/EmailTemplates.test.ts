@@ -6,8 +6,11 @@ import { Comment } from '@/domain/entities/Comment';
 import { User } from '@/domain/entities/User';
 
 describe('EmailTemplates', () => {
+  let emailTemplates: EmailTemplates;
+
   beforeEach(() => {
     process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+    emailTemplates = new EmailTemplates();
   });
 
   describe('ticketCreated', () => {
@@ -23,7 +26,7 @@ describe('EmailTemplates', () => {
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       };
 
-      const result = EmailTemplates.ticketCreated(ticket);
+      const result = emailTemplates.ticketCreated(ticket);
 
       expect(result.subject).toBe('[CoTiTra] Nouveau ticket créé : Test Ticket');
       expect(result.htmlContent).toContain('Nouveau ticket créé');
@@ -45,7 +48,7 @@ describe('EmailTemplates', () => {
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       };
 
-      const result = EmailTemplates.ticketCreated(ticket);
+      const result = emailTemplates.ticketCreated(ticket);
 
       expect(result.htmlContent).toContain('&lt;script&gt;');
       expect(result.htmlContent).toContain('&amp;');
@@ -75,7 +78,7 @@ describe('EmailTemplates', () => {
         email: 'john@test.com',
       };
 
-      const result = EmailTemplates.ticketAssigned(ticket, assignee);
+      const result = emailTemplates.ticketAssigned(ticket, assignee);
 
       expect(result.subject).toBe('[CoTiTra] Ticket assigné : Test Ticket');
       expect(result.htmlContent).toContain('Un ticket vous a été assigné');
@@ -104,7 +107,7 @@ describe('EmailTemplates', () => {
         email: 'john@test.com',
       };
 
-      const result = EmailTemplates.ticketAssigned(ticket, assignee);
+      const result = emailTemplates.ticketAssigned(ticket, assignee);
 
       expect(result.htmlContent).toContain('&lt;script&gt;');
       expect(result.htmlContent).not.toContain('<script>alert');
@@ -124,7 +127,7 @@ describe('EmailTemplates', () => {
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       };
 
-      const result = EmailTemplates.ticketStatusChanged(
+      const result = emailTemplates.ticketStatusChanged(
         ticket,
         TicketStatus.NEW,
         TicketStatus.IN_PROGRESS
@@ -162,7 +165,7 @@ describe('EmailTemplates', () => {
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
-      const result = EmailTemplates.commentAdded(ticket, comment);
+      const result = emailTemplates.commentAdded(ticket, comment);
 
       expect(result.subject).toBe('[CoTiTra] Nouveau commentaire : Test Ticket');
       expect(result.htmlContent).toContain('Nouveau commentaire sur le ticket');
@@ -194,7 +197,7 @@ describe('EmailTemplates', () => {
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
-      const result = EmailTemplates.commentAdded(ticket, comment);
+      const result = emailTemplates.commentAdded(ticket, comment);
 
       expect(result.htmlContent).toContain('&lt;script&gt;');
       expect(result.htmlContent).not.toContain('<script>alert');

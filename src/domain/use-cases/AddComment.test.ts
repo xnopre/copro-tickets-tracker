@@ -4,6 +4,7 @@ import { ICommentRepository } from '../repositories/ICommentRepository';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { TicketStatus } from '../value-objects/TicketStatus';
 
 describe('AddComment', () => {
@@ -30,6 +31,29 @@ describe('AddComment', () => {
     sendSafe: vi.fn(),
   };
 
+  const mockEmailTemplateService: IEmailTemplateService = {
+    ticketCreated: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    ticketAssigned: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    ticketStatusChanged: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+    commentAdded: vi.fn().mockReturnValue({
+      subject: 'Test Subject',
+      htmlContent: '<p>Test HTML</p>',
+      textContent: 'Test Text',
+    }),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -49,7 +73,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
     const result = await useCase.execute({
       ticketId: 'ticket-1',
@@ -80,7 +105,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -100,7 +126,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     await expect(
@@ -117,7 +144,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     await expect(
@@ -134,7 +162,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     await expect(
@@ -151,7 +180,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     await expect(
@@ -168,7 +198,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     await expect(
@@ -218,7 +249,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -247,7 +279,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -287,7 +320,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -317,7 +351,8 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
 
     const result = await useCase.execute({

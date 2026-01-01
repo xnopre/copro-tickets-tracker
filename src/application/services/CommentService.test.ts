@@ -4,6 +4,7 @@ import { ICommentRepository } from '@/domain/repositories/ICommentRepository';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
 import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
 
 describe('CommentService', () => {
@@ -11,6 +12,7 @@ describe('CommentService', () => {
   let mockTicketRepository: ITicketRepository;
   let mockUserRepository: IUserRepository;
   let mockEmailService: IEmailService;
+  let mockEmailTemplateService: IEmailTemplateService;
   let commentService: CommentService;
 
   beforeEach(() => {
@@ -33,11 +35,34 @@ describe('CommentService', () => {
       send: vi.fn().mockResolvedValue(undefined),
       sendSafe: vi.fn().mockResolvedValue(true),
     };
+    mockEmailTemplateService = {
+      ticketCreated: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      ticketAssigned: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      ticketStatusChanged: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      commentAdded: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+    };
     commentService = new CommentService(
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService
+      mockEmailService,
+      mockEmailTemplateService
     );
   });
 

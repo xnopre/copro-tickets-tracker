@@ -2,15 +2,16 @@ import { Ticket } from '@/domain/entities/Ticket';
 import { Comment } from '@/domain/entities/Comment';
 import { User } from '@/domain/entities/User';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { IEmailTemplateService, EmailTemplate } from '@/domain/services/IEmailTemplateService';
 
-export class EmailTemplates {
-  private static readonly APP_NAME = 'CoTiTra';
-  private static readonly APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+export class EmailTemplates implements IEmailTemplateService {
+  private readonly APP_NAME = 'CoTiTra';
+  private readonly APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
   /**
    * Email de création de ticket
    */
-  static ticketCreated(ticket: Ticket) {
+  ticketCreated(ticket: Ticket): EmailTemplate {
     const subject = `[${this.APP_NAME}] Nouveau ticket créé : ${ticket.title}`;
     const ticketUrl = `${this.APP_URL}/tickets/${ticket.id}`;
 
@@ -39,7 +40,7 @@ Voir le ticket : ${ticketUrl}
   /**
    * Email d'assignation de ticket
    */
-  static ticketAssigned(ticket: Ticket, assignee: User) {
+  ticketAssigned(ticket: Ticket, assignee: User): EmailTemplate {
     const subject = `[${this.APP_NAME}] Ticket assigné : ${ticket.title}`;
     const ticketUrl = `${this.APP_URL}/tickets/${ticket.id}`;
 
@@ -72,7 +73,11 @@ Voir le ticket : ${ticketUrl}
   /**
    * Email de changement de statut
    */
-  static ticketStatusChanged(ticket: Ticket, oldStatus: TicketStatus, newStatus: TicketStatus) {
+  ticketStatusChanged(
+    ticket: Ticket,
+    oldStatus: TicketStatus,
+    newStatus: TicketStatus
+  ): EmailTemplate {
     const subject = `[${this.APP_NAME}] Changement de statut : ${ticket.title}`;
     const ticketUrl = `${this.APP_URL}/tickets/${ticket.id}`;
 
@@ -100,7 +105,7 @@ Voir le ticket : ${ticketUrl}
   /**
    * Email de nouveau commentaire
    */
-  static commentAdded(ticket: Ticket, comment: Comment) {
+  commentAdded(ticket: Ticket, comment: Comment): EmailTemplate {
     const subject = `[${this.APP_NAME}] Nouveau commentaire : ${ticket.title}`;
     const ticketUrl = `${this.APP_URL}/tickets/${ticket.id}`;
 
@@ -129,7 +134,7 @@ Voir le ticket : ${ticketUrl}
   /**
    * Échappe les caractères HTML pour éviter les injections XSS
    */
-  private static escapeHtml(text: string): string {
+  private escapeHtml(text: string): string {
     const map: Record<string, string> = {
       '&': '&amp;',
       '<': '&lt;',

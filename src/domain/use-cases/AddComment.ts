@@ -2,16 +2,17 @@ import { ICommentRepository } from '../repositories/ICommentRepository';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { CreateCommentData, Comment } from '../entities/Comment';
 import { ValidationError } from '../errors/ValidationError';
-import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 
 export class AddComment {
   constructor(
     private commentRepository: ICommentRepository,
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService
+    private emailService: IEmailService,
+    private emailTemplateService: IEmailTemplateService
   ) {}
 
   async execute(data: CreateCommentData): Promise<Comment> {
@@ -41,7 +42,10 @@ export class AddComment {
         return;
       }
 
-      const { subject, htmlContent, textContent } = EmailTemplates.commentAdded(ticket, comment);
+      const { subject, htmlContent, textContent } = this.emailTemplateService.commentAdded(
+        ticket,
+        comment
+      );
 
       await this.emailService.sendSafe({
         to: users.map(user => ({
