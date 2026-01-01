@@ -1,10 +1,17 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
+import { IUserRepository } from '../repositories/IUserRepository';
+import { IEmailService } from '../services/IEmailService';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 
 export class UpdateTicket {
-  constructor(private ticketRepository: ITicketRepository) {}
+  constructor(
+    private ticketRepository: ITicketRepository,
+    private userRepository: IUserRepository,
+    private emailService: IEmailService
+  ) {}
 
   async execute(id: string, data: UpdateTicketData): Promise<Ticket | null> {
     this.validateData(data);
@@ -31,7 +38,87 @@ export class UpdateTicket {
           : null;
     }
 
-    return await this.ticketRepository.update(id, trimmedData);
+    const updatedTicket = await this.ticketRepository.update(id, trimmedData);
+
+    if (!updatedTicket) {
+      return null;
+    }
+
+    await this.notifyTicketUpdated(existingTicket, updatedTicket, trimmedData);
+
+    return updatedTicket;
+  }
+
+  private async notifyTicketUpdated(
+    oldTicket: Ticket,
+    newTicket: Ticket,
+    updateData: UpdateTicketData
+  ): Promise<void> {
+    try {
+      if (updateData.assignedTo !== undefined && updateData.assignedTo !== null) {
+        const oldAssignedId = oldTicket.assignedTo?.id;
+        const newAssignedId = newTicket.assignedTo?.id;
+
+        if (oldAssignedId !== newAssignedId && newAssignedId) {
+          await this.notifyAssignment(newTicket, newAssignedId);
+        }
+      }
+
+      if (updateData.status !== undefined && oldTicket.status !== newTicket.status) {
+        await this.notifyStatusChange(newTicket, oldTicket.status, newTicket.status);
+      }
+    } catch (error) {
+      console.error("[UpdateTicket] Erreur lors de l'envoi des emails:", error);
+    }
+  }
+
+  private async notifyAssignment(ticket: Ticket, assigneeId: string): Promise<void> {
+    const assignee = await this.userRepository.findById(assigneeId);
+    if (!assignee) {
+      return;
+    }
+
+    const { subject, htmlContent, textContent } = EmailTemplates.ticketAssigned(ticket, assignee);
+
+    await this.emailService.sendSafe({
+      to: [
+        {
+          email: assignee.email,
+          name: `${assignee.firstName} ${assignee.lastName}`,
+        },
+      ],
+      subject,
+      htmlContent,
+      textContent,
+    });
+  }
+
+  private async notifyStatusChange(
+    ticket: Ticket,
+    oldStatus: TicketStatus,
+    newStatus: TicketStatus
+  ): Promise<void> {
+    const users = await this.userRepository.findAll();
+
+    if (users.length === 0) {
+      return;
+    }
+
+    const { subject, htmlContent, textContent } = EmailTemplates.ticketStatusChanged(
+      ticket,
+      oldStatus,
+      newStatus
+    );
+
+    await this.emailService.sendSafe({
+      to: users.map(user => ({
+        email: user.email,
+        name: `${user.firstName} ${user.lastName}`,
+      })),
+      subject,
+      htmlContent,
+      textContent,
+    });
   }
 
   private validateData(data: UpdateTicketData): void {

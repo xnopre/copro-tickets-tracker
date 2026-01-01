@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UpdateTicket } from './UpdateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
+import { IUserRepository } from '../repositories/IUserRepository';
+import { IEmailService } from '../services/IEmailService';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { UserPublic } from '../entities/User';
+import { User, UserPublic } from '../entities/User';
 
 const mockUser: UserPublic = {
   id: '507f1f77bcf86cd799439016',
@@ -10,10 +12,24 @@ const mockUser: UserPublic = {
   lastName: 'Doe',
 };
 
+const mockUserFull: User = {
+  id: '507f1f77bcf86cd799439016',
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@test.com',
+};
+
 const mockUser2: UserPublic = {
   id: '507f1f77bcf86cd799439017',
   firstName: 'Jane',
   lastName: 'Smith',
+};
+
+const mockUser2Full: User = {
+  id: '507f1f77bcf86cd799439017',
+  firstName: 'Jane',
+  lastName: 'Smith',
+  email: 'jane@test.com',
 };
 
 describe('UpdateTicket', () => {
@@ -23,6 +39,16 @@ describe('UpdateTicket', () => {
     create: vi.fn(),
     update: vi.fn(),
     archive: vi.fn(),
+  };
+
+  const mockUserRepository: IUserRepository = {
+    findAll: vi.fn(),
+    findById: vi.fn(),
+  };
+
+  const mockEmailService: IEmailService = {
+    send: vi.fn(),
+    sendSafe: vi.fn(),
   };
 
   beforeEach(() => {
@@ -56,7 +82,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       const result = await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
         assignedTo: mockUser.id,
@@ -96,7 +122,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
         assignedTo: `  ${mockUser.id}  `,
@@ -136,7 +162,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       const result = await useCase.execute('1', {
         title: 'Updated Title',
         description: 'Updated Description',
@@ -175,7 +201,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       await useCase.execute('1', {
         title: '  Updated Title  ',
         description: '  Updated Description  ',
@@ -213,7 +239,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       const result = await useCase.execute('1', {
         title: 'New Title',
       });
@@ -252,7 +278,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       const result = await useCase.execute('1', {
         title: 'New Title',
         description: 'New Description',
@@ -272,7 +298,7 @@ describe('UpdateTicket', () => {
 
   describe('Validation errors', () => {
     it('should throw error when no fields provided', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(useCase.execute('1', {})).rejects.toThrow(
         'Au moins un champ doit être fourni pour la mise à jour'
@@ -280,7 +306,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when title is empty', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -290,7 +316,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when title is only whitespace', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -300,7 +326,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when title exceeds 200 characters', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -310,7 +336,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when description is empty', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -320,7 +346,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when description is only whitespace', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -330,7 +356,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when description exceeds 5000 characters', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -340,7 +366,7 @@ describe('UpdateTicket', () => {
     });
 
     it('should throw error when status is invalid', async () => {
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -375,7 +401,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       await useCase.execute('1', {
         assignedTo: '',
       });
@@ -411,7 +437,7 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       await useCase.execute('1', {
         assignedTo: '   ',
       });
@@ -426,7 +452,7 @@ describe('UpdateTicket', () => {
     it('should return null when ticket not found', async () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(null);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
       const result = await useCase.execute('999', {
         title: 'New Title',
       });
@@ -450,7 +476,7 @@ describe('UpdateTicket', () => {
 
       vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -476,7 +502,7 @@ describe('UpdateTicket', () => {
 
       vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
@@ -499,13 +525,202 @@ describe('UpdateTicket', () => {
 
       vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
 
-      const useCase = new UpdateTicket(mockRepository);
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
 
       await expect(
         useCase.execute('1', {
           assignedTo: mockUser.id,
         })
       ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
+    });
+  });
+
+  describe('Email notifications', () => {
+    it('should send email notification when assigning a ticket', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: mockUser,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUserFull);
+      vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
+      await useCase.execute('1', {
+        assignedTo: mockUser.id,
+      });
+
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockEmailService.sendSafe).toHaveBeenCalled();
+    });
+
+    it('should send email notification when changing status', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      const mockUsers: User[] = [mockUserFull, mockUser2Full];
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
+      vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
+      await useCase.execute('1', {
+        status: TicketStatus.IN_PROGRESS,
+      });
+
+      expect(mockUserRepository.findAll).toHaveBeenCalled();
+      expect(mockEmailService.sendSafe).toHaveBeenCalled();
+    });
+
+    it('should not send email notification if status does not change', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
+      const mockTicket = {
+        id: '1',
+        title: 'Updated Title',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
+      await useCase.execute('1', {
+        title: 'Updated Title',
+      });
+
+      expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+    });
+
+    it('should not fail if email sending fails', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.IN_PROGRESS,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
+
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
+
+      const result = await useCase.execute('1', {
+        status: TicketStatus.IN_PROGRESS,
+      });
+
+      expect(result).toEqual(mockTicket);
+      expect(consoleErrorSpy).toHaveBeenCalled();
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('should not send email notification if assignee is not found', async () => {
+      const existingTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: null,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
+      };
+
+      const mockTicket = {
+        id: '1',
+        title: 'Test Ticket',
+        description: 'Test Description',
+        status: TicketStatus.NEW,
+        assignedTo: mockUser,
+        archived: false,
+        createdAt: new Date('2025-01-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
+      };
+
+      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
+
+      const useCase = new UpdateTicket(mockRepository, mockUserRepository, mockEmailService);
+      await useCase.execute('1', {
+        assignedTo: mockUser.id,
+      });
+
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
     });
   });
 });

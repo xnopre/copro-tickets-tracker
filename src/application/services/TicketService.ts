@@ -1,4 +1,6 @@
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
+import { IUserRepository } from '@/domain/repositories/IUserRepository';
+import { IEmailService } from '@/domain/services/IEmailService';
 import { CreateTicket } from '@/domain/use-cases/CreateTicket';
 import { GetTickets } from '@/domain/use-cases/GetTickets';
 import { GetTicketById } from '@/domain/use-cases/GetTicketById';
@@ -13,11 +15,15 @@ export class TicketService {
   private updateTicketUseCase: UpdateTicket;
   private archiveTicketUseCase: ArchiveTicket;
 
-  constructor(ticketRepository: ITicketRepository) {
-    this.createTicketUseCase = new CreateTicket(ticketRepository);
+  constructor(
+    ticketRepository: ITicketRepository,
+    userRepository: IUserRepository,
+    emailService: IEmailService
+  ) {
+    this.createTicketUseCase = new CreateTicket(ticketRepository, userRepository, emailService);
     this.getTicketsUseCase = new GetTickets(ticketRepository);
     this.getTicketByIdUseCase = new GetTicketById(ticketRepository);
-    this.updateTicketUseCase = new UpdateTicket(ticketRepository);
+    this.updateTicketUseCase = new UpdateTicket(ticketRepository, userRepository, emailService);
     this.archiveTicketUseCase = new ArchiveTicket(ticketRepository);
   }
 

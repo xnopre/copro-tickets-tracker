@@ -1,10 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CommentService } from './CommentService';
 import { ICommentRepository } from '@/domain/repositories/ICommentRepository';
+import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
+import { IUserRepository } from '@/domain/repositories/IUserRepository';
+import { IEmailService } from '@/domain/services/IEmailService';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
 
 describe('CommentService', () => {
   let mockRepository: ICommentRepository;
+  let mockTicketRepository: ITicketRepository;
+  let mockUserRepository: IUserRepository;
+  let mockEmailService: IEmailService;
   let commentService: CommentService;
 
   beforeEach(() => {
@@ -12,7 +18,27 @@ describe('CommentService', () => {
       findByTicketId: vi.fn(),
       create: vi.fn(),
     };
-    commentService = new CommentService(mockRepository);
+    mockTicketRepository = {
+      findAll: vi.fn(),
+      findById: vi.fn().mockResolvedValue(null),
+      create: vi.fn(),
+      update: vi.fn(),
+      archive: vi.fn(),
+    };
+    mockUserRepository = {
+      findAll: vi.fn().mockResolvedValue([]),
+      findById: vi.fn().mockResolvedValue(null),
+    };
+    mockEmailService = {
+      send: vi.fn().mockResolvedValue(undefined),
+      sendSafe: vi.fn().mockResolvedValue(true),
+    };
+    commentService = new CommentService(
+      mockRepository,
+      mockTicketRepository,
+      mockUserRepository,
+      mockEmailService
+    );
   });
 
   describe('getCommentsByTicketId', () => {

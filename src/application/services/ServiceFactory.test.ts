@@ -29,11 +29,28 @@ vi.mock('@/infrastructure/repositories/MongoCommentRepository', () => {
   };
 });
 
+vi.mock('@/infrastructure/repositories/MongoUserRepository', () => {
+  return {
+    MongoUserRepository: class MockMongoUserRepository {
+      async findAll() {
+        return [];
+      }
+      async findById() {
+        return null;
+      }
+      async create() {
+        return {};
+      }
+    },
+  };
+});
+
 describe('ServiceFactory', () => {
   beforeEach(() => {
     // Reset the singleton instances before each test
     (ServiceFactory as any).ticketService = null;
     (ServiceFactory as any).commentService = null;
+    (ServiceFactory as any).emailService = null;
   });
 
   describe('getTicketService', () => {

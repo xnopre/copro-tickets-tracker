@@ -1,9 +1,18 @@
 import { ICommentRepository } from '../repositories/ICommentRepository';
+import { ITicketRepository } from '../repositories/ITicketRepository';
+import { IUserRepository } from '../repositories/IUserRepository';
+import { IEmailService } from '../services/IEmailService';
 import { CreateCommentData, Comment } from '../entities/Comment';
 import { ValidationError } from '../errors/ValidationError';
+import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 
 export class AddComment {
-  constructor(private commentRepository: ICommentRepository) {}
+  constructor(
+    private commentRepository: ICommentRepository,
+    private ticketRepository: ITicketRepository,
+    private userRepository: IUserRepository,
+    private emailService: IEmailService
+  ) {}
 
   async execute(data: CreateCommentData): Promise<Comment> {
     this.validateData(data);
@@ -14,7 +23,38 @@ export class AddComment {
       author: data.author.trim(),
     });
 
+    await this.notifyCommentAdded(comment);
+
     return comment;
+  }
+
+  private async notifyCommentAdded(comment: Comment): Promise<void> {
+    try {
+      const ticket = await this.ticketRepository.findById(comment.ticketId);
+      if (!ticket) {
+        return;
+      }
+
+      const users = await this.userRepository.findAll();
+
+      if (users.length === 0) {
+        return;
+      }
+
+      const { subject, htmlContent, textContent } = EmailTemplates.commentAdded(ticket, comment);
+
+      await this.emailService.sendSafe({
+        to: users.map(user => ({
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+        })),
+        subject,
+        htmlContent,
+        textContent,
+      });
+    } catch (error) {
+      console.error("[AddComment] Erreur lors de l'envoi des emails:", error);
+    }
   }
 
   private validateData(data: CreateCommentData): void {
