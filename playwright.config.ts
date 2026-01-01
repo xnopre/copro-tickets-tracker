@@ -21,5 +21,13 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
+    env: {
+      MONGODB_URI: 'mongodb://localhost:27017/cotitra-test',
+      EMAIL_PROVIDER: 'gmail',
+      GMAIL_USER: 'test@example.com',
+      GMAIL_APP_PASSWORD: 'fake-password-for-tests',
+      FROM_EMAIL: 'test@example.com',
+      NODE_ENV: 'test',
+    },
   },
 });
