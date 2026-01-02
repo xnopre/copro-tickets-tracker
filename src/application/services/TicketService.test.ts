@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TicketService } from './TicketService';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
+import { IUserRepository } from '@/domain/repositories/IUserRepository';
+import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
+import { ILogger } from '@/domain/services/ILogger';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
 import { UserPublic } from '@/domain/entities/User';
@@ -25,6 +29,10 @@ const mockUser3: UserPublic = {
 
 describe('TicketService', () => {
   let mockRepository: ITicketRepository;
+  let mockUserRepository: IUserRepository;
+  let mockEmailService: IEmailService;
+  let mockEmailTemplateService: IEmailTemplateService;
+  let mockLogger: ILogger;
   let ticketService: TicketService;
 
   beforeEach(() => {
@@ -35,7 +43,49 @@ describe('TicketService', () => {
       update: vi.fn(),
       archive: vi.fn(),
     };
-    ticketService = new TicketService(mockRepository);
+    mockUserRepository = {
+      findAll: vi.fn().mockResolvedValue([]),
+      findById: vi.fn().mockResolvedValue(null),
+    };
+    mockEmailService = {
+      send: vi.fn().mockResolvedValue(undefined),
+      sendSafe: vi.fn().mockResolvedValue(true),
+    };
+    mockEmailTemplateService = {
+      ticketCreated: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      ticketAssigned: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      ticketStatusChanged: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+      commentAdded: vi.fn().mockReturnValue({
+        subject: 'Test Subject',
+        htmlContent: '<p>Test HTML</p>',
+        textContent: 'Test Text',
+      }),
+    };
+    mockLogger = {
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+    };
+    ticketService = new TicketService(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService,
+      mockLogger
+    );
   });
 
   describe('getAllTickets', () => {

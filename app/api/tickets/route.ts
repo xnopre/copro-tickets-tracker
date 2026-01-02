@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { ValidationError } from '@/domain/errors/ValidationError';
+import { logger } from '@/infrastructure/services/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,10 +13,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(ticket, { status: 201 });
   } catch (error) {
-    console.error(
-      'Error creating ticket:',
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error creating ticket', error);
 
     if (error instanceof ValidationError) {
       return NextResponse.json({ error: error.message }, { status: 400 });

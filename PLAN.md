@@ -31,10 +31,12 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [✏️ Étape 8 : Modifier un Ticket](#️-étape-8--modifier-un-ticket)
 - [📦 Étape 9 : Archiver un Ticket](#-étape-9--archiver-un-ticket)
 - [👥 Étape 10 : Liste des Utilisateurs](#-étape-10--liste-des-utilisateurs)
-- [🎯 Étape 11 : Filtrer par Statut](#-étape-11--filtrer-par-statut)
-- [🔍 Étape 12 : Recherche de Tickets](#-étape-12--recherche-de-tickets)
-- [📊 Étape 13 : Dashboard avec Statistiques](#-étape-13--dashboard-avec-statistiques)
-- [🎨 Étape 14 : Polish UX/UI](#-étape-14--polish-uxui)
+- [📧 Étape 11 : Notifier les Utilisateurs par Mail](#-étape-11--notifier-les-utilisateurs-par-mail)
+- [📧 Étape 11b : Service d'Envoi d'Emails Gmail](#-étape-11b--service-denvoi-demails-gmail)
+- [🎯 Étape 12 : Filtrer par Statut](#-étape-12--filtrer-par-statut)
+- [🔍 Étape 13 : Recherche de Tickets](#-étape-13--recherche-de-tickets)
+- [📊 Étape 14 : Dashboard avec Statistiques](#-étape-14--dashboard-avec-statistiques)
+- [🎨 Étape 15 : Polish UX/UI](#-étape-15--polish-uxui)
 - [🚀 Étapes Futures (Optionnelles)](#-étapes-futures-optionnelles)
 - [📝 Notes Importantes](#-notes-importantes)
 
@@ -1194,7 +1196,389 @@ scripts/seed.ts (création users)
 
 ---
 
-## 🎯 Étape 11 : Filtrer par Statut
+## 📧 Étape 11 : Notifier les Utilisateurs par Mail
+
+**Objectif** : Envoyer des notifications par email lors des événements importants (création de ticket, changement de statut, ajout de commentaire)
+
+### Ce qu'on livre
+
+- Service d'envoi d'email intégré à l'architecture hexagonale
+- Templates d'emails HTML pour chaque type de notification
+- Configuration du service Resend (API moderne et gratuite)
+- Notifications automatiques lors de :
+  - Création d'un nouveau ticket
+  - Changement de statut d'un ticket
+  - Ajout d'un commentaire sur un ticket
+- Tests unitaires complets du service d'envoi
+
+### Tâches
+
+- [x] Choisir et configurer le service d'envoi (Resend)
+- [x] Créer l'architecture hexagonale pour les emails
+  - [x] Interface IEmailService dans le domain (src/domain/services/IEmailService.ts)
+  - [x] Implémentation ResendEmailService dans l'infrastructure (src/infrastructure/services/ResendEmailService.ts)
+  - [x] MockEmailService pour les tests (src/infrastructure/services/**mocks**/MockEmailService.ts)
+  - [x] ServiceFactory.getEmailService() (retourne MockEmailService en test, ResendEmailService en prod)
+- [x] Créer les templates d'emails HTML (src/infrastructure/services/EmailTemplates.ts)
+  - [x] Template de création de ticket (ticketCreated)
+  - [x] Template d'assignation de ticket (ticketAssigned)
+  - [x] Template de changement de statut (ticketStatusChanged)
+  - [x] Template de nouveau commentaire (commentAdded)
+- [x] Intégrer les notifications dans les use cases
+  - [x] CreateTicket → email à tous les utilisateurs
+  - [x] UpdateTicket → email à l'utilisateur assigné (assignation) + tous les utilisateurs (changement de statut)
+  - [x] AddComment → email à tous les utilisateurs
+- [x] Configurer les variables d'environnement (.env.local.example)
+  - [x] RESEND_API_KEY
+  - [x] FROM_EMAIL
+  - [x] NEXT_PUBLIC_APP_URL
+- [x] Tests unitaires (528 tests passants au total, +20 nouveaux tests)
+  - [x] Tests du service d'envoi (ResendEmailService.test.ts - 8 tests)
+  - [x] Tests des templates (EmailTemplates.test.ts - 7 tests)
+  - [x] Tests du mock (MockEmailService.test.ts - 5 tests)
+  - [x] Tests d'intégration avec les use cases (CreateTicket, UpdateTicket, AddComment)
+- [x] Build TypeScript et Next.js
+- [ ] Déployer
+
+### Validation
+
+- ✅ Un email est envoyé lors de la création d'un ticket (tous les utilisateurs notifiés)
+- ✅ Un email est envoyé lors du changement de statut (tous les utilisateurs notifiés)
+- ✅ Un email est envoyé lors de l'assignation (utilisateur assigné notifié)
+- ✅ Un email est envoyé lors de l'ajout d'un commentaire (tous les utilisateurs notifiés)
+- ✅ Les templates sont professionnels et bien formatés (HTML + texte brut)
+- ✅ Les emails contiennent les informations pertinentes (titre, description, statut, lien vers le ticket)
+- ✅ Protection XSS : escapeHtml() dans les templates
+- ✅ Architecture hexagonale respectée (IEmailService dans domain, ResendEmailService + MockEmailService dans infrastructure)
+- ✅ Les erreurs d'envoi ne bloquent pas le flux métier (sendSafe + try/catch dans use cases)
+- ✅ Tous les tests passent (528 tests, +20 nouveaux tests email)
+- ✅ Build TypeScript et Next.js réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes d'implémentation
+
+**Fichiers créés** (10 nouveaux fichiers) :
+
+```
+src/domain/services/IEmailService.ts
+src/domain/errors/EmailServiceError.ts
+src/infrastructure/services/ResendEmailService.ts
+src/infrastructure/services/ResendEmailService.test.ts
+src/infrastructure/services/EmailTemplates.ts
+src/infrastructure/services/EmailTemplates.test.ts
+src/infrastructure/services/__mocks__/MockEmailService.ts
+src/infrastructure/services/__mocks__/MockEmailService.test.ts
+```
+
+**Fichiers modifiés** (9 fichiers) :
+
+```
+package.json (+ resend@6.6.0)
+.env.local.example (+ RESEND_API_KEY, FROM_EMAIL, NEXT_PUBLIC_APP_URL)
+src/application/services/ServiceFactory.ts (+ getEmailService)
+src/application/services/TicketService.ts (injection IEmailService)
+src/application/services/CommentService.ts (injection IEmailService)
+src/domain/use-cases/CreateTicket.ts (+ notifyTicketCreated)
+src/domain/use-cases/UpdateTicket.ts (+ notifyTicketUpdated, notifyAssignment, notifyStatusChange)
+src/domain/use-cases/AddComment.ts (+ notifyCommentAdded)
+vitest.config.ts (setup EmailService mock pour tests)
+```
+
+**Tests** : +20 nouveaux tests (8 ResendEmailService, 7 EmailTemplates, 5 MockEmailService)
+
+**Particularités** :
+
+- **Méthode sendSafe()** : Envoie non-bloquant qui retourne true/false au lieu de throw, utilisée dans tous les use cases pour éviter de bloquer le flux métier
+- **Gestion d'erreur** : Tous les appels d'email sont dans des try/catch, les erreurs sont loguées mais n'interrompent pas le flux
+- **Templates** : Double format (HTML + texte brut) pour compatibilité clients mail
+- **Protection XSS** : Méthode escapeHtml() pour échapper les caractères dangereux (&, <, >, ", ')
+- **Configuration environnement** : MockEmailService en test (NODE_ENV=test), ResendEmailService en dev/prod
+- **Variable FROM_EMAIL** : Utilisée au lieu de EMAIL_FROM pour cohérence avec Resend
+
+### Notes techniques
+
+**Service d'envoi : Resend**
+
+- API moderne et simple (https://resend.com)
+- Plan gratuit : 100 emails/jour, 3 000/mois
+- Installation : `npm install resend`
+- Nécessite vérification du domaine ou utilisation de `onboarding@resend.dev` pour les tests
+
+**Architecture hexagonale** :
+
+```typescript
+// Domain
+interface IEmailService {
+  sendTicketCreated(ticket: Ticket, recipient: string): Promise<void>;
+  sendTicketUpdated(ticket: Ticket, recipient: string): Promise<void>;
+  sendCommentAdded(ticket: Ticket, comment: Comment, recipient: string): Promise<void>;
+}
+
+// Infrastructure
+class ResendEmailService implements IEmailService {
+  constructor(private resend: Resend) {}
+  // Implémentation avec Resend
+}
+
+// Alternative pour les tests
+class MockEmailService implements IEmailService {
+  // Mock pour les tests
+}
+```
+
+**Templates d'emails** :
+
+Les emails doivent être en HTML avec un style inline (pour compatibilité clients mail) :
+
+```html
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h1>Nouveau ticket créé : {{title}}</h1>
+  <p><strong>Description :</strong> {{description}}</p>
+  <p><strong>Statut :</strong> {{status}}</p>
+  <a
+    href="{{ticketUrl}}"
+    style="background: #0070f3; color: white; padding: 10px 20px; text-decoration: none;"
+  >
+    Voir le ticket
+  </a>
+</div>
+```
+
+**Variables d'environnement** :
+
+```bash
+# .env.local
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+EMAIL_FROM=noreply@votredomaine.com
+```
+
+**Intégration dans les use cases** :
+
+```typescript
+// CreateTicket.ts
+async execute(data: CreateTicketData): Promise<Ticket> {
+  const ticket = await this.ticketRepository.create(data);
+
+  // Envoyer notification email
+  if (ticket.assignedUser?.email) {
+    await this.emailService.sendTicketCreated(ticket, ticket.assignedUser.email);
+  }
+
+  return ticket;
+}
+```
+
+**Gestion des erreurs** :
+
+- Les erreurs d'envoi d'email ne doivent PAS bloquer la création/modification du ticket
+- Logger les erreurs d'envoi mais continuer le flux métier
+- Utiliser try/catch autour de l'envoi d'email
+
+**Sécurité** :
+
+- Ne jamais inclure de données sensibles dans les emails
+- Utiliser HTTPS pour tous les liens
+- Valider les adresses email avant envoi
+
+**Tests** :
+
+- Utiliser MockEmailService pour les tests unitaires
+- Vérifier que les emails sont appelés avec les bons paramètres
+- Tester que les erreurs d'envoi n'interrompent pas le flux
+
+---
+
+## 📧 Étape 11b : Service d'Envoi d'Emails Gmail
+
+**Objectif** : Ajouter Gmail comme service d'envoi d'emails alternatif à Resend (qui nécessite un nom de domaine)
+
+### Ce qu'on livre
+
+- Service d'envoi d'emails Gmail via Nodemailer
+- Architecture hexagonale respectée avec interchangeabilité des providers
+- Sélection du provider via variable d'environnement `EMAIL_PROVIDER`
+- Configuration simple avec mot de passe d'application Google
+- Tests unitaires complets (543 tests passants au total, +14 nouveaux tests)
+- Documentation de configuration Gmail
+
+### Tâches
+
+- [x] Installer les dépendances
+  - [x] `npm install nodemailer`
+  - [x] `npm install --save-dev @types/nodemailer`
+- [x] Créer l'implémentation Gmail
+  - [x] `src/infrastructure/services/GmailEmailService.ts` (implémente `IEmailService`)
+  - [x] Configuration Nodemailer avec Gmail SMTP
+  - [x] Validation des variables d'environnement (GMAIL_USER, GMAIL_APP_PASSWORD, FROM_EMAIL)
+- [x] Créer les tests unitaires
+  - [x] `src/infrastructure/services/GmailEmailService.test.ts` (9 tests)
+  - [x] Mock de nodemailer avec vi.mock()
+  - [x] Tests du constructeur, send(), sendSafe()
+- [x] Modifier ServiceFactory
+  - [x] Ajouter import de `GmailEmailService`
+  - [x] Logique de sélection via `EMAIL_PROVIDER` (gmail|resend)
+  - [x] Gestion des erreurs pour provider invalide
+  - [x] Défaut à Resend si non spécifié
+- [x] Mettre à jour les tests de ServiceFactory
+  - [x] Test retour GmailEmailService quand EMAIL_PROVIDER=gmail
+  - [x] Test retour ResendEmailService quand EMAIL_PROVIDER=resend
+  - [x] Test défaut à ResendEmailService si non défini
+  - [x] Test erreur si EMAIL_PROVIDER invalide
+- [x] Mettre à jour `.env.local.example`
+  - [x] Documentation des deux providers (Gmail et Resend)
+  - [x] Instructions de configuration Gmail
+  - [x] Variable `EMAIL_PROVIDER` pour choisir le service
+- [x] Validation complète
+  - [x] Type-check sans erreur
+  - [x] Lint sans erreur
+  - [x] Build Next.js réussi
+  - [x] Tous les tests passent (543 tests)
+- [ ] Déployer
+
+### Validation
+
+- ✅ GmailEmailService implémente correctement IEmailService
+- ✅ ServiceFactory retourne le bon service selon EMAIL_PROVIDER
+- ✅ Architecture hexagonale respectée (Domain inchangé)
+- ✅ Les templates existants fonctionnent avec Gmail
+- ✅ Tous les tests passent (543/543)
+- ✅ Type-check sans erreur
+- ✅ Lint sans erreur
+- ✅ Build Next.js réussi
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Service Gmail : Nodemailer**
+
+- Bibliothèque Node.js mature et bien documentée
+- Support natif de Gmail SMTP
+- Configuration simple avec mot de passe d'application Google
+- Pas besoin de Google Cloud Console / OAuth2
+
+**Configuration Gmail** :
+
+1. **Activer la validation en 2 étapes** :
+   - Aller sur https://myaccount.google.com
+   - Sécurité → Validation en 2 étapes
+   - Suivre les instructions
+
+2. **Créer un mot de passe d'application** :
+   - Retourner sur https://myaccount.google.com
+   - Sécurité → Validation en 2 étapes → Mots de passe des applications
+   - Sélectionner "Autre (nom personnalisé)"
+   - Entrer "CoTiTra"
+   - Cliquer sur "Générer"
+   - **Copier le mot de passe** (16 caractères)
+
+3. **Configurer `.env.local`** :
+   ```bash
+   EMAIL_PROVIDER=gmail
+   GMAIL_USER=votreemail@gmail.com
+   GMAIL_APP_PASSWORD=abcdefghijklmnop  # Mot de passe d'application (sans espaces)
+   FROM_EMAIL=votreemail@gmail.com
+   ```
+
+**Variables d'environnement** :
+
+```bash
+# Choix du provider
+EMAIL_PROVIDER=gmail  # ou 'resend' (défaut si non spécifié)
+
+# Gmail
+GMAIL_USER=votreemail@gmail.com
+GMAIL_APP_PASSWORD=mot_de_passe_application
+
+# Resend (alternative)
+RESEND_API_KEY=your_resend_api_key_here
+
+# Commun aux deux providers
+FROM_EMAIL=noreply@votredomaine.com
+```
+
+**Architecture hexagonale** :
+
+```typescript
+// Domain (inchangé)
+interface IEmailService {
+  send(data: EmailData): Promise<void>;
+  sendSafe(data: EmailData): Promise<boolean>;
+}
+
+// Infrastructure - Nouvel adapter Gmail
+class GmailEmailService implements IEmailService {
+  private transporter: nodemailer.Transporter;
+  constructor() {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
+  }
+}
+
+// ServiceFactory - Sélection dynamique
+static getEmailService(): IEmailService {
+  if (NODE_ENV === 'test') return new MockEmailService();
+
+  const provider = process.env.EMAIL_PROVIDER || 'resend';
+  if (provider === 'gmail') return new GmailEmailService();
+  if (provider === 'resend') return new ResendEmailService();
+  throw new Error('EMAIL_PROVIDER invalide');
+}
+```
+
+**Avantages de Gmail** :
+
+- ✅ Gratuit (500 emails/jour pour comptes gratuits)
+- ✅ Pas besoin de nom de domaine
+- ✅ Configuration simple (juste email + mot de passe d'application)
+- ✅ Fiable et bien supporté
+
+**Limitations Gmail** :
+
+- Limite de 500 emails/jour (comptes gratuits)
+- Limite de 100 destinataires par email
+- Nécessite validation en 2 étapes et mot de passe d'application
+
+**Fichiers créés** (2 nouveaux fichiers) :
+
+```
+src/infrastructure/services/GmailEmailService.ts
+src/infrastructure/services/GmailEmailService.test.ts
+```
+
+**Fichiers modifiés** (3 fichiers) :
+
+```
+src/application/services/ServiceFactory.ts (+ import GmailEmailService, + logique sélection)
+src/application/services/ServiceFactory.test.ts (+ 5 nouveaux tests)
+.env.local.example (+ documentation Gmail)
+```
+
+**Tests** : +14 nouveaux tests (9 GmailEmailService, 5 ServiceFactory)
+
+**Sécurité** :
+
+- Ne JAMAIS commiter le mot de passe d'application dans Git
+- Utiliser `.env.local` (ignoré par Git)
+- Le mot de passe d'application est différent du mot de passe principal Gmail
+
+**Basculer entre providers** :
+
+```bash
+# Utiliser Gmail
+EMAIL_PROVIDER=gmail
+
+# Utiliser Resend
+EMAIL_PROVIDER=resend
+
+# Défaut (Resend)
+# EMAIL_PROVIDER non défini
+```
+
+---
+
+## 🎯 Étape 12 : Filtrer par Statut
 
 **Objectif** : Permettre de filtrer la liste des tickets par statut
 
@@ -1222,7 +1606,7 @@ scripts/seed.ts (création users)
 
 ---
 
-## 🔍 Étape 12 : Recherche de Tickets
+## 🔍 Étape 13 : Recherche de Tickets
 
 **Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
 
@@ -1250,7 +1634,7 @@ scripts/seed.ts (création users)
 
 ---
 
-## 📊 Étape 13 : Dashboard avec Statistiques
+## 📊 Étape 14 : Dashboard avec Statistiques
 
 **Objectif** : Afficher un résumé des tickets sur la page d'accueil
 
@@ -1278,7 +1662,7 @@ scripts/seed.ts (création users)
 
 ---
 
-## 🎨 Étape 14 : Polish UX/UI
+## 🎨 Étape 15 : Polish UX/UI
 
 **Objectif** : Améliorer l'expérience utilisateur
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
+import { logger } from '@/infrastructure/services/logger';
 
 /**
  * GET /api/users
@@ -14,7 +15,7 @@ export async function GET() {
 
     return NextResponse.json(users);
   } catch (error) {
-    console.error('Error fetching users:', error);
+    logger.error('Error fetching users', error);
     return NextResponse.json(
       { error: 'Erreur lors de la récupération des utilisateurs' },
       { status: 500 }

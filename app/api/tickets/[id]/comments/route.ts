@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
+import { logger } from '@/infrastructure/services/logger';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,11 +17,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'ID de ticket invalide' }, { status: 400 });
     }
 
-    console.error(
-      'Error fetching comments for ticket ID:',
-      id,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error fetching comments', error, { ticketId: id });
 
     return NextResponse.json(
       { error: 'Erreur lors de la récupération des commentaires' },
@@ -53,11 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'ID de ticket invalide' }, { status: 400 });
     }
 
-    console.error(
-      'Error creating comment for ticket ID:',
-      id,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error creating comment', error, { ticketId: id });
 
     return NextResponse.json(
       { error: 'Erreur lors de la création du commentaire' },

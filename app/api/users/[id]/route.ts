@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
+import { logger } from '@/infrastructure/services/logger';
 
 /**
  * GET /api/users/[id]
@@ -20,7 +21,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Error fetching user:', error);
+    logger.error('Error fetching user', error);
 
     if (error instanceof InvalidIdError) {
       return NextResponse.json({ error: error.message }, { status: 400 });

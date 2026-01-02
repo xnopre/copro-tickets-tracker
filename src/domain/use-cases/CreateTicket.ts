@@ -1,9 +1,19 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
+import { IUserRepository } from '../repositories/IUserRepository';
+import { IEmailService } from '../services/IEmailService';
+import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
 
 export class CreateTicket {
-  constructor(private ticketRepository: ITicketRepository) {}
+  constructor(
+    private ticketRepository: ITicketRepository,
+    private userRepository: IUserRepository,
+    private emailService: IEmailService,
+    private emailTemplateService: IEmailTemplateService,
+    private logger: ILogger
+  ) {}
 
   async execute(data: CreateTicketData): Promise<Ticket> {
     this.validateData(data);
@@ -13,7 +23,33 @@ export class CreateTicket {
       description: data.description.trim(),
     });
 
+    await this.notifyTicketCreated(ticket);
+
     return ticket;
+  }
+
+  private async notifyTicketCreated(ticket: Ticket): Promise<void> {
+    try {
+      const users = await this.userRepository.findAll();
+
+      if (users.length === 0) {
+        return;
+      }
+
+      const { subject, htmlContent, textContent } = this.emailTemplateService.ticketCreated(ticket);
+
+      await this.emailService.sendSafe({
+        to: users.map(user => ({
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+        })),
+        subject,
+        htmlContent,
+        textContent,
+      });
+    } catch (error) {
+      this.logger.error("[CreateTicket] Erreur lors de l'envoi des emails", error);
+    }
   }
 
   private validateData(data: CreateTicketData): void {

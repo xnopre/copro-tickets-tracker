@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
+import { logger } from '@/infrastructure/services/logger';
 
 export async function PATCH(
   _request: NextRequest,
@@ -22,11 +23,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
     }
 
-    console.error(
-      'Error archiving ticket with ID:',
-      id,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error archiving ticket', error, { ticketId: id });
 
     return NextResponse.json({ error: "Erreur lors de l'archivage du ticket" }, { status: 500 });
   }
