@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
+import { User, UserPublic } from '@/domain/entities/User';
 
 vi.mock('@/infrastructure/database/mongodb');
 vi.mock('@/application/services/ServiceFactory');
@@ -12,7 +13,7 @@ describe('GET /api/users', () => {
   });
 
   it('should return all users', async () => {
-    const mockUsers = [
+    const mockUsers: UserPublic[] = [
       {
         id: '1',
         firstName: 'Jean',

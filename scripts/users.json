@@ -2,21 +2,25 @@
   {
     "firstName": "Jean",
     "lastName": "Martin",
-    "email": "jean.martin@example.com"
+    "email": "jean.martin@example.com",
+    "password": "password123Jean"
   },
   {
     "firstName": "Marie",
     "lastName": "Dubois",
-    "email": "marie.dubois@example.com"
+    "email": "marie.dubois@example.com",
+    "password": "password123Marie"
   },
   {
     "firstName": "Pierre",
     "lastName": "Lefebvre",
-    "email": "pierre.lefebvre@example.com"
+    "email": "pierre.lefebvre@example.com",
+    "password": "password123Pierre"
   },
   {
     "firstName": "Sophie",
     "lastName": "Bernard",
-    "email": "sophie.bernard@example.com"
+    "email": "sophie.bernard@example.com",
+    "password": "password123Sophie"
   }
 ]

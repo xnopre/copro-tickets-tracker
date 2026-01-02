@@ -33,10 +33,14 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [👥 Étape 10 : Liste des Utilisateurs](#-étape-10--liste-des-utilisateurs)
 - [📧 Étape 11 : Notifier les Utilisateurs par Mail](#-étape-11--notifier-les-utilisateurs-par-mail)
 - [📧 Étape 11b : Service d'Envoi d'Emails Gmail](#-étape-11b--service-denvoi-demails-gmail)
-- [🎯 Étape 12 : Filtrer par Statut](#-étape-12--filtrer-par-statut)
-- [🔍 Étape 13 : Recherche de Tickets](#-étape-13--recherche-de-tickets)
-- [📊 Étape 14 : Dashboard avec Statistiques](#-étape-14--dashboard-avec-statistiques)
-- [🎨 Étape 15 : Polish UX/UI](#-étape-15--polish-uxui)
+- [🔐 Étape 12a : Ajout des Mots de Passe](#-étape-12a--ajout-des-mots-de-passe)
+- [🔐 Étape 12b : Ajout Authentification](#-étape-12b--ajout-authentification)
+- [💬 Étape 12c : Utiliser l'Utilisateur Connecté pour les Commentaires](#-étape-12c--utiliser-lutilisateur-connecté-pour-les-commentaires)
+- [👤 Étape 12d : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket](#-étape-12d--ajouter-lutilisateur-courant-comme-créateur-dun-ticket)
+- [🎯 Étape 13 : Filtrer par Statut](#-étape-13--filtrer-par-statut)
+- [🔍 Étape 14 : Recherche de Tickets](#-étape-14--recherche-de-tickets)
+- [📊 Étape 15 : Dashboard avec Statistiques](#-étape-15--dashboard-avec-statistiques)
+- [🎨 Étape 16 : Polish UX/UI](#-étape-16--polish-uxui)
 - [🚀 Étapes Futures (Optionnelles)](#-étapes-futures-optionnelles)
 - [📝 Notes Importantes](#-notes-importantes)
 
@@ -1578,7 +1582,452 @@ EMAIL_PROVIDER=resend
 
 ---
 
-## 🎯 Étape 12 : Filtrer par Statut
+## 🔐 Étape 12a : Ajout des Mots de Passe
+
+**Objectif** : Ajouter le champ `password` à l'entité User avec hashage automatique via hook Mongoose
+
+### Ce qu'on livre
+
+- Champ `password` (hashé avec bcryptjs) dans le schéma User
+- Hook Mongoose `.pre('save')` pour hacher automatiquement les mots de passe
+- Mise à jour de `users.json` avec mots de passe en clair (seront hashés automatiquement au seed)
+- Script seed met à jour les utilisateurs avec mots de passe hashés
+- Architecture hexagonale conservée
+
+### Tâches
+
+- [x] Installer bcryptjs : `npm install bcryptjs` et `npm install --save-dev @types/bcryptjs`
+- [x] Ajouter le champ `password` au schéma Mongoose User
+  - [x] Type: string
+  - [x] Required: true
+  - [x] Minlength: 8 caractères
+  - [x] Pas de select par défaut (caché dans les requêtes lean)
+- [x] Ajouter le hook `.pre('save')` dans UserSchema
+  - [x] Hash automatique avec bcryptjs (10 rounds)
+  - [x] Skip si password non modifié
+  - [x] Gère les erreurs correctement
+- [x] Mettre à jour `users.json` avec mots de passe
+  - [x] Ajouter champ `"password"` avec mots de passe en clair
+  - [x] Exemple : `{ "firstName": "Jean", "lastName": "Dupont", "email": "jean@example.com", "password": "monMotDePasse123" }`
+- [x] Mettre à jour l'entité Domain User
+  - [x] Ajouter `password` à l'interface User
+  - [x] UserPublic reste sans password
+- [x] Ajouter le champ `password` aux mocks des tests
+- [x] Tests unitaires
+  - [x] Tester que le password est hashé au save
+  - [x] Tester que le hash ne se refait pas si password non modifié
+  - [x] Tester que les utilisateurs seed ont des passwords hashés
+- [x] Build TypeScript et Next.js
+- [ ] Déployer
+
+### Validation
+
+- ✅ Champ `password` présent dans le schéma User
+- ✅ Les mots de passe sont automatiquement hashés (jamais en clair dans la DB)
+- ✅ Hook Mongoose fonctionne correctement
+- ✅ Les utilisateurs seed ont des mots de passe hashés
+- ✅ Impossible de créer un utilisateur sans password
+- ✅ Build TypeScript réussi
+- ✅ Build Next.js réussi
+- ✅ Tous les tests existants passent
+
+### Notes techniques
+
+**Hook Mongoose Pre-Save** :
+
+```typescript
+// src/infrastructure/database/schemas/UserSchema.ts
+import bcryptjs from 'bcryptjs';
+
+UserSchema.pre('save', async function (next) {
+  // Si le password n'a pas été modifié, on skip
+  if (!this.isModified('password')) return next();
+
+  try {
+    // Hash avec bcryptjs (10 rounds = bon compromis sécurité/perf)
+    this.password = await bcryptjs.hash(this.password, 10);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+**Avantages de cette approche** :
+
+- ✅ Automatique et transparent
+- ✅ Garantit le hashing même si on oublie dans le code métier
+- ✅ S'applique à tous les modes de création (`create()`, `insertMany()`, `save()`)
+- ✅ Pattern standard Mongoose
+- ✅ Pas besoin de scripts manuels
+- ✅ Sûr et maintenable
+
+**Bcryptjs vs Bcrypt** :
+
+- Utiliser `bcryptjs` (pur JavaScript) plutôt que `bcrypt` (binding natif)
+- Plus compatible, pas de dépendances de compilation
+- Même sécurité, légèrement plus lent mais négligeable
+
+**Workflow de seed** :
+
+1. Lancer `npm run seed` ou `npm run seed:users`
+2. Les utilisateurs sont créés avec `UserModel.create(users)`
+3. Le hook `.pre('save')` est automatiquement appelé
+4. Les mots de passe sont hashés
+5. Les utilisateurs sont insérés dans la DB
+
+**Fichiers créés** : Aucun
+
+**Fichiers modifiés** (3 fichiers) :
+
+```
+src/infrastructure/database/schemas/UserSchema.ts (+ password field, + pre-save hook)
+src/domain/entities/User.ts (+ password au type User)
+scripts/users.json (+ password aux utilisateurs)
+```
+
+**Tests** : Mettre à jour les mocks existants pour inclure le champ `password`
+
+---
+
+## 🔐 Étape 12b : Ajout Authentification
+
+**Objectif** : Implémenter l'authentification des utilisateurs
+
+### Ce qu'on livre
+
+- Pas de page d'inscription (signup)
+- Page de connexion (login)
+- Sessions utilisateur sécurisées
+- Protection des routes (redirect non-authentifiés vers login)
+- Architecture hexagonale respectée
+- Tests unitaires complets
+
+### Tâches
+
+- [ ] Installer et configurer le service d'authentification
+- [ ] Créer l'entité User avec hachage de mot de passe
+- [ ] Créer le use case LoginUser
+- [ ] Créer l'API route `/api/auth/login`
+- [ ] Créer la page `/login`
+- [ ] Implémenter la gestion des sessions
+- [ ] Protéger les routes (middleware Next.js)
+- [ ] Afficher l'utilisateur connecté dans le header
+- [ ] Ajouter le bouton "Déconnexion"
+- [ ] Tests unitaires complets
+- [ ] Déployer
+
+### Validation
+
+- ✅ On peut se connecter avec email/password
+- ✅ Les sessions sont sécurisées (JWT/cookies)
+- ✅ On est redirigé vers login si non authentifié
+- ✅ L'utilisateur connecté est affiché
+- ✅ Le bouton déconnexion fonctionne
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent
+- ⏳ Déployé en production
+
+### Notes techniques
+
+**Solutions d'authentification** : **NextAuth.js**
+
+- Framework d'authentification Next.js natif
+- Support OAuth, JWT, database sessions
+- Configuration simple avec Credentials provider
+- Middleware automatique pour les routes protégées
+
+**Approche : NextAuth.js + Credentials Provider**
+
+- Configuration : `/src/auth.ts`
+- Callback login : validation email/password (mots de passe déjà hashés par l'Étape 12a)
+- Sessions : JWT tokens
+- Middleware : protection des routes (dans `/src/middleware.ts`)
+- Routes API : `/api/auth/[...nextauth]`
+
+**Sécurité** :
+
+- Validation des mots de passe hashés (bcrypt validé par NextAuth)
+- Validation email
+- CSRF protection (automatique avec NextAuth)
+- Secrets sécurisés dans .env.local
+- Tokens JWT avec expiration
+
+**Fichiers à créer** :
+
+```
+src/auth.ts (configuration NextAuth)
+src/middleware.ts (protection des routes)
+src/infrastructure/services/AuthService.ts
+app/api/auth/[...nextauth]/route.ts
+app/login/page.tsx
+app/signup/page.tsx
+```
+
+---
+
+## 💬 Étape 12c : Utiliser l'Utilisateur Connecté pour les Commentaires
+
+**Objectif** : Modifier les commentaires pour utiliser l'utilisateur connecté comme auteur automatique, au lieu d'un champ texte libre
+
+### Ce qu'on livre
+
+- Modification de l'entité `Comment` : `author` devient une référence `User` (ObjectId)
+- Formulaire de commentaire sans champ "auteur" (dérivé automatiquement de la session)
+- Affichage du nom complet de l'auteur (Prénom Nom)
+- API protégée par authentification
+- Architecture hexagonale respectée
+- Tests unitaires complets
+
+### Tâches
+
+- [ ] Modifier l'entité Domain `Comment`
+  - [ ] Changer `author: string` en `authorId: string` (ObjectId de User)
+  - [ ] Ajouter interface `CommentWithAuthor` avec `author: User` (pour l'affichage)
+- [ ] Mettre à jour le schéma Mongoose `CommentSchema`
+  - [ ] Changer `author: string` en `authorId: { type: ObjectId, ref: 'User' }`
+  - [ ] Ajouter populate() dans les requêtes pour récupérer les données de l'utilisateur
+- [ ] Modifier l'entité Domain `AddCommentData`
+  - [ ] Supprimer le champ `author: string`
+  - [ ] Remplacer par `authorId: string` (venant de la session)
+- [ ] Modifier l'API route `POST /api/tickets/[id]/comments`
+  - [ ] Récupérer l'utilisateur connecté via la session
+  - [ ] Valider que l'utilisateur est authentifié
+  - [ ] Passer `authorId` au lieu de `author` au use case
+- [ ] Modifier le use case `AddComment`
+  - [ ] Accepter `authorId` au lieu de `author`
+  - [ ] Valider que `authorId` correspond à un utilisateur valide
+- [ ] Modifier le composant `AddCommentForm`
+  - [ ] Supprimer le champ input pour le nom de l'auteur
+  - [ ] Afficher un message "Vous commentez en tant que [Prénom Nom]"
+  - [ ] Garder juste le champ textarea pour le contenu
+  - [ ] Ajouter la session utilisateur via hook (ex: `useSession()`)
+- [ ] Modifier le composant `CommentCard`
+  - [ ] Afficher `author.firstName author.lastName` (au lieu de juste `author`)
+- [ ] Modifier l'API route `GET /api/tickets/[id]/comments`
+  - [ ] S'assurer que le populate('authorId') retourne les données User
+- [ ] Mettre à jour le use case `GetComments`
+  - [ ] Retourner les commentaires avec les données de l'utilisateur
+- [ ] Mettre à jour tous les tests
+  - [ ] Tests use case AddComment avec `authorId`
+  - [ ] Tests composant AddCommentForm sans champ auteur
+  - [ ] Tests composant CommentCard avec affichage du nom complet
+  - [ ] Tests API routes
+  - [ ] Tous les mocks de commentaires avec `authorId`
+- [ ] Mise à jour du composant `TicketComments`
+  - [ ] Passer la session utilisateur aux composants enfants
+- [ ] Type-check et build
+- [ ] Déployer
+
+### Validation
+
+- ✅ Les nouveaux commentaires ont une référence à `User` au lieu d'une string
+- ✅ Le formulaire n'affiche plus le champ "auteur"
+- ✅ L'auteur du commentaire est automatiquement l'utilisateur connecté
+- ✅ Le nom complet de l'auteur s'affiche dans les commentaires (Prénom Nom)
+- ✅ L'API est protégée (erreur si non authentifié)
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent
+- ✅ Type-check et build réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Modification du schéma** :
+
+Avant :
+
+```typescript
+interface Comment {
+  ticketId: string;
+  content: string;
+  author: string; // Texte libre
+  createdAt: Date;
+}
+```
+
+Après :
+
+```typescript
+interface Comment {
+  ticketId: string;
+  content: string;
+  authorId: string; // ObjectId vers User
+  author?: User; // Population optionnelle (pour les requêtes GET)
+  createdAt: Date;
+}
+
+interface CommentWithAuthor extends Comment {
+  author: User; // Obligatoire après populate
+}
+```
+
+**Session utilisateur** :
+
+Pour accéder à l'utilisateur connecté :
+
+```typescript
+import { getSession } from 'next-auth/react';
+
+// Côté serveur (API route)
+const session = await getSession({ req });
+const userId = session?.user?.id;
+
+// Côté client (composant React)
+import { useSession } from 'next-auth/react';
+const { data: session } = useSession();
+const userId = session?.user?.id;
+```
+
+**Fichiers modifiés** (7 fichiers) :
+
+```
+src/domain/entities/Comment.ts (+ authorId, interface CommentWithAuthor)
+src/infrastructure/database/schemas/CommentSchema.ts (ref User)
+src/infrastructure/repositories/MongoCommentRepository.ts (populate)
+src/domain/use-cases/AddComment.ts (authorId au lieu d'author)
+src/domain/use-cases/GetComments.ts (retour avec author hydraté)
+src/presentation/components/AddCommentForm.tsx (sans champ auteur)
+src/presentation/components/CommentCard.tsx (affichage firstName + lastName)
+```
+
+**Fichiers de test modifiés** (10+ fichiers) :
+
+- Tous les tests de commentaires doivent utiliser `authorId` au lieu de `author`
+- Tests du composant `AddCommentForm` : vérifier absence du champ auteur
+- Tests du composant `CommentCard` : vérifier affichage du nom complet
+- Tests des API routes : vérifier que le populate marche
+
+**Tests** : +10-15 nouveaux tests pour couvrir la nouvelle logique avec utilisateurs
+
+---
+
+## 👤 Étape 12d : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket
+
+**Objectif** : Ajouter l'utilisateur connecté comme créateur du ticket. Le créateur est automatiquement défini lors de la création du ticket basé sur l'utilisateur authentifié.
+
+### Ce qu'on livre
+
+- Ajout du champ `createdBy` à l'entité `Ticket` : référence vers `UserPublic`
+- Le créateur du ticket est automatiquement l'utilisateur connecté (stocké en base de données)
+- Affichage du nom complet du créateur (Prénom Nom) sur les tickets
+- API protégée par authentification
+- Architecture hexagonale respectée
+- Tests unitaires complets
+
+### Tâches
+
+- [ ] Ajouter le champ `createdBy` à l'entité Domain `Ticket`
+  - [ ] Ajouter `createdBy: UserPublic` à l'interface `Ticket`
+- [ ] Mettre à jour le schéma Mongoose `TicketSchema`
+  - [ ] Ajouter `createdBy: { type: ObjectId, ref: 'User' }`
+  - [ ] Ajouter populate('createdBy') dans les requêtes
+- [ ] Modifier l'API route `POST /api/tickets`
+  - [ ] Récupérer l'utilisateur connecté via la session
+  - [ ] Valider que l'utilisateur est authentifié
+  - [ ] Passer `createdBy` (l'ID utilisateur) au use case
+- [ ] Modifier le use case `CreateTicket`
+  - [ ] Accepter `createdBy: string` (ID utilisateur)
+  - [ ] Valider que `createdBy` correspond à un utilisateur valide
+- [ ] Modifier le composant `CreateTicketForm`
+  - [ ] Afficher le message "Vous créez un ticket en tant que [Prénom Nom]"
+  - [ ] Ajouter la session utilisateur via hook (ex: `useSession()`)
+- [ ] Modifier l'API route `GET /api/tickets`
+  - [ ] S'assurer que populate('createdBy') retourne les données User
+- [ ] Modifier l'API route `GET /api/tickets/[id]`
+  - [ ] S'assurer que populate('createdBy') retourne les données User
+- [ ] Mettre à jour le use case `GetTickets`
+  - [ ] Retourner les tickets avec les données du créateur
+- [ ] Mettre à jour le use case `GetTicketById`
+  - [ ] Retourner les tickets avec les données du créateur
+- [ ] Modifier le composant `TicketCard`
+  - [ ] Afficher `createdBy.firstName createdBy.lastName`
+- [ ] Modifier le composant `TicketDetail` (ou page)
+  - [ ] Afficher `createdBy.firstName createdBy.lastName`
+- [ ] Mettre à jour tous les tests
+  - [ ] Tests use case CreateTicket avec `createdBy`
+  - [ ] Tests composant CreateTicketForm
+  - [ ] Tests composant TicketCard avec affichage du créateur
+  - [ ] Tests composant TicketDetail avec affichage du créateur
+  - [ ] Tests API routes
+  - [ ] Tous les mocks de tickets avec `createdBy`
+- [ ] Type-check et build
+- [ ] Déployer
+
+### Validation
+
+- ✅ Le champ `createdBy` existe sur les nouveaux tickets
+- ✅ Le créateur du ticket est automatiquement l'utilisateur connecté
+- ✅ Le nom complet du créateur s'affiche sur les tickets
+- ✅ L'API est protégée (erreur si non authentifié)
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent
+- ✅ Type-check et build réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Modification du schéma** :
+
+Avant :
+
+```typescript
+interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  status: TicketStatus;
+  assignedTo: UserPublic | null;
+  archived: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+Après :
+
+```typescript
+interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  status: TicketStatus;
+  createdBy: UserPublic; // Nouveau champ
+  assignedTo: UserPublic | null;
+  archived: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+**Fichiers modifiés** (10 fichiers) :
+
+```
+src/domain/entities/Ticket.ts (+ createdBy: UserPublic)
+src/infrastructure/database/schemas/TicketSchema.ts (add createdBy ref)
+src/infrastructure/repositories/MongoTicketRepository.ts (populate createdBy)
+src/domain/use-cases/CreateTicket.ts (accept createdBy)
+src/domain/use-cases/GetTickets.ts (return with createdBy populated)
+src/domain/use-cases/GetTicketById.ts (return with createdBy populated)
+src/presentation/components/CreateTicketForm.tsx (show user creating)
+src/presentation/components/TicketCard.tsx (display createdBy)
+src/presentation/pages/TicketDetail.tsx (display createdBy)
+src/infrastructure/api/routes (POST/GET endpoints)
+```
+
+**Fichiers de test modifiés** (12+ fichiers) :
+
+- Tous les tests de tickets doivent inclure `createdBy` dans les mocks
+- Tests du composant `CreateTicketForm` : vérifier affichage de l'utilisateur courant
+- Tests du composant `TicketCard` : vérifier affichage du créateur
+- Tests du composant `TicketDetail` : vérifier affichage du créateur
+- Tests des API routes : vérifier que le populate marche
+
+**Tests** : +12-15 nouveaux tests pour couvrir la nouvelle logique
+
+---
+
+## 🎯 Étape 13 : Filtrer par Statut
 
 **Objectif** : Permettre de filtrer la liste des tickets par statut
 
@@ -1606,7 +2055,7 @@ EMAIL_PROVIDER=resend
 
 ---
 
-## 🔍 Étape 13 : Recherche de Tickets
+## 🔍 Étape 14 : Recherche de Tickets
 
 **Objectif** : Rechercher des tickets par mots-clés dans le titre ou la description
 
@@ -1634,7 +2083,7 @@ EMAIL_PROVIDER=resend
 
 ---
 
-## 📊 Étape 14 : Dashboard avec Statistiques
+## 📊 Étape 15 : Dashboard avec Statistiques
 
 **Objectif** : Afficher un résumé des tickets sur la page d'accueil
 
@@ -1662,7 +2111,7 @@ EMAIL_PROVIDER=resend
 
 ---
 
-## 🎨 Étape 15 : Polish UX/UI
+## 🎨 Étape 16 : Polish UX/UI
 
 **Objectif** : Améliorer l'expérience utilisateur
 

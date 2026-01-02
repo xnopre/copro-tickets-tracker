@@ -7,6 +7,7 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { User } from '@/domain/entities/User';
 
 describe('AddComment', () => {
   const mockRepository: ICommentRepository = {
@@ -246,7 +247,7 @@ describe('AddComment', () => {
       updatedAt: new Date(),
     };
 
-    const mockUsers = [
+    const mockUsers: User[] = [
       {
         id: 'user_1',
         firstName: 'John',

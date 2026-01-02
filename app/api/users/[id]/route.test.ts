@@ -3,6 +3,7 @@ import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
+import { UserPublic } from '@/domain/entities/User';
 
 vi.mock('@/infrastructure/database/mongodb');
 vi.mock('@/application/services/ServiceFactory');
@@ -13,7 +14,7 @@ describe('GET /api/users/[id]', () => {
   });
 
   it('should return user when found', async () => {
-    const mockUser = {
+    const mockUser: UserPublic = {
       id: '1',
       firstName: 'Jean',
       lastName: 'Dupont',
