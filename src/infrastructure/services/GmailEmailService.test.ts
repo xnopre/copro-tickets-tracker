@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GmailEmailService } from './GmailEmailService';
+import { ILogger } from '@/domain/services/ILogger';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
 
 const mockSendMail = vi.fn();
@@ -13,11 +14,19 @@ vi.mock('nodemailer', () => ({
 }));
 
 describe('GmailEmailService', () => {
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.stubEnv('GMAIL_USER', 'test@gmail.com');
     vi.stubEnv('GMAIL_APP_PASSWORD', 'test_app_password');
     vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
     mockSendMail.mockClear();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -28,7 +37,7 @@ describe('GmailEmailService', () => {
     it('should throw error if GMAIL_USER is missing', () => {
       vi.stubEnv('GMAIL_USER', '');
 
-      expect(() => new GmailEmailService()).toThrow(
+      expect(() => new GmailEmailService(mockLogger)).toThrow(
         "GMAIL_USER, GMAIL_APP_PASSWORD et FROM_EMAIL doivent être configurés dans les variables d'environnement"
       );
     });
@@ -36,7 +45,7 @@ describe('GmailEmailService', () => {
     it('should throw error if GMAIL_APP_PASSWORD is missing', () => {
       vi.stubEnv('GMAIL_APP_PASSWORD', '');
 
-      expect(() => new GmailEmailService()).toThrow(
+      expect(() => new GmailEmailService(mockLogger)).toThrow(
         "GMAIL_USER, GMAIL_APP_PASSWORD et FROM_EMAIL doivent être configurés dans les variables d'environnement"
       );
     });
@@ -44,13 +53,13 @@ describe('GmailEmailService', () => {
     it('should throw error if FROM_EMAIL is missing', () => {
       vi.stubEnv('FROM_EMAIL', '');
 
-      expect(() => new GmailEmailService()).toThrow(
+      expect(() => new GmailEmailService(mockLogger)).toThrow(
         "GMAIL_USER, GMAIL_APP_PASSWORD et FROM_EMAIL doivent être configurés dans les variables d'environnement"
       );
     });
 
     it('should create instance with valid environment variables', () => {
-      expect(() => new GmailEmailService()).not.toThrow();
+      expect(() => new GmailEmailService(mockLogger)).not.toThrow();
     });
   });
 
@@ -58,7 +67,7 @@ describe('GmailEmailService', () => {
     it('should send email successfully', async () => {
       mockSendMail.mockResolvedValue({ messageId: 'email_123' });
 
-      const service = new GmailEmailService();
+      const service = new GmailEmailService(mockLogger);
 
       await service.send({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -79,7 +88,7 @@ describe('GmailEmailService', () => {
     it('should send email to multiple recipients', async () => {
       mockSendMail.mockResolvedValue({ messageId: 'email_123' });
 
-      const service = new GmailEmailService();
+      const service = new GmailEmailService(mockLogger);
 
       await service.send({
         to: [
@@ -103,7 +112,7 @@ describe('GmailEmailService', () => {
     it('should throw EmailServiceError on exception', async () => {
       mockSendMail.mockRejectedValue(new Error('SMTP Error'));
 
-      const service = new GmailEmailService();
+      const service = new GmailEmailService(mockLogger);
 
       await expect(
         service.send({
@@ -129,7 +138,7 @@ describe('GmailEmailService', () => {
     it('should return true on sendSafe success', async () => {
       mockSendMail.mockResolvedValue({ messageId: 'email_123' });
 
-      const service = new GmailEmailService();
+      const service = new GmailEmailService(mockLogger);
 
       const result = await service.sendSafe({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -144,9 +153,7 @@ describe('GmailEmailService', () => {
     it('should return false on sendSafe failure without throwing', async () => {
       mockSendMail.mockRejectedValue(new Error('SMTP Error'));
 
-      const service = new GmailEmailService();
-
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const service = new GmailEmailService(mockLogger);
 
       const result = await service.sendSafe({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -156,9 +163,7 @@ describe('GmailEmailService', () => {
       });
 
       expect(result).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

@@ -1,4 +1,5 @@
 import { IEmailService, EmailData } from '@/domain/services/IEmailService';
+import { ILogger } from '@/domain/services/ILogger';
 
 /**
  * Mock du service Email pour les tests
@@ -6,6 +7,10 @@ import { IEmailService, EmailData } from '@/domain/services/IEmailService';
  */
 export class MockEmailService implements IEmailService {
   private sentEmails: EmailData[] = [];
+
+  constructor(_logger: ILogger) {
+    // Logger is not used in mock, but injected for consistency
+  }
 
   async send(data: EmailData): Promise<void> {
     this.sentEmails.push(data);

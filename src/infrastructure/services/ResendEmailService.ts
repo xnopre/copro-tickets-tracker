@@ -1,13 +1,15 @@
 import { Resend } from 'resend';
 import { IEmailService, EmailData } from '@/domain/services/IEmailService';
+import { ILogger } from '@/domain/services/ILogger';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
-import { logger } from './logger';
 
 export class ResendEmailService implements IEmailService {
   private resend: Resend;
   private fromEmail: string;
+  private logger: ILogger;
 
-  constructor() {
+  constructor(logger: ILogger) {
+    this.logger = logger;
     const apiKey = process.env.RESEND_API_KEY;
     const fromEmail = process.env.FROM_EMAIL;
 
@@ -22,7 +24,7 @@ export class ResendEmailService implements IEmailService {
   }
 
   async send(data: EmailData): Promise<void> {
-    logger.info('Envoi de mail', {
+    this.logger.info('Envoi de mail', {
       subject: data.subject,
       recipients: data.to.map(recipient => recipient.email),
     });
@@ -42,7 +44,7 @@ export class ResendEmailService implements IEmailService {
         );
       }
 
-      logger.info('Email envoyé avec succès', { data: response.data });
+      this.logger.info('Email envoyé avec succès', { data: response.data });
     } catch (error) {
       throw new EmailServiceError(
         `Échec d'envoi d'email: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
@@ -56,7 +58,7 @@ export class ResendEmailService implements IEmailService {
       await this.send(data);
       return true;
     } catch (error) {
-      logger.error("Erreur d'envoi (non-bloquante)", error, { service: 'EmailService' });
+      this.logger.error("Erreur d'envoi (non-bloquante)", error, { service: 'EmailService' });
       return false;
     }
   }

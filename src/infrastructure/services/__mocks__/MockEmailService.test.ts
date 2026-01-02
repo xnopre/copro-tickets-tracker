@@ -1,12 +1,19 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MockEmailService } from './MockEmailService';
+import { ILogger } from '@/domain/services/ILogger';
 import { EmailData } from '@/domain/services/IEmailService';
 
 describe('MockEmailService', () => {
   let service: MockEmailService;
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
 
   beforeEach(() => {
-    service = new MockEmailService();
+    service = new MockEmailService(mockLogger);
   });
 
   describe('send', () => {

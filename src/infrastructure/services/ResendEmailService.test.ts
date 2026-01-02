@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ResendEmailService } from './ResendEmailService';
+import { ILogger } from '@/domain/services/ILogger';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
 
 const mockSend = vi.fn();
@@ -15,10 +16,18 @@ vi.mock('resend', () => {
 });
 
 describe('ResendEmailService', () => {
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.stubEnv('RESEND_API_KEY', 'test_api_key');
     vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
     mockSend.mockClear();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -29,7 +38,7 @@ describe('ResendEmailService', () => {
     it('should throw error if RESEND_API_KEY is missing', () => {
       vi.stubEnv('RESEND_API_KEY', '');
 
-      expect(() => new ResendEmailService()).toThrow(
+      expect(() => new ResendEmailService(mockLogger)).toThrow(
         "RESEND_API_KEY et FROM_EMAIL doivent être configurés dans les variables d'environnement"
       );
     });
@@ -37,13 +46,13 @@ describe('ResendEmailService', () => {
     it('should throw error if FROM_EMAIL is missing', () => {
       vi.stubEnv('FROM_EMAIL', '');
 
-      expect(() => new ResendEmailService()).toThrow(
+      expect(() => new ResendEmailService(mockLogger)).toThrow(
         "RESEND_API_KEY et FROM_EMAIL doivent être configurés dans les variables d'environnement"
       );
     });
 
     it('should create instance with valid environment variables', () => {
-      expect(() => new ResendEmailService()).not.toThrow();
+      expect(() => new ResendEmailService(mockLogger)).not.toThrow();
     });
   });
 
@@ -51,7 +60,7 @@ describe('ResendEmailService', () => {
     it('should send email successfully', async () => {
       mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
-      const service = new ResendEmailService();
+      const service = new ResendEmailService(mockLogger);
 
       await service.send({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -72,7 +81,7 @@ describe('ResendEmailService', () => {
     it('should send email to multiple recipients', async () => {
       mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
-      const service = new ResendEmailService();
+      const service = new ResendEmailService(mockLogger);
 
       await service.send({
         to: [
@@ -99,7 +108,7 @@ describe('ResendEmailService', () => {
         error: { message: 'Invalid API key' },
       });
 
-      const service = new ResendEmailService();
+      const service = new ResendEmailService(mockLogger);
 
       await expect(
         service.send({
@@ -123,7 +132,7 @@ describe('ResendEmailService', () => {
     it('should throw EmailServiceError on exception', async () => {
       mockSend.mockRejectedValue(new Error('API Error'));
 
-      const service = new ResendEmailService();
+      const service = new ResendEmailService(mockLogger);
 
       await expect(
         service.send({
@@ -149,7 +158,7 @@ describe('ResendEmailService', () => {
     it('should return true on sendSafe success', async () => {
       mockSend.mockResolvedValue({ data: { id: 'email_123' }, error: null });
 
-      const service = new ResendEmailService();
+      const service = new ResendEmailService(mockLogger);
 
       const result = await service.sendSafe({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -164,9 +173,7 @@ describe('ResendEmailService', () => {
     it('should return false on sendSafe failure without throwing', async () => {
       mockSend.mockRejectedValue(new Error('API Error'));
 
-      const service = new ResendEmailService();
-
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const service = new ResendEmailService(mockLogger);
 
       const result = await service.sendSafe({
         to: [{ email: 'user@test.com', name: 'Test User' }],
@@ -176,9 +183,7 @@ describe('ResendEmailService', () => {
       });
 
       expect(result).toBe(false);
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

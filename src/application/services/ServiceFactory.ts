@@ -57,16 +57,17 @@ export class ServiceFactory {
 
   static getEmailService(): IEmailService {
     if (!this.emailService) {
+      const loggerInstance = this.getLogger();
       // En mode test, utiliser le mock pour éviter les dépendances aux variables d'environnement
       if (process.env.NODE_ENV === 'test') {
-        this.emailService = new MockEmailService();
+        this.emailService = new MockEmailService(loggerInstance);
       } else {
         const emailProvider = process.env.EMAIL_PROVIDER || 'resend';
 
         if (emailProvider === 'gmail') {
-          this.emailService = new GmailEmailService();
+          this.emailService = new GmailEmailService(loggerInstance);
         } else if (emailProvider === 'resend') {
-          this.emailService = new ResendEmailService();
+          this.emailService = new ResendEmailService(loggerInstance);
         } else {
           throw new Error(
             `EMAIL_PROVIDER invalide: ${emailProvider}. Valeurs acceptées: 'gmail', 'resend'`
