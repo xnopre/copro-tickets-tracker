@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
+import { logger } from '@/infrastructure/services/logger';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,11 +21,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
     }
 
-    console.error(
-      'Error fetching ticket with ID:',
-      id,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error fetching ticket', error, { ticketId: id });
 
     return NextResponse.json(
       { error: 'Erreur lors de la récupération du ticket' },
@@ -62,11 +59,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'ID invalide' }, { status: 400 });
     }
 
-    console.error(
-      'Error updating ticket with ID:',
-      id,
-      error instanceof Error ? error.message : 'Unknown error'
-    );
+    logger.error('Error updating ticket', error, { ticketId: id });
 
     return NextResponse.json({ error: 'Erreur lors de la mise à jour du ticket' }, { status: 500 });
   }

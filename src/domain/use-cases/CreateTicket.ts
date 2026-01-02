@@ -4,6 +4,7 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
+import { logger } from '@/infrastructure/services/logger';
 
 export class CreateTicket {
   constructor(
@@ -46,7 +47,7 @@ export class CreateTicket {
         textContent,
       });
     } catch (error) {
-      console.error("[CreateTicket] Erreur lors de l'envoi des emails:", error);
+      logger.error("[CreateTicket] Erreur lors de l'envoi des emails", error);
     }
   }
 

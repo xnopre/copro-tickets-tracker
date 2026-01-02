@@ -5,6 +5,7 @@ import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { logger } from '@/infrastructure/services/logger';
 
 export class UpdateTicket {
   constructor(
@@ -69,7 +70,7 @@ export class UpdateTicket {
         await this.notifyStatusChange(newTicket, oldTicket.status, newTicket.status);
       }
     } catch (error) {
-      console.error("[UpdateTicket] Erreur lors de l'envoi des emails:", error);
+      logger.error("[UpdateTicket] Erreur lors de l'envoi des emails", error);
     }
   }
 

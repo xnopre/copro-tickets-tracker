@@ -11,6 +11,7 @@ import Textarea from '@/presentation/components/ui/Textarea';
 import Select from '@/presentation/components/ui/Select';
 import Alert from '@/presentation/components/ui/Alert';
 import Card from '@/presentation/components/ui/Card';
+import { logger } from '@/infrastructure/services/logger';
 
 interface EditTicketFormProps {
   ticketId: string;
@@ -52,7 +53,7 @@ export default function EditTicketForm({
         const data = await response.json();
         setUsers(data);
       } catch (err) {
-        console.error('Error fetching users:', err);
+        logger.error('Error fetching users', err);
         setError('Impossible de charger la liste des utilisateurs');
       } finally {
         setIsLoadingUsers(false);

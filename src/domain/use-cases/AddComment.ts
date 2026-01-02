@@ -5,6 +5,7 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { CreateCommentData, Comment } from '../entities/Comment';
 import { ValidationError } from '../errors/ValidationError';
+import { logger } from '@/infrastructure/services/logger';
 
 export class AddComment {
   constructor(
@@ -57,7 +58,7 @@ export class AddComment {
         textContent,
       });
     } catch (error) {
-      console.error("[AddComment] Erreur lors de l'envoi des emails:", error);
+      logger.error("[AddComment] Erreur lors de l'envoi des emails", error);
     }
   }
 
