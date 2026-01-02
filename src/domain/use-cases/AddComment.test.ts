@@ -5,6 +5,7 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
 
 describe('AddComment', () => {
@@ -54,6 +55,13 @@ describe('AddComment', () => {
     }),
   };
 
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -74,7 +82,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     const result = await useCase.execute({
       ticketId: 'ticket-1',
@@ -106,7 +115,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -127,7 +137,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -145,7 +156,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -163,7 +175,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -181,7 +194,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -199,7 +213,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -250,7 +265,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -280,7 +296,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -321,7 +338,8 @@ describe('AddComment', () => {
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     await useCase.execute({
       ticketId: 'ticket-1',
@@ -345,14 +363,13 @@ describe('AddComment', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockComment);
     vi.mocked(mockTicketRepository.findById).mockRejectedValue(new Error('Database error'));
 
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const useCase = new AddComment(
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     const result = await useCase.execute({
@@ -362,8 +379,6 @@ describe('AddComment', () => {
     });
 
     expect(result).toEqual(mockComment);
-    expect(consoleErrorSpy).toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
+    expect(mockLogger.error).toHaveBeenCalled();
   });
 });

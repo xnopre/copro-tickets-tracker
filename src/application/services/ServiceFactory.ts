@@ -5,8 +5,10 @@ import { ResendEmailService } from '@/infrastructure/services/ResendEmailService
 import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
 import { MockEmailService } from '@/infrastructure/services/__mocks__/MockEmailService';
 import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
+import { logger } from '@/infrastructure/services/logger';
 import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
+import { ILogger } from '@/domain/services/ILogger';
 import { TicketService } from './TicketService';
 import { CommentService } from './CommentService';
 import { UserService } from './UserService';
@@ -17,6 +19,7 @@ export class ServiceFactory {
   private static userService: UserService | null = null;
   private static emailService: IEmailService | null = null;
   private static emailTemplateService: IEmailTemplateService | null = null;
+  private static loggerInstance: ILogger | null = null;
 
   static getTicketService(): TicketService {
     if (!this.ticketService) {
@@ -24,7 +27,8 @@ export class ServiceFactory {
         new MongoTicketRepository(),
         new MongoUserRepository(),
         this.getEmailService(),
-        this.getEmailTemplateService()
+        this.getEmailTemplateService(),
+        this.getLogger()
       );
     }
     return this.ticketService;
@@ -37,7 +41,8 @@ export class ServiceFactory {
         new MongoTicketRepository(),
         new MongoUserRepository(),
         this.getEmailService(),
-        this.getEmailTemplateService()
+        this.getEmailTemplateService(),
+        this.getLogger()
       );
     }
     return this.commentService;
@@ -77,5 +82,12 @@ export class ServiceFactory {
       this.emailTemplateService = new EmailTemplates();
     }
     return this.emailTemplateService;
+  }
+
+  static getLogger(): ILogger {
+    if (!this.loggerInstance) {
+      this.loggerInstance = logger;
+    }
+    return this.loggerInstance;
   }
 }

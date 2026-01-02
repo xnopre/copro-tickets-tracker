@@ -4,6 +4,7 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
 
 describe('CreateTicket', () => {
@@ -48,6 +49,13 @@ describe('CreateTicket', () => {
     }),
   };
 
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -81,7 +89,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     const result = await useCase.execute({
       title: 'Test Ticket',
@@ -115,7 +124,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
     await useCase.execute({
       title: '  Test Ticket  ',
@@ -133,7 +143,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -149,7 +160,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -165,7 +177,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -181,7 +194,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await expect(
@@ -207,13 +221,12 @@ describe('CreateTicket', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
 
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     const result = await useCase.execute({
@@ -222,9 +235,7 @@ describe('CreateTicket', () => {
     });
 
     expect(result).toEqual(mockTicket);
-    expect(consoleErrorSpy).toHaveBeenCalled();
-
-    consoleErrorSpy.mockRestore();
+    expect(mockLogger.error).toHaveBeenCalled();
   });
 
   it('should not send email if no users exist', async () => {
@@ -246,7 +257,8 @@ describe('CreateTicket', () => {
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
 
     await useCase.execute({

@@ -2,17 +2,18 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { logger } from '@/infrastructure/services/logger';
 
 export class UpdateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
     private emailService: IEmailService,
-    private emailTemplateService: IEmailTemplateService
+    private emailTemplateService: IEmailTemplateService,
+    private logger: ILogger
   ) {}
 
   async execute(id: string, data: UpdateTicketData): Promise<Ticket | null> {
@@ -70,7 +71,7 @@ export class UpdateTicket {
         await this.notifyStatusChange(newTicket, oldTicket.status, newTicket.status);
       }
     } catch (error) {
-      logger.error("[UpdateTicket] Erreur lors de l'envoi des emails", error);
+      this.logger.error("[UpdateTicket] Erreur lors de l'envoi des emails", error);
     }
   }
 

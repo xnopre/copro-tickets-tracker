@@ -1,10 +1,8 @@
+import { ILogger, LogContext } from '@/domain/services/ILogger';
+
 type LogLevel = 'info' | 'error' | 'warn' | 'debug';
 
-interface LogContext {
-  [key: string]: unknown;
-}
-
-class Logger {
+class Logger implements ILogger {
   private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
     const timestamp = new Date().toISOString();
     const contextStr = context ? ` ${JSON.stringify(context)}` : '';

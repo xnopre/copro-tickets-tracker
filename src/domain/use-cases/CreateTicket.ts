@@ -2,16 +2,17 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
 import { ValidationError } from '../errors/ValidationError';
-import { logger } from '@/infrastructure/services/logger';
 
 export class CreateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
     private emailService: IEmailService,
-    private emailTemplateService: IEmailTemplateService
+    private emailTemplateService: IEmailTemplateService,
+    private logger: ILogger
   ) {}
 
   async execute(data: CreateTicketData): Promise<Ticket> {
@@ -47,7 +48,7 @@ export class CreateTicket {
         textContent,
       });
     } catch (error) {
-      logger.error("[CreateTicket] Erreur lors de l'envoi des emails", error);
+      this.logger.error("[CreateTicket] Erreur lors de l'envoi des emails", error);
     }
   }
 

@@ -4,6 +4,7 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
 import { User, UserPublic } from '../entities/User';
 
@@ -75,6 +76,13 @@ describe('UpdateTicket', () => {
     }),
   };
 
+  const mockLogger: ILogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -110,7 +118,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       const result = await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
@@ -155,7 +164,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
@@ -200,7 +210,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       const result = await useCase.execute('1', {
         title: 'Updated Title',
@@ -244,7 +255,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         title: '  Updated Title  ',
@@ -287,7 +299,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       const result = await useCase.execute('1', {
         title: 'New Title',
@@ -331,7 +344,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       const result = await useCase.execute('1', {
         title: 'New Title',
@@ -356,7 +370,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(useCase.execute('1', {})).rejects.toThrow(
@@ -369,7 +384,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -384,7 +400,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -399,7 +416,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -414,7 +432,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -429,7 +448,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -444,7 +464,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -459,7 +480,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -499,7 +521,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         assignedTo: '',
@@ -540,7 +563,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         assignedTo: '   ',
@@ -560,7 +584,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       const result = await useCase.execute('999', {
         title: 'New Title',
@@ -589,7 +614,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -620,7 +646,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -648,7 +675,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       await expect(
@@ -692,7 +720,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         assignedTo: mockUser.id,
@@ -736,7 +765,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
@@ -776,7 +806,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         title: 'Updated Title',
@@ -812,13 +843,12 @@ describe('UpdateTicket', () => {
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
       vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
 
-      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
 
       const result = await useCase.execute('1', {
@@ -826,9 +856,7 @@ describe('UpdateTicket', () => {
       });
 
       expect(result).toEqual(mockTicket);
-      expect(consoleErrorSpy).toHaveBeenCalled();
-
-      consoleErrorSpy.mockRestore();
+      expect(mockLogger.error).toHaveBeenCalled();
     });
 
     it('should not send email notification if assignee is not found', async () => {
@@ -862,7 +890,8 @@ describe('UpdateTicket', () => {
         mockRepository,
         mockUserRepository,
         mockEmailService,
-        mockEmailTemplateService
+        mockEmailTemplateService,
+        mockLogger
       );
       await useCase.execute('1', {
         assignedTo: mockUser.id,

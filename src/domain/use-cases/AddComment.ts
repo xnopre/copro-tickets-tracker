@@ -3,9 +3,9 @@ import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
 import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
+import { ILogger } from '../services/ILogger';
 import { CreateCommentData, Comment } from '../entities/Comment';
 import { ValidationError } from '../errors/ValidationError';
-import { logger } from '@/infrastructure/services/logger';
 
 export class AddComment {
   constructor(
@@ -13,7 +13,8 @@ export class AddComment {
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
     private emailService: IEmailService,
-    private emailTemplateService: IEmailTemplateService
+    private emailTemplateService: IEmailTemplateService,
+    private logger: ILogger
   ) {}
 
   async execute(data: CreateCommentData): Promise<Comment> {
@@ -58,7 +59,7 @@ export class AddComment {
         textContent,
       });
     } catch (error) {
-      logger.error("[AddComment] Erreur lors de l'envoi des emails", error);
+      this.logger.error("[AddComment] Erreur lors de l'envoi des emails", error);
     }
   }
 

@@ -4,6 +4,7 @@ import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
 import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
+import { ILogger } from '@/domain/services/ILogger';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
 import { UserPublic } from '@/domain/entities/User';
@@ -31,6 +32,7 @@ describe('TicketService', () => {
   let mockUserRepository: IUserRepository;
   let mockEmailService: IEmailService;
   let mockEmailTemplateService: IEmailTemplateService;
+  let mockLogger: ILogger;
   let ticketService: TicketService;
 
   beforeEach(() => {
@@ -71,11 +73,18 @@ describe('TicketService', () => {
         textContent: 'Test Text',
       }),
     };
+    mockLogger = {
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+    };
     ticketService = new TicketService(
       mockRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
   });
 

@@ -5,6 +5,7 @@ import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
 import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
+import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
 
 describe('CommentService', () => {
@@ -13,6 +14,7 @@ describe('CommentService', () => {
   let mockUserRepository: IUserRepository;
   let mockEmailService: IEmailService;
   let mockEmailTemplateService: IEmailTemplateService;
+  let mockLogger: ILogger;
   let commentService: CommentService;
 
   beforeEach(() => {
@@ -57,12 +59,19 @@ describe('CommentService', () => {
         textContent: 'Test Text',
       }),
     };
+    mockLogger = {
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
+    };
     commentService = new CommentService(
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
       mockEmailService,
-      mockEmailTemplateService
+      mockEmailTemplateService,
+      mockLogger
     );
   });
 
