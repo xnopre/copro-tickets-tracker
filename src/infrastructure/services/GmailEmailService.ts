@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { IEmailService, EmailData } from '@/domain/services/IEmailService';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
+import { logger } from './logger';
 
 export class GmailEmailService implements IEmailService {
   private transporter: nodemailer.Transporter;
@@ -29,9 +30,10 @@ export class GmailEmailService implements IEmailService {
   }
 
   async send(data: EmailData): Promise<void> {
-    console.log(
-      `Envoi d'un mail [${data.subject}] à ${data.to.map(recipient => recipient.email).join(', ')}`
-    );
+    logger.info('Envoi de mail', {
+      subject: data.subject,
+      recipients: data.to.map(recipient => recipient.email),
+    });
     try {
       const result = await this.transporter.sendMail({
         from: this.fromEmail,
@@ -41,7 +43,7 @@ export class GmailEmailService implements IEmailService {
         text: data.textContent,
       });
 
-      console.log('Email envoyé avec succès:', result.messageId);
+      logger.info('Email envoyé avec succès', { messageId: result.messageId });
     } catch (error) {
       throw new EmailServiceError(
         `Échec d'envoi d'email: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
@@ -55,7 +57,7 @@ export class GmailEmailService implements IEmailService {
       await this.send(data);
       return true;
     } catch (error) {
-      console.error("[EmailService] Erreur d'envoi (non-bloquante):", error);
+      logger.error("Erreur d'envoi (non-bloquante)", error, { service: 'EmailService' });
       return false;
     }
   }

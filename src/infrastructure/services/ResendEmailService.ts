@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { IEmailService, EmailData } from '@/domain/services/IEmailService';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
+import { logger } from './logger';
 
 export class ResendEmailService implements IEmailService {
   private resend: Resend;
@@ -21,9 +22,10 @@ export class ResendEmailService implements IEmailService {
   }
 
   async send(data: EmailData): Promise<void> {
-    console.log(
-      `Envoi d'un mail [${data.subject}] à ${data.to.map(recipient => recipient.email).join(', ')}`
-    );
+    logger.info('Envoi de mail', {
+      subject: data.subject,
+      recipients: data.to.map(recipient => recipient.email),
+    });
     try {
       const response = await this.resend.emails.send({
         from: this.fromEmail,
@@ -40,7 +42,7 @@ export class ResendEmailService implements IEmailService {
         );
       }
 
-      console.log(`Email envoyé avec succès:`, response.data);
+      logger.info('Email envoyé avec succès', { data: response.data });
     } catch (error) {
       throw new EmailServiceError(
         `Échec d'envoi d'email: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
@@ -54,7 +56,7 @@ export class ResendEmailService implements IEmailService {
       await this.send(data);
       return true;
     } catch (error) {
-      console.error("[EmailService] Erreur d'envoi (non-bloquante):", error);
+      logger.error("Erreur d'envoi (non-bloquante)", error, { service: 'EmailService' });
       return false;
     }
   }
