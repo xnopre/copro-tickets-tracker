@@ -1,8 +1,31 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import UserModel from './UserSchema';
 import bcryptjs from 'bcryptjs';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 describe('UserSchema', () => {
+  let mongoServer: MongoMemoryServer;
+
+  beforeAll(async () => {
+    // Démarrer un serveur MongoDB en mémoire
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
+
+    // Se connecter à MongoDB en mémoire
+    await mongoose.connect(mongoUri);
+  });
+
+  afterAll(async () => {
+    // Déconnecter Mongoose
+    await mongoose.disconnect();
+
+    // Arrêter le serveur MongoDB en mémoire
+    if (mongoServer) {
+      await mongoServer.stop();
+    }
+  });
+
   it('should have required fields', () => {
     const schema = UserModel.schema;
 
@@ -61,19 +84,15 @@ describe('UserSchema', () => {
       password: plainPassword,
     });
 
-    // Mongoose stores hooks in a different structure, we'll test by checking the schema definition
-    const schema = UserModel.schema;
-    expect(schema.pre).toBeDefined();
+    // Sauvegarder l'utilisateur dans MongoDB en mémoire
+    const savedUser = await user.save();
 
-    // Password should be hashed after pre-save hook execution
-    // Since we can't easily trigger hooks without a real DB, we verify the hook exists
-    // and test password hashing directly with bcryptjs
-    const hash = await bcryptjs.hash(plainPassword, 10);
-    expect(hash).not.toBe(plainPassword);
-    expect(hash).toMatch(/^\$2[aby]\$/);
+    // Vérifier que le password a été hashé
+    expect(savedUser.password).not.toBe(plainPassword);
+    expect(savedUser.password).toMatch(/^\$2[aby]\$/);
 
-    // Verify hash can be compared with original
-    const isMatch = await bcryptjs.compare(plainPassword, hash);
+    // Vérifier que le hash peut être comparé avec le password original
+    const isMatch = await bcryptjs.compare(plainPassword, savedUser.password);
     expect(isMatch).toBe(true);
   });
 
