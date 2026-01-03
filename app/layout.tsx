@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Providers } from '@/presentation/components/Providers';
 
 export const metadata: Metadata = {
   title: 'CoTiTra',
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="antialiased">
-        <main className="min-h-screen bg-gray-50 p-8">{children}</main>
+        <Providers>
+          <main className="min-h-screen bg-gray-50 p-8">{children}</main>
+        </Providers>
       </body>
     </html>
   );

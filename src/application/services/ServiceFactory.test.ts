@@ -41,6 +41,9 @@ vi.mock('@/infrastructure/repositories/MongoUserRepository', () => {
       async findById() {
         return null;
       }
+      async findByEmail() {
+        return null;
+      }
       async create() {
         return {};
       }
@@ -53,6 +56,7 @@ describe('ServiceFactory', () => {
     // Reset the singleton instances before each test
     (ServiceFactory as any).ticketService = null;
     (ServiceFactory as any).commentService = null;
+    (ServiceFactory as any).authService = null;
     (ServiceFactory as any).emailService = null;
   });
 
@@ -105,6 +109,23 @@ describe('ServiceFactory', () => {
       expect(service.addComment).toBeDefined();
       expect(typeof service.getCommentsByTicketId).toBe('function');
       expect(typeof service.addComment).toBe('function');
+    });
+  });
+
+  describe('getAuthService', () => {
+    it('should return an AuthService instance', () => {
+      const service = ServiceFactory.getAuthService();
+
+      expect(service).toBeDefined();
+      expect(service.validateCredentials).toBeDefined();
+      expect(typeof service.validateCredentials).toBe('function');
+    });
+
+    it('should return the same instance on multiple calls (singleton pattern)', () => {
+      const service1 = ServiceFactory.getAuthService();
+      const service2 = ServiceFactory.getAuthService();
+
+      expect(service1).toBe(service2);
     });
   });
 

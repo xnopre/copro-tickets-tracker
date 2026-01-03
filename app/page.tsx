@@ -2,10 +2,17 @@ import TicketListWithArchiveToggle from '@/presentation/components/TicketListWit
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import Link from '@/presentation/components/ui/Link';
 import Container from '@/presentation/components/ui/Container';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+  const session = await auth();
+  if (!session) {
+    redirect('/login');
+  }
+
   const ticketService = ServiceFactory.getTicketService();
   const tickets = await ticketService.getAllTickets();
   return (

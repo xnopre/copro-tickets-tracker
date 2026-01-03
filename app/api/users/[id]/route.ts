@@ -3,12 +3,17 @@ import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { logger } from '@/infrastructure/services/logger';
+import { auth } from '@/auth';
 
 /**
  * GET /api/users/[id]
  * Récupère un utilisateur par son ID
  */
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     await connectDB();
     const { id } = await params;

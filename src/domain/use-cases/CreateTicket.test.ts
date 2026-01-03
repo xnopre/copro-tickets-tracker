@@ -20,6 +20,7 @@ describe('CreateTicket', () => {
   const mockUserRepository: IUserRepository = {
     findAll: vi.fn(),
     findById: vi.fn(),
+    findByEmail: vi.fn(),
   };
 
   const mockEmailService: IEmailService = {

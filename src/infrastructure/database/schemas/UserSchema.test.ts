@@ -98,7 +98,6 @@ describe('UserSchema', () => {
 
   it('should have pre-save hook for password hashing', () => {
     const schema = UserModel.schema;
-    const preSaveHooks = schema._pres?.get?.('save') || [];
 
     // Verify that there's a pre-save hook defined
     // The hook should exist in the schema middleware

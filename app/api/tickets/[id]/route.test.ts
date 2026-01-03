@@ -11,6 +11,14 @@ import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
 import { UserPublic } from '@/domain/entities/User';
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
+
 vi.mock('@/application/services/ServiceFactory');
 
 const mockUser: UserPublic = {
@@ -37,6 +45,7 @@ describe('GET /api/tickets/[id]', () => {
   } as unknown as TicketService;
 
   beforeEach(() => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
     vi.mocked(ServiceFactory.getTicketService).mockReturnValue(mockTicketService);
   });
 

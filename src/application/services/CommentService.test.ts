@@ -32,6 +32,7 @@ describe('CommentService', () => {
     mockUserRepository = {
       findAll: vi.fn().mockResolvedValue([]),
       findById: vi.fn().mockResolvedValue(null),
+      findByEmail: vi.fn().mockResolvedValue(null),
     };
     mockEmailService = {
       send: vi.fn().mockResolvedValue(undefined),
