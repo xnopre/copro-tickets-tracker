@@ -6,6 +6,7 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { User } from '@/domain/entities/User';
 
 describe('CreateTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -72,7 +73,7 @@ describe('CreateTicket', () => {
       updatedAt: new Date(),
     };
 
-    const mockUsers = [
+    const mockUsers: User[] = [
       {
         id: 'user_1',
         firstName: 'John',

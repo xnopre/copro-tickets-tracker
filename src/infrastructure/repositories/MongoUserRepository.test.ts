@@ -29,14 +29,12 @@ describe('MongoUserRepository', () => {
           firstName: 'Jean',
           lastName: 'Dupont',
           email: 'jean.dupont@example.com',
-          password: 'hashedPassword',
         },
         {
           _id: { toString: () => '2' },
           firstName: 'Marie',
           lastName: 'Martin',
           email: 'marie.martin@example.com',
-          password: 'hashedPassword',
         },
       ];
 
@@ -59,6 +57,12 @@ describe('MongoUserRepository', () => {
         lastName: 'Dupont',
         email: 'jean.dupont@example.com',
       });
+      expect(result[1]).toEqual({
+        id: '2',
+        firstName: 'Marie',
+        lastName: 'Martin',
+        email: 'marie.martin@example.com',
+      });
     });
   });
 
@@ -69,7 +73,6 @@ describe('MongoUserRepository', () => {
         firstName: 'Jean',
         lastName: 'Dupont',
         email: 'jean.dupont@example.com',
-        password: 'hashedPassword',
       };
 
       vi.mocked(UserModel.findById).mockReturnValue({
