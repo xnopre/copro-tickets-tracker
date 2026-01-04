@@ -2,6 +2,7 @@ import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { ServiceFactory } from './application/services/ServiceFactory';
 import connectDB from './infrastructure/database/mongodb';
+import { logger } from '@/infrastructure/services/logger';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -36,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             lastName: user.lastName,
           };
         } catch (error) {
-          console.error('Authentication error:', error);
+          logger.error('Authentication error:', error);
           return null;
         }
       },
