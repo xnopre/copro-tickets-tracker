@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AuthService } from './AuthService';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
+import bcryptjs from 'bcryptjs';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -57,26 +58,25 @@ describe('AuthService', () => {
     });
 
     it('should return user without password when credentials are valid', async () => {
+      const validPassword = 'mySecurePassword123';
+      const hashedPassword = await bcryptjs.hash(validPassword, 10);
+
       const mockUser = {
         id: '123',
         firstName: 'Jean',
         lastName: 'Dupont',
         email: 'jean@example.com',
-        password: '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcg7b3XeKeUxWDeWMr37mPkMLOm',
+        password: hashedPassword,
       };
 
       vi.mocked(mockUserRepository.findByEmail).mockResolvedValueOnce(mockUser);
 
-      // Use a correct password that matches the test hash
-      // This is a real bcryptjs comparison
-      const result = await authService.validateCredentials('jean@example.com', 'password');
+      const result = await authService.validateCredentials('jean@example.com', validPassword);
 
-      expect(mockUserRepository.findByEmail).toHaveBeenCalledWith('jean@example.com');
-      // The result should be null since the password doesn't match
-      // But if it did match, password would be undefined
-      if (result) {
-        expect(result.password).toBeUndefined();
-      }
+      expect(result).toBeDefined();
+      expect(result?.password).toBeUndefined();
+      expect(result?.firstName).toBe('Jean');
+      expect(result?.lastName).toBe('Dupont');
     });
   });
 });
