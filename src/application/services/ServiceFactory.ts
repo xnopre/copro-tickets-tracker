@@ -62,7 +62,7 @@ export class ServiceFactory {
       if (process.env.NODE_ENV === 'test') {
         this.emailService = new MockEmailService(loggerInstance);
       } else {
-        const emailProvider = process.env.EMAIL_PROVIDER || 'resend';
+        const emailProvider = process.env.EMAIL_PROVIDER || 'gmail';
 
         if (emailProvider === 'gmail') {
           this.emailService = new GmailEmailService(loggerInstance);
