@@ -46,6 +46,7 @@ export function LoginForm() {
         setError('Adresse e-mail ou mot de passe invalide');
       } else if (result?.ok) {
         router.refresh();
+        // TODO : voir pour supprimer ce any (pb lié à "typedRoutes: true")
         router.push((callbackUrl || '/') as any);
       }
     } catch (err) {
