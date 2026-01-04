@@ -140,14 +140,15 @@ describe('ServiceFactory', () => {
       expect(service).toBeInstanceOf(ResendEmailService);
     });
 
-    it('should default to ResendEmailService when EMAIL_PROVIDER is not set', () => {
+    it('should default to GmailEmailService when EMAIL_PROVIDER is not set', () => {
       vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('RESEND_API_KEY', 'test_key');
+      vi.stubEnv('GMAIL_USER', 'gmail_user');
+      vi.stubEnv('GMAIL_APP_PASSWORD', 'gmail_app_password');
       vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
 
       const service = ServiceFactory.getEmailService();
 
-      expect(service).toBeInstanceOf(ResendEmailService);
+      expect(service).toBeInstanceOf(GmailEmailService);
     });
 
     it('should throw error when EMAIL_PROVIDER is invalid', () => {
