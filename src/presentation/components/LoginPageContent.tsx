@@ -15,14 +15,6 @@ export function LoginPageContent() {
         <Card padding="lg" shadow="md">
           <LoginForm />
         </Card>
-
-        <div className="text-center text-sm text-gray-600">
-          <p className="font-medium">Identifiants de démonstration :</p>
-          <ul className="mt-2 space-y-1">
-            <li>E-mail : jean.martin@example.com</li>
-            <li>Mot de passe : K7$mP2nQr9@vL8</li>
-          </ul>
-        </div>
       </div>
     </main>
   );

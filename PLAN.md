@@ -1727,7 +1727,6 @@ scripts/users.json (+ password aux utilisateurs)
 - ✅ Page de connexion `/login` fonctionnelle
 - ✅ LoginForm avec validation client/serveur
 - ✅ SessionProvider ajouté dans layout
-- ✅ Credentials valides testés : jean.martin@example.com / K7$mP2nQr9@vL8
 - ✅ Architecture hexagonale respectée
 - ✅ Tous les tests passent (568/568)
 - ✅ Build Next.js réussi
