@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { ValidationError } from '@/domain/errors/ValidationError';
 import { logger } from '@/infrastructure/services/logger';
+import { auth } from '@/auth';
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { title, description } = body;

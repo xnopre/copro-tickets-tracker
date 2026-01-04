@@ -5,9 +5,11 @@ import { ResendEmailService } from '@/infrastructure/services/ResendEmailService
 import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
 import { MockEmailService } from '@/infrastructure/services/__mocks__/MockEmailService';
 import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
+import { AuthService } from '@/infrastructure/services/AuthService';
 import { logger } from '@/infrastructure/services/logger';
 import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
+import { IAuthService } from '@/domain/services/IAuthService';
 import { ILogger } from '@/domain/services/ILogger';
 import { TicketService } from './TicketService';
 import { CommentService } from './CommentService';
@@ -17,6 +19,7 @@ export class ServiceFactory {
   private static ticketService: TicketService | null = null;
   private static commentService: CommentService | null = null;
   private static userService: UserService | null = null;
+  private static authService: IAuthService | null = null;
   private static emailService: IEmailService | null = null;
   private static emailTemplateService: IEmailTemplateService | null = null;
   private static loggerInstance: ILogger | null = null;
@@ -53,6 +56,13 @@ export class ServiceFactory {
       this.userService = new UserService(new MongoUserRepository());
     }
     return this.userService;
+  }
+
+  static getAuthService(): IAuthService {
+    if (!this.authService) {
+      this.authService = new AuthService(new MongoUserRepository());
+    }
+    return this.authService;
   }
 
   static getEmailService(): IEmailService {

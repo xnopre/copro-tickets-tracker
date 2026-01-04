@@ -1,11 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { useTestDB } from '../tests/helpers/useTestDB';
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
+
 describe('Home Page', () => {
   useTestDB();
+
+  beforeEach(() => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
+  });
 
   it('should display the title "CoTiTra"', async () => {
     const Home = (await import('./page')).default;

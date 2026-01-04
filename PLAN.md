@@ -35,8 +35,9 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - [📧 Étape 11b : Service d'Envoi d'Emails Gmail](#-étape-11b--service-denvoi-demails-gmail)
 - [🔐 Étape 12a : Ajout des Mots de Passe](#-étape-12a--ajout-des-mots-de-passe)
 - [🔐 Étape 12b : Ajout Authentification](#-étape-12b--ajout-authentification)
-- [💬 Étape 12c : Utiliser l'Utilisateur Connecté pour les Commentaires](#-étape-12c--utiliser-lutilisateur-connecté-pour-les-commentaires)
-- [👤 Étape 12d : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket](#-étape-12d--ajouter-lutilisateur-courant-comme-créateur-dun-ticket)
+- [👤 Étape 12c : Afficher l'Utilisateur Connecté](#-étape-12c--afficher-lutilisateur-connecté)
+- [💬 Étape 12d : Utiliser l'Utilisateur Connecté pour les Commentaires](#-étape-12d--utiliser-lutilisateur-connecté-pour-les-commentaires)
+- [👤 Étape 12e : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket](#-étape-12e--ajouter-lutilisateur-courant-comme-créateur-dun-ticket)
 - [🎯 Étape 13 : Filtrer par Statut](#-étape-13--filtrer-par-statut)
 - [🔍 Étape 14 : Recherche de Tickets](#-étape-14--recherche-de-tickets)
 - [📊 Étape 15 : Dashboard avec Statistiques](#-étape-15--dashboard-avec-statistiques)
@@ -1705,28 +1706,33 @@ scripts/users.json (+ password aux utilisateurs)
 
 ### Tâches
 
-- [ ] Installer et configurer le service d'authentification
-- [ ] Créer l'entité User avec hachage de mot de passe
-- [ ] Créer le use case LoginUser
-- [ ] Créer l'API route `/api/auth/login`
-- [ ] Créer la page `/login`
-- [ ] Implémenter la gestion des sessions
-- [ ] Protéger les routes (middleware Next.js)
-- [ ] Afficher l'utilisateur connecté dans le header
-- [ ] Ajouter le bouton "Déconnexion"
-- [ ] Tests unitaires complets
+- [x] Installer et configurer le service d'authentification
+- [x] Créer l'entité User avec hachage de mot de passe (Étape 12a)
+- [x] Créer l'AuthService pour validation des credentials
+- [x] Créer l'API route `/api/auth/[...nextauth]`
+- [x] Créer la page `/login` avec LoginForm
+- [x] Implémenter la gestion des sessions avec NextAuth
+- [x] Protéger les routes (middleware Next.js)
+- [x] Tests unitaires complets (568 tests ✅)
 - [ ] Déployer
 
 ### Validation
 
-- ✅ On peut se connecter avec email/password
-- ✅ Les sessions sont sécurisées (JWT/cookies)
-- ✅ On est redirigé vers login si non authentifié
-- ✅ L'utilisateur connecté est affiché
-- ✅ Le bouton déconnexion fonctionne
+- ✅ NextAuth.js installé et configuré
+- ✅ AuthService implémente IAuthService (domain layer)
+- ✅ Password validation avec bcryptjs
+- ✅ src/auth.ts avec Credentials provider
+- ✅ src/middleware.ts protège les routes
+- ✅ app/api/auth/[...nextauth]/route.ts configuré
+- ✅ Page de connexion `/login` fonctionnelle
+- ✅ LoginForm avec validation client/serveur
+- ✅ SessionProvider ajouté dans layout
 - ✅ Architecture hexagonale respectée
-- ✅ Tous les tests passent
+- ✅ Tous les tests passent (568/568)
+- ✅ Build Next.js réussi
 - ⏳ Déployé en production
+- ⏳ Affichage utilisateur dans header (Step 12c)
+- ⏳ Bouton déconnexion (Step 12c)
 
 ### Notes techniques
 
@@ -1753,20 +1759,150 @@ scripts/users.json (+ password aux utilisateurs)
 - Secrets sécurisés dans .env.local
 - Tokens JWT avec expiration
 
-**Fichiers à créer** :
+**Fichiers créés** :
 
 ```
-src/auth.ts (configuration NextAuth)
-src/middleware.ts (protection des routes)
-src/infrastructure/services/AuthService.ts
-app/api/auth/[...nextauth]/route.ts
-app/login/page.tsx
-app/signup/page.tsx
+src/domain/services/IAuthService.ts (interface domain)
+src/infrastructure/services/AuthService.ts (implémentation)
+src/infrastructure/services/AuthService.test.ts (tests)
+src/auth.ts (configuration NextAuth avec Credentials provider)
+src/middleware.ts (protection des routes + redirects)
+src/presentation/components/LoginForm.tsx (formulaire client)
+src/presentation/components/LoginForm.test.tsx (tests)
+src/presentation/components/Providers.tsx (SessionProvider wrapper)
+src/presentation/components/LoginPageContent.tsx (page content client)
+app/api/auth/[...nextauth]/route.ts (API handler NextAuth)
+app/login/page.tsx (page login server-side)
+```
+
+**Fichiers modifiés** :
+
+```
+package.json (+ next-auth@beta)
+.env.local.example (+ NextAuth config)
+app/layout.tsx (+ Providers wrapper)
+src/domain/entities/User.ts (+ password optionnel)
+src/domain/repositories/IUserRepository.ts (+ findByEmail)
+src/infrastructure/repositories/MongoUserRepository.ts (+ findByEmail)
+src/infrastructure/repositories/MongoUserRepository.test.ts (+ tests findByEmail)
+src/application/services/ServiceFactory.ts (+ getAuthService)
+src/application/services/ServiceFactory.test.ts (+ tests)
 ```
 
 ---
 
-## 💬 Étape 12c : Utiliser l'Utilisateur Connecté pour les Commentaires
+## 👤 Étape 12c : Afficher l'Utilisateur Connecté
+
+**Objectif** : Afficher l'utilisateur actuellement connecté dans le header et ajouter un bouton de déconnexion
+
+### Ce qu'on livre
+
+- Composant Header avec affichage du nom de l'utilisateur connecté
+- Bouton "Déconnexion" fonctionnel
+- Redirection vers la page de connexion après déconnexion
+- Affichage conditionnel (masqué si non authentifié)
+- Architecture hexagonale respectée
+- Tests unitaires complets
+
+### Tâches
+
+- [ ] Créer le composant `Header` avec l'affichage de l'utilisateur connecté
+  - [ ] Utiliser `useSession()` pour récupérer les données de session
+  - [ ] Afficher "Connecté en tant que : Prénom Nom"
+  - [ ] Afficher l'icône/avatar de l'utilisateur (optionnel)
+- [ ] Créer le composant `LogoutButton`
+  - [ ] Bouton "Déconnexion" avec `signOut()` de NextAuth
+  - [ ] Redirection vers la page d'accueil après déconnexion
+  - [ ] Gérer l'état de chargement (disabled pendant la déconnexion)
+- [ ] Ajouter le Header dans le layout principal (`app/layout.tsx`)
+  - [ ] Placer en haut de la page avant le contenu
+  - [ ] Rendre visible sur toutes les pages authentifiées
+- [ ] Mettre à jour les composants existants
+  - [ ] Ajouter la session utilisateur dans les contextes nécessaires
+  - [ ] Tester que l'utilisateur est bien affiché partout
+- [ ] Créer les tests unitaires
+  - [ ] Tests Header avec session utilisateur
+  - [ ] Tests Header sans session (non authentifié)
+  - [ ] Tests LogoutButton
+  - [ ] Tests du logout workflow
+- [ ] Type-check et build
+- [ ] Déployer
+
+### Validation
+
+- ✅ Le header affiche le nom de l'utilisateur connecté
+- ✅ Le bouton "Déconnexion" fonctionne et redirige
+- ✅ Le header est masqué quand l'utilisateur n'est pas connecté
+- ✅ L'utilisateur revient à la page d'accueil après déconnexion
+- ✅ Architecture hexagonale respectée
+- ✅ Tous les tests passent
+- ✅ Type-check et build réussis
+- ⏳ Déployé en production (en attente)
+
+### Notes techniques
+
+**Composant Header** :
+
+```typescript
+import { useSession, signOut } from 'next-auth/react';
+
+export default function Header() {
+  const { data: session } = useSession();
+
+  if (!session) return null;
+
+  return (
+    <header>
+      <div>
+        Connecté en tant que : {session.user?.name}
+      </div>
+      <button onClick={() => signOut({ redirectTo: '/' })}>
+        Déconnexion
+      </button>
+    </header>
+  );
+}
+```
+
+**Intégration dans le layout** :
+
+```typescript
+import Header from '@/src/presentation/components/Header';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html>
+      <body>
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
+      </body>
+    </html>
+  );
+}
+```
+
+**Fichiers créés** :
+
+```
+src/presentation/components/Header.tsx
+src/presentation/components/Header.test.tsx
+src/presentation/components/LogoutButton.tsx
+src/presentation/components/LogoutButton.test.tsx
+```
+
+**Fichiers modifiés** :
+
+```
+app/layout.tsx (+ import Header, + <Header /> dans le layout)
+```
+
+**Tests** : +8-10 nouveaux tests (Header avec session, sans session, LogoutButton)
+
+---
+
+## 💬 Étape 12d : Utiliser l'Utilisateur Connecté pour les Commentaires
 
 **Objectif** : Modifier les commentaires pour utiliser l'utilisateur connecté comme auteur automatique, au lieu d'un champ texte libre
 
@@ -1902,7 +2038,7 @@ src/presentation/components/CommentCard.tsx (affichage firstName + lastName)
 
 ---
 
-## 👤 Étape 12d : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket
+## 👤 Étape 12e : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket
 
 **Objectif** : Ajouter l'utilisateur connecté comme créateur du ticket. Le créateur est automatiquement défini lors de la création du ticket basé sur l'utilisateur authentifié.
 

@@ -6,6 +6,7 @@ vi.mock('../database/schemas/UserSchema', () => ({
   default: {
     find: vi.fn(),
     findById: vi.fn(),
+    findOne: vi.fn(),
   },
 }));
 
@@ -96,6 +97,54 @@ describe('MongoUserRepository', () => {
       } as any);
 
       const result = await repository.findById('999');
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('findByEmail', () => {
+    it('should return user with password when found', async () => {
+      const mockUser = {
+        _id: { toString: () => '1' },
+        firstName: 'Jean',
+        lastName: 'Dupont',
+        email: 'jean.dupont@example.com',
+        password: '$2a$10$hashedpassword123',
+      };
+
+      const selectMock = vi.fn().mockReturnValue({
+        lean: vi.fn().mockResolvedValue(mockUser),
+      });
+
+      vi.mocked(UserModel.findOne).mockReturnValue({
+        select: selectMock,
+      } as any);
+
+      const result = await repository.findByEmail('jean.dupont@example.com');
+
+      expect(UserModel.findOne).toHaveBeenCalledWith({
+        email: 'jean.dupont@example.com',
+      });
+      expect(selectMock).toHaveBeenCalledWith('+password');
+      expect(result).toEqual({
+        id: '1',
+        firstName: 'Jean',
+        lastName: 'Dupont',
+        email: 'jean.dupont@example.com',
+        password: '$2a$10$hashedpassword123',
+      });
+    });
+
+    it('should return null when user not found by email', async () => {
+      const selectMock = vi.fn().mockReturnValue({
+        lean: vi.fn().mockResolvedValue(null),
+      });
+
+      vi.mocked(UserModel.findOne).mockReturnValue({
+        select: selectMock,
+      } as any);
+
+      const result = await repository.findByEmail('nonexistent@example.com');
 
       expect(result).toBeNull();
     });

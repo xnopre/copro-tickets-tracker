@@ -29,6 +29,23 @@ export class MongoUserRepository implements IUserRepository {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      password: undefined,
+    };
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await UserModel.findOne({ email }).select('+password').lean();
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user._id.toString(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: user.password,
     };
   }
 }

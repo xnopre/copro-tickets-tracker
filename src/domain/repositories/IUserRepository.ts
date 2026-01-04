@@ -14,4 +14,9 @@ export interface IUserRepository {
    * Récupère un utilisateur par son ID
    */
   findById(id: string): Promise<User | null>;
+
+  /**
+   * Récupère un utilisateur par son email
+   */
+  findByEmail(email: string): Promise<User | null>;
 }

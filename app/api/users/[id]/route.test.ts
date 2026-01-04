@@ -5,11 +5,20 @@ import connectDB from '@/infrastructure/database/mongodb';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { UserPublic } from '@/domain/entities/User';
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
+
 vi.mock('@/infrastructure/database/mongodb');
 vi.mock('@/application/services/ServiceFactory');
 
 describe('GET /api/users/[id]', () => {
   beforeEach(() => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
     vi.clearAllMocks();
   });
 

@@ -6,6 +6,14 @@ import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { TicketService } from '@/application/services/TicketService';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
+
 vi.mock('@/application/services/ServiceFactory');
 
 describe('PATCH /api/tickets/[id]/archive', () => {
@@ -18,6 +26,7 @@ describe('PATCH /api/tickets/[id]/archive', () => {
   } as unknown as TicketService;
 
   beforeEach(() => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
     vi.mocked(ServiceFactory.getTicketService).mockReturnValue(mockTicketService);
   });
 

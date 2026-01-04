@@ -2,13 +2,22 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
-import { User, UserPublic } from '@/domain/entities/User';
+import { UserPublic } from '@/domain/entities/User';
+
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
 
 vi.mock('@/infrastructure/database/mongodb');
 vi.mock('@/application/services/ServiceFactory');
 
 describe('GET /api/users', () => {
   beforeEach(() => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
     vi.clearAllMocks();
   });
 

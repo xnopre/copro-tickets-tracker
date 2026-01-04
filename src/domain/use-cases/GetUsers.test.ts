@@ -11,6 +11,7 @@ describe('GetUsers', () => {
     mockRepository = {
       findAll: vi.fn(),
       findById: vi.fn(),
+      findByEmail: vi.fn(),
     };
     getUsers = new GetUsers(mockRepository);
   });

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { GET, POST } from './route';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
@@ -6,12 +6,21 @@ import { CommentModel } from '@/infrastructure/database/schemas/CommentSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { useTestDB } from '../../../../../tests/helpers/useTestDB';
 
+const { mockAuth } = vi.hoisted(() => ({
+  mockAuth: vi.fn(),
+}));
+
+vi.mock('@/auth', () => ({
+  auth: mockAuth,
+}));
+
 describe('Comment API Routes', () => {
   useTestDB();
 
   let testTicketId: string;
 
   beforeEach(async () => {
+    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
     const ticket = await TicketModel.create({
       title: 'Test Ticket',
       description: 'Test Description',

@@ -2,12 +2,17 @@ import { NextResponse } from 'next/server';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
 import { logger } from '@/infrastructure/services/logger';
+import { auth } from '@/auth';
 
 /**
  * GET /api/users
  * Récupère la liste de tous les utilisateurs
  */
 export async function GET() {
+  const session = await auth();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     await connectDB();
     const userService = ServiceFactory.getUserService();

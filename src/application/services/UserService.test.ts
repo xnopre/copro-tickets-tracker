@@ -11,6 +11,7 @@ describe('UserService', () => {
     mockRepository = {
       findAll: vi.fn(),
       findById: vi.fn(),
+      findByEmail: vi.fn(),
     };
     userService = new UserService(mockRepository);
   });
