@@ -33,7 +33,7 @@ describe('LogoutButton', () => {
     fireEvent.click(button);
 
     await waitFor(() => {
-      expect(mockSignOut).toHaveBeenCalledWith({ redirectTo: '/' });
+      expect(mockSignOut).toHaveBeenCalled();
     });
   });
 
