@@ -35,6 +35,19 @@ function fromHex(hex: string): Uint8Array {
 }
 
 /**
+ * Constant-time string comparison to prevent timing attacks
+ * Compares all characters without early exit
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+/**
  * Hash a password using PBKDF2 with SHA-256
  * Returns a string combining salt and hash (salt:hash)
  */
@@ -100,7 +113,7 @@ export async function comparePassword(
     const derivedHashArray = new Uint8Array(derivedHashBuffer);
     const derivedHashHex = toHex(derivedHashArray);
 
-    return derivedHashHex === hashHex;
+    return constantTimeEqual(derivedHashHex, hashHex);
   } catch {
     return false;
   }
