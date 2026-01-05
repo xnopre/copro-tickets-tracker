@@ -10,7 +10,7 @@ const mockSignOut = vi.mocked(signOut);
 describe('LogoutButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSignOut.mockResolvedValue(undefined as any);
+    mockSignOut.mockResolvedValue({ url: '/' });
   });
 
   it('should render logout button', () => {
