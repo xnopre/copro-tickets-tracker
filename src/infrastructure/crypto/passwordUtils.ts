@@ -39,8 +39,15 @@ export async function comparePassword(
     const salt = Buffer.from(saltHex, 'hex');
     const hash = await pbkdf2Async(plainPassword, salt, ITERATIONS, HASH_LENGTH, 'sha256');
 
-    const computedHash = (hash as Buffer).toString('hex');
-    return timingSafeEqual(Buffer.from(computedHash), Buffer.from(hashHex));
+    // Comparer directement les Buffers (pas de conversion en hex)
+    const storedHash = Buffer.from(hashHex, 'hex');
+
+    // timingSafeEqual nécessite des buffers de même longueur
+    if (hash.length !== storedHash.length) {
+      return false;
+    }
+
+    return timingSafeEqual(hash as Buffer, storedHash);
   } catch {
     return false;
   }
