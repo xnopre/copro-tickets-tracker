@@ -97,6 +97,7 @@ describe('Header', () => {
     const { container } = render(<Header />);
 
     const header = container.querySelector('header');
+    expect(header).toBeInTheDocument();
     expect(header).toHaveClass('bg-white', 'shadow-sm', 'border-b');
   });
 

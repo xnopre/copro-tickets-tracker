@@ -2,6 +2,7 @@
 
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
+import Button from '@/presentation/components/ui/Button';
 
 export function LogoutButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,13 +19,14 @@ export function LogoutButton() {
   };
 
   return (
-    <button
+    <Button
+      variant="danger"
+      size="md"
       onClick={handleLogout}
       disabled={isLoading}
       aria-busy={isLoading}
-      className="rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-400"
     >
       {isLoading ? 'Déconnexion en cours...' : 'Déconnexion'}
-    </button>
+    </Button>
   );
 }

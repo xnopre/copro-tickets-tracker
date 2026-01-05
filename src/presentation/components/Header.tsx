@@ -1,6 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import Container from '@/presentation/components/ui/Container';
 import { LogoutButton } from './LogoutButton';
 
 export function Header() {
@@ -10,7 +11,7 @@ export function Header() {
 
   return (
     <header className="border-b border-gray-200 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+      <Container size="lg" className="flex items-center justify-between py-4">
         <h1 className="text-2xl font-bold text-gray-900">CoTiTra</h1>
         <div className="flex items-center gap-6">
           <div className="text-gray-700">
@@ -21,7 +22,7 @@ export function Header() {
           </div>
           <LogoutButton />
         </div>
-      </div>
+      </Container>
     </header>
   );
 }
