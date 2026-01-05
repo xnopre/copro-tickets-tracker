@@ -107,4 +107,75 @@ describe('LogoutButton', () => {
       expect(button).not.toBeDisabled();
     });
   });
+
+  it('should display error message when signOut throws', async () => {
+    mockSignOut.mockImplementation(
+      () => new Promise((_, reject) => setTimeout(() => reject(new Error('Network error')), 50))
+    );
+
+    render(<LogoutButton />);
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText('Network error')).toBeInTheDocument();
+    });
+  });
+
+  it('should display default error message when error is not an Error instance', async () => {
+    mockSignOut.mockImplementation(
+      () => new Promise((_, reject) => setTimeout(() => reject('Unknown error'), 50))
+    );
+
+    render(<LogoutButton />);
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText('Erreur lors de la déconnexion')).toBeInTheDocument();
+    });
+  });
+
+  it('should clear error message when retrying logout', async () => {
+    mockSignOut.mockImplementation(
+      () => new Promise((_, reject) => setTimeout(() => reject(new Error('First error')), 50))
+    );
+
+    const { rerender } = render(<LogoutButton />);
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByText('First error')).toBeInTheDocument();
+    });
+
+    mockSignOut.mockResolvedValue({ url: '/' });
+    rerender(<LogoutButton />);
+
+    const newButton = screen.getByRole('button');
+    fireEvent.click(newButton);
+
+    // Error should be cleared when starting a new logout attempt
+    expect(screen.queryByText('First error')).not.toBeInTheDocument();
+  });
+
+  it('should have proper accessibility attributes on error alert', async () => {
+    mockSignOut.mockImplementation(
+      () => new Promise((_, reject) => setTimeout(() => reject(new Error('Access denied')), 50))
+    );
+
+    render(<LogoutButton />);
+
+    const button = screen.getByRole('button');
+    fireEvent.click(button);
+
+    await waitFor(() => {
+      const alert = screen.getByRole('alert');
+      expect(alert).toBeInTheDocument();
+      expect(alert).toHaveAttribute('aria-live', 'assertive');
+    });
+  });
 });
