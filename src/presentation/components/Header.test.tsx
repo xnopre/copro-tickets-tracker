@@ -99,6 +99,7 @@ describe('Header', () => {
     const header = container.querySelector('header');
     expect(header).toBeInTheDocument();
     expect(header).toHaveClass('bg-white', 'shadow-sm', 'border-b');
+    expect(header).toHaveAttribute('aria-label', 'En-tête de navigation');
   });
 
   it('should call LogoutButton component', () => {

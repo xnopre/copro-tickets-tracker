@@ -10,11 +10,19 @@ export function Header() {
   if (!session) return null;
 
   return (
-    <header className="border-b border-gray-200 bg-white shadow-sm">
+    <header
+      className="border-b border-gray-200 bg-white shadow-sm"
+      aria-label="En-tête de navigation"
+    >
       <Container size="lg" className="flex items-center justify-between py-4">
         <h1 className="text-2xl font-bold text-gray-900">CoTiTra</h1>
         <div className="flex items-center gap-6">
-          <div className="text-gray-700">
+          <div
+            className="text-gray-700"
+            role="status"
+            aria-live="polite"
+            aria-label={`Connecté en tant que ${session.user.firstName} ${session.user.lastName}`}
+          >
             Connecté en tant que :{' '}
             <span className="font-semibold">
               {session.user.firstName} {session.user.lastName}
