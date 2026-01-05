@@ -10,8 +10,8 @@ export function LogoutButton() {
     setIsLoading(true);
     try {
       await signOut({ redirectTo: '/' });
-    } catch {
-      // Silently handle error - signOut typically handles redirects internally
+    } catch (error) {
+      console.error('Logout failed:', error);
     } finally {
       setIsLoading(false);
     }
