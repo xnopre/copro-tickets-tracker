@@ -17,12 +17,7 @@ export function Header() {
       <Container size="lg" className="flex items-center justify-between py-4">
         <h1 className="text-2xl font-bold text-gray-900">CoTiTra</h1>
         <div className="flex items-center gap-6">
-          <div
-            className="text-gray-700"
-            role="status"
-            aria-live="polite"
-            aria-label={`Connecté en tant que ${session.user.firstName} ${session.user.lastName}`}
-          >
+          <div className="text-gray-700" role="status" aria-live="polite">
             Connecté en tant que :{' '}
             <span className="font-semibold">
               {session.user.firstName} {session.user.lastName}
