@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Stack Technique
 
 - **Framework**: Next.js 15+ (App Router)
+  - Ne jamais utiliser de librairie NPM en version beta
 - **Langage**: TypeScript (strict mode)
 - **UI**: React 19 (dernière version stable)
 - **Base de données**: MongoDB (MongoDB Atlas)
@@ -497,8 +498,6 @@ Le projet est configuré pour être déployé sur Render.com :
 - Build Command : `npm install && npm run build`
 - Start Command : `npm start`
 - Variables d'environnement à configurer dans Render dashboard
-
-IMPORTANT : ne jamais utiliser le module "crypto" de NodeJs (non supporté sur render.com).
 
 ## Notes Importantes
 

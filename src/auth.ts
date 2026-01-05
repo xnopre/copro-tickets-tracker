@@ -1,12 +1,12 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
+import { type NextAuthOptions, getServerSession } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { ServiceFactory } from './application/services/ServiceFactory';
 import connectDB from './infrastructure/database/mongodb';
 import { logger } from '@/infrastructure/services/logger';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: 'Credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
@@ -65,4 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: '/login',
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+export const auth = () => getServerSession(authOptions);
+export { signIn, signOut } from 'next-auth/react';
