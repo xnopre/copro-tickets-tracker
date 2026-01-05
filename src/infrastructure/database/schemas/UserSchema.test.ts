@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import UserModel from './UserSchema';
-import bcryptjs from 'bcryptjs';
+import { comparePassword } from '../../crypto/passwordUtils';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
@@ -89,10 +89,11 @@ describe('UserSchema', () => {
 
     // Vérifier que le password a été hashé
     expect(savedUser.password).not.toBe(plainPassword);
-    expect(savedUser.password).toMatch(/^\$2[aby]\$/);
+    // Web Crypto API format: salt:hash (both in hex)
+    expect(savedUser.password).toMatch(/^[a-f0-9]{32}:[a-f0-9]{64}$/);
 
     // Vérifier que le hash peut être comparé avec le password original
-    const isMatch = await bcryptjs.compare(plainPassword, savedUser.password);
+    const isMatch = await comparePassword(plainPassword, savedUser.password);
     expect(isMatch).toBe(true);
   });
 

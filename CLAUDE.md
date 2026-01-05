@@ -498,6 +498,8 @@ Le projet est configuré pour être déployé sur Render.com :
 - Start Command : `npm start`
 - Variables d'environnement à configurer dans Render dashboard
 
+IMPORTANT : ne jamais utiliser le module "crypto" de NodeJs (non supporté sur render.com).
+
 ## Notes Importantes
 
 ### Architecture

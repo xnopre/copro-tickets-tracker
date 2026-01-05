@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import bcryptjs from 'bcryptjs';
+import { hashPassword } from '../../crypto/passwordUtils';
 
 /**
  * Schéma Mongoose pour l'entité User
@@ -36,15 +36,15 @@ const UserSchema = new Schema({
 // Note : L'index sur email est créé automatiquement via l'option unique: true
 
 /**
- * Hook pre-save : Hash automatique du password avec bcryptjs
+ * Hook pre-save : Hash automatique du password avec Web Crypto API
  * S'exécute avant chaque save()
  */
 UserSchema.pre('save', async function () {
   // Si le password n'a pas été modifié, on skip
   if (!this.isModified('password')) return;
 
-  // Hash avec bcryptjs (10 rounds = bon compromis sécurité/perf)
-  this.password = await bcryptjs.hash(this.password, 10);
+  // Hash avec Web Crypto API (PBKDF2 avec SHA-256)
+  this.password = await hashPassword(this.password);
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
