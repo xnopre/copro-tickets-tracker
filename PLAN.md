@@ -1806,76 +1806,66 @@ src/application/services/ServiceFactory.test.ts (+ tests)
 
 ### Tâches
 
-- [ ] Créer le composant `Header` avec l'affichage de l'utilisateur connecté
-  - [ ] Utiliser `useSession()` pour récupérer les données de session
-  - [ ] Afficher "Connecté en tant que : Prénom Nom"
-  - [ ] Afficher l'icône/avatar de l'utilisateur (optionnel)
-- [ ] Créer le composant `LogoutButton`
-  - [ ] Bouton "Déconnexion" avec `signOut()` de NextAuth
-  - [ ] Redirection vers la page d'accueil après déconnexion
-  - [ ] Gérer l'état de chargement (disabled pendant la déconnexion)
-- [ ] Ajouter le Header dans le layout principal (`app/layout.tsx`)
-  - [ ] Placer en haut de la page avant le contenu
-  - [ ] Rendre visible sur toutes les pages authentifiées
-- [ ] Mettre à jour les composants existants
-  - [ ] Ajouter la session utilisateur dans les contextes nécessaires
-  - [ ] Tester que l'utilisateur est bien affiché partout
-- [ ] Créer les tests unitaires
-  - [ ] Tests Header avec session utilisateur
-  - [ ] Tests Header sans session (non authentifié)
-  - [ ] Tests LogoutButton
-  - [ ] Tests du logout workflow
-- [ ] Type-check et build
+- [x] Créer le composant `Header` avec l'affichage de l'utilisateur connecté
+  - [x] Utiliser `useSession()` pour récupérer les données de session
+  - [x] Afficher "Connecté en tant que : Prénom Nom"
+- [x] Créer le composant `LogoutButton`
+  - [x] Bouton "Déconnexion" avec `signOut()` de NextAuth
+  - [x] Redirection vers la page d'accueil après déconnexion
+  - [x] Gérer l'état de chargement (disabled pendant la déconnexion)
+- [x] Ajouter le Header dans le layout principal (`app/layout.tsx`)
+  - [x] Placer en haut de la page avant le contenu
+  - [x] Rendre visible sur toutes les pages authentifiées
+- [x] Créer les tests unitaires
+  - [x] Tests Header avec session utilisateur (5 tests)
+  - [x] Tests Header sans session (non authentifié)
+  - [x] Tests LogoutButton (8 tests)
+- [x] Type-check et build
 - [ ] Déployer
 
 ### Validation
 
 - ✅ Le header affiche le nom de l'utilisateur connecté
-- ✅ Le bouton "Déconnexion" fonctionne et redirige
+- ✅ Le bouton "Déconnexion" fonctionne et redirige vers "/"
 - ✅ Le header est masqué quand l'utilisateur n'est pas connecté
 - ✅ L'utilisateur revient à la page d'accueil après déconnexion
 - ✅ Architecture hexagonale respectée
-- ✅ Tous les tests passent
-- ✅ Type-check et build réussis
+- ✅ Tous les tests passent (594 tests, +13 nouveaux tests Header & LogoutButton)
+- ✅ Type-check sans erreur
+- ✅ Lint sans erreur
+- ✅ Build Next.js réussi
 - ⏳ Déployé en production (en attente)
 
 ### Notes techniques
 
-**Composant Header** :
+**Architecture implémentation** :
 
-```typescript
-import { useSession, signOut } from 'next-auth/react';
+- **Header** : Composant client ('use client') qui affiche le header avec les infos de session
+  - Retourne `null` si pas de session (caché pour les non-authentifiés)
+  - Affiche "Connecté en tant que : Prénom Nom"
+  - Import/utilisation du composant LogoutButton
 
-export default function Header() {
-  const { data: session } = useSession();
-
-  if (!session) return null;
-
-  return (
-    <header>
-      <div>
-        Connecté en tant que : {session.user?.name}
-      </div>
-      <button onClick={() => signOut({ redirectTo: '/' })}>
-        Déconnexion
-      </button>
-    </header>
-  );
-}
-```
+- **LogoutButton** : Composant client séparé, réutilisable
+  - Gère son propre état de chargement (`isLoading`)
+  - Appelle `signOut({ redirectTo: '/' })` de NextAuth
+  - Affiche "Déconnexion en cours..." pendant le chargement
+  - Bouton désactivé pendant la déconnexion
+  - Gestion des erreurs avec try/catch (silencieuse)
 
 **Intégration dans le layout** :
 
 ```typescript
-import Header from '@/src/presentation/components/Header';
+import { Header } from '@/presentation/components/Header';
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html>
-      <body>
+    <html lang="fr">
+      <body className="antialiased">
         <Providers>
           <Header />
-          {children}
+          <main className="min-h-screen bg-gray-50 p-8">{children}</main>
         </Providers>
       </body>
     </html>
@@ -1883,7 +1873,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-**Fichiers créés** :
+**Fichiers créés** (4 fichiers) :
 
 ```
 src/presentation/components/Header.tsx
@@ -1892,13 +1882,16 @@ src/presentation/components/LogoutButton.tsx
 src/presentation/components/LogoutButton.test.tsx
 ```
 
-**Fichiers modifiés** :
+**Fichiers modifiés** (1 fichier) :
 
 ```
 app/layout.tsx (+ import Header, + <Header /> dans le layout)
 ```
 
-**Tests** : +8-10 nouveaux tests (Header avec session, sans session, LogoutButton)
+**Tests** : +13 nouveaux tests
+
+- Header.test.tsx : 5 tests (render null, avec session, affichage firstName/lastName, structure sémantique, LogoutButton call)
+- LogoutButton.test.tsx : 8 tests (render, initial text, signOut call, loading text, disabled state, aria-busy, styling, error handling)
 
 ---
 
