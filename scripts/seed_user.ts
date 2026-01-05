@@ -55,7 +55,11 @@ async function seedUsers() {
 
       if (existingUser) {
         // Mettre à jour l'utilisateur existant
-        await UserModel.updateOne({ _id: existingUser._id }, { $set: { email: userData.email } });
+        existingUser.firstName = userData.firstName;
+        existingUser.lastName = userData.lastName;
+        existingUser.email = userData.email;
+        existingUser.password = userData.password;
+        await existingUser.save(); // Déclenche le hook pre('save') pour rehash le password
         console.log(`🔄 Updated: ${userData.firstName} ${userData.lastName} (${userData.email})`);
         updatedCount++;
       } else {

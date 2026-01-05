@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AuthService } from './AuthService';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
-import bcryptjs from 'bcryptjs';
+import { hashPassword } from '../crypto/passwordUtils';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -59,7 +59,7 @@ describe('AuthService', () => {
 
     it('should return user without password when credentials are valid', async () => {
       const validPassword = 'mySecurePassword123';
-      const hashedPassword = await bcryptjs.hash(validPassword, 10);
+      const hashedPassword = await hashPassword(validPassword);
 
       const mockUser = {
         id: '123',

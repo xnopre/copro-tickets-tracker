@@ -1,11 +1,11 @@
-import bcryptjs from 'bcryptjs';
+import { comparePassword } from '../crypto/passwordUtils';
 import { IAuthService } from '../../domain/services/IAuthService';
 import { User } from '../../domain/entities/User';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
 
 /**
  * Implémentation du service d'authentification (Adapter)
- * Utilise bcryptjs pour la validation des mots de passe
+ * Utilise Web Crypto API pour la validation des mots de passe
  */
 export class AuthService implements IAuthService {
   constructor(private userRepository: IUserRepository) {}
@@ -32,6 +32,6 @@ export class AuthService implements IAuthService {
    * Méthode privée : Compare un mot de passe en clair avec un hash
    */
   private async comparePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
-    return bcryptjs.compare(plainPassword, hashedPassword);
+    return comparePassword(plainPassword, hashedPassword);
   }
 }
