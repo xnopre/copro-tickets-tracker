@@ -16,7 +16,7 @@ export function Header() {
           <div className="text-gray-700">
             Connecté en tant que :{' '}
             <span className="font-semibold">
-              {session.user?.firstName} {session.user?.lastName}
+              {session.user.firstName} {session.user.lastName}
             </span>
           </div>
           <LogoutButton />
