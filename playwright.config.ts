@@ -7,14 +7,20 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? 'github' : 'html',
+  globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], storageState: 'tests/e2e/.auth/user.json' },
+      dependencies: ['setup'],
     },
   ],
   webServer: {
@@ -28,6 +34,8 @@ export default defineConfig({
       GMAIL_APP_PASSWORD: 'fake-password-for-tests',
       FROM_EMAIL: 'test@example.com',
       NODE_ENV: 'test',
+      NEXTAUTH_SECRET: 'test-secret-key-for-e2e-tests',
+      NEXTAUTH_URL: 'http://localhost:3000',
     },
   },
 });
