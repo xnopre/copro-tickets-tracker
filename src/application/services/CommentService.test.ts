@@ -7,6 +7,7 @@ import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
+import { User } from '@/domain/entities/User';
 
 describe('CommentService', () => {
   let mockRepository: ICommentRepository;
@@ -16,6 +17,13 @@ describe('CommentService', () => {
   let mockEmailTemplateService: IEmailTemplateService;
   let mockLogger: ILogger;
   let commentService: CommentService;
+
+  const mockUser1: User = {
+    id: 'user-1',
+    firstName: 'Jean',
+    lastName: 'Martin',
+    email: 'jean@example.com',
+  };
 
   beforeEach(() => {
     mockRepository = {
@@ -31,7 +39,10 @@ describe('CommentService', () => {
     };
     mockUserRepository = {
       findAll: vi.fn().mockResolvedValue([]),
-      findById: vi.fn().mockResolvedValue(null),
+      findById: vi.fn((id: string) => {
+        const user = id === 'user-1' ? mockUser1 : null;
+        return Promise.resolve(user);
+      }),
       findByEmail: vi.fn().mockResolvedValue(null),
     };
     mockEmailService = {

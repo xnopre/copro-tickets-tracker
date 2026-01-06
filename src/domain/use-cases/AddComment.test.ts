@@ -23,9 +23,19 @@ describe('AddComment', () => {
     archive: vi.fn(),
   };
 
+  const mockUser1: User = {
+    id: 'user-1',
+    firstName: 'Jean',
+    lastName: 'Martin',
+    email: 'jean@example.com',
+  };
+
   const mockUserRepository: IUserRepository = {
     findAll: vi.fn(),
-    findById: vi.fn(),
+    findById: vi.fn((id: string) => {
+      const user = id === 'user-1' ? mockUser1 : null;
+      return Promise.resolve(user);
+    }),
     findByEmail: vi.fn(),
   };
 
@@ -73,12 +83,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
@@ -111,12 +116,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
@@ -224,12 +224,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
@@ -282,12 +277,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
@@ -317,12 +307,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
@@ -364,12 +349,7 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-        email: 'jean@example.com',
-      },
+      author: mockUser1,
       createdAt: new Date(),
     };
 
