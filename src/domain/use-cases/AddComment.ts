@@ -18,7 +18,7 @@ export class AddComment {
   ) {}
 
   async execute(data: CreateCommentData): Promise<Comment> {
-    this.validateData(data);
+    await this.validateData(data);
 
     const comment = await this.commentRepository.create({
       ticketId: data.ticketId,
@@ -63,7 +63,7 @@ export class AddComment {
     }
   }
 
-  private validateData(data: CreateCommentData): void {
+  private async validateData(data: CreateCommentData): Promise<void> {
     if (!data.ticketId) {
       throw new ValidationError("L'ID du ticket est requis");
     }
@@ -78,6 +78,10 @@ export class AddComment {
 
     if (!data.authorId) {
       throw new ValidationError("L'ID de l'auteur est requis");
+    }
+    const user = await this.userRepository.findById(data.authorId);
+    if (!user) {
+      throw new ValidationError("L'utilisateur spécifié n'existe pas");
     }
   }
 }
