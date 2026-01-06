@@ -140,7 +140,7 @@ export class UpdateTicket {
 
     // Valider title si présent
     if (data.title !== undefined) {
-      if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
+      if (!data.title || data.title.trim().length === 0) {
         throw new ValidationError('Le titre est requis');
       }
       if (data.title.trim().length > 200) {
@@ -150,11 +150,7 @@ export class UpdateTicket {
 
     // Valider description si présente
     if (data.description !== undefined) {
-      if (
-        !data.description ||
-        typeof data.description !== 'string' ||
-        data.description.trim().length === 0
-      ) {
+      if (!data.description || data.description.trim().length === 0) {
         throw new ValidationError('La description est requise');
       }
       if (data.description.trim().length > 5000) {

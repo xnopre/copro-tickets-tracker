@@ -64,11 +64,11 @@ export class AddComment {
   }
 
   private validateData(data: CreateCommentData): void {
-    if (!data.ticketId || typeof data.ticketId !== 'string') {
+    if (!data.ticketId) {
       throw new ValidationError("L'ID du ticket est requis");
     }
 
-    if (!data.content || typeof data.content !== 'string' || data.content.trim().length === 0) {
+    if (!data.content || data.content.trim().length === 0) {
       throw new ValidationError('Le contenu du commentaire est requis');
     }
 
@@ -76,7 +76,7 @@ export class AddComment {
       throw new ValidationError('Le commentaire ne doit pas dépasser 2000 caractères');
     }
 
-    if (!data.authorId || typeof data.authorId !== 'string') {
+    if (!data.authorId) {
       throw new ValidationError("L'ID de l'auteur est requis");
     }
   }

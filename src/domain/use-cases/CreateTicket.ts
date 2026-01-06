@@ -53,7 +53,7 @@ export class CreateTicket {
   }
 
   private validateData(data: CreateTicketData): void {
-    if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
+    if (!data.title || data.title.trim().length === 0) {
       throw new ValidationError('Le titre est requis');
     }
 
@@ -61,11 +61,7 @@ export class CreateTicket {
       throw new ValidationError('Le titre ne doit pas dépasser 200 caractères');
     }
 
-    if (
-      !data.description ||
-      typeof data.description !== 'string' ||
-      data.description.trim().length === 0
-    ) {
+    if (!data.description || data.description.trim().length === 0) {
       throw new ValidationError('La description est requise');
     }
 
