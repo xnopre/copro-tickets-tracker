@@ -1,16 +1,17 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface CommentDocument extends Document {
-  ticketId: string;
+  ticketId: Types.ObjectId;
   content: string;
-  author: string;
+  authorId: Types.ObjectId;
   createdAt: Date;
 }
 
 const commentSchema = new Schema<CommentDocument>(
   {
     ticketId: {
-      type: String,
+      type: Types.ObjectId,
+      ref: 'Ticket',
       required: true,
       index: true,
     },
@@ -20,11 +21,10 @@ const commentSchema = new Schema<CommentDocument>(
       maxlength: 2000,
       trim: true,
     },
-    author: {
-      type: String,
+    authorId: {
+      type: Types.ObjectId,
+      ref: 'User',
       required: true,
-      maxlength: 100,
-      trim: true,
     },
   },
   {

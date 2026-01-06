@@ -23,7 +23,7 @@ export class AddComment {
     const comment = await this.commentRepository.create({
       ticketId: data.ticketId,
       content: data.content.trim(),
-      author: data.author.trim(),
+      authorId: data.authorId,
     });
 
     await this.notifyCommentAdded(comment);
@@ -76,12 +76,8 @@ export class AddComment {
       throw new ValidationError('Le commentaire ne doit pas dépasser 2000 caractères');
     }
 
-    if (!data.author || typeof data.author !== 'string' || data.author.trim().length === 0) {
-      throw new ValidationError("L'auteur du commentaire est requis");
-    }
-
-    if (data.author.trim().length > 100) {
-      throw new ValidationError("L'auteur ne doit pas dépasser 100 caractères");
+    if (!data.authorId || typeof data.authorId !== 'string') {
+      throw new ValidationError("L'ID de l'auteur est requis");
     }
   }
 }

@@ -5,6 +5,7 @@ import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { TicketModel, TicketDocument } from '../database/schemas/TicketSchema';
 import connectDB from '../database/mongodb';
 import { Types } from 'mongoose';
+import { UserPublic } from '@/domain/entities/User';
 
 export class MongoTicketRepository implements ITicketRepository {
   async findAll(): Promise<Ticket[]> {
@@ -96,17 +97,16 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   private mapToEntity(document: TicketDocument): Ticket {
-    const assignedToData = (document as any).assignedTo;
-
-    // Si assignedTo est populé (objet User), on extrait les données
-    let assignedTo = null;
-
-    if (assignedToData && typeof assignedToData === 'object' && assignedToData._id) {
-      // Populé : assignedTo est un objet User
+    let assignedTo: UserPublic | null = null;
+    if (document.assignedTo) {
+      const assignedToPopulated = document.assignedTo as unknown as {
+        firstName: string;
+        lastName: string;
+      };
       assignedTo = {
-        id: assignedToData._id.toString(),
-        firstName: assignedToData.firstName,
-        lastName: assignedToData.lastName,
+        id: document.assignedTo._id.toString(),
+        firstName: assignedToPopulated.firstName,
+        lastName: assignedToPopulated.lastName,
       };
     }
 

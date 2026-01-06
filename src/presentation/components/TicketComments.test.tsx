@@ -33,7 +33,12 @@ vi.mock('./AddCommentForm', () => ({
             id: 'new-comment',
             ticketId,
             content: 'New comment',
-            author: 'Test User',
+            author: {
+              id: 'user-1',
+              firstName: 'Test',
+              lastName: 'User',
+              email: 'test@example.com',
+            },
             createdAt: new Date('2025-01-15T12:00:00.000Z'),
           })
         }
@@ -70,14 +75,24 @@ describe('TicketComments', () => {
         id: '1',
         ticketId: '123',
         content: 'First comment',
-        author: 'Jean Dupont',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Dupont',
+          email: 'jean@example.com',
+        },
         createdAt: '2025-01-15T10:00:00.000Z',
       },
       {
         id: '2',
         ticketId: '123',
         content: 'Second comment',
-        author: 'Marie Martin',
+        author: {
+          id: 'user-2',
+          firstName: 'Marie',
+          lastName: 'Martin',
+          email: 'marie@example.com',
+        },
         createdAt: '2025-01-15T11:00:00.000Z',
       },
     ];
@@ -146,7 +161,12 @@ describe('TicketComments', () => {
         id: '1',
         ticketId: '123',
         content: 'Test comment',
-        author: 'Test User',
+        author: {
+          id: 'user-1',
+          firstName: 'Test',
+          lastName: 'User',
+          email: 'test@example.com',
+        },
         createdAt: '2025-01-15T10:00:00.000Z',
       },
     ];
@@ -248,7 +268,12 @@ describe('TicketComments', () => {
         id: '1',
         ticketId: '123',
         content: 'Existing comment',
-        author: 'Jean Dupont',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Dupont',
+          email: 'jean@example.com',
+        },
         createdAt: '2025-01-15T10:00:00.000Z',
       },
     ];

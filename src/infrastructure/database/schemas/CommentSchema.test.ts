@@ -1,16 +1,30 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { CommentModel } from './CommentSchema';
+import UserModel from './UserSchema';
 import { useTestDB } from '../../../../tests/helpers/useTestDB';
+import { Types } from 'mongoose';
 
 describe('Comment Schema', () => {
   useTestDB();
 
+  let testUserId: Types.ObjectId;
+
+  beforeEach(async () => {
+    const user = await UserModel.create({
+      firstName: 'Jean',
+      lastName: 'Dupont',
+      email: 'jean.dupont@example.com',
+      password: 'password123',
+    });
+    testUserId = user._id;
+  });
+
   describe('Schema Validation', () => {
     it('should create a valid comment with all required fields', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment content',
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -19,7 +33,7 @@ describe('Comment Schema', () => {
       expect(savedComment._id).toBeDefined();
       expect(savedComment.ticketId).toBe(commentData.ticketId);
       expect(savedComment.content).toBe(commentData.content);
-      expect(savedComment.author).toBe(commentData.author);
+      expect(savedComment.authorId.toString()).toBe(testUserId.toString());
       expect(savedComment.createdAt).toBeInstanceOf(Date);
       expect(savedComment.updatedAt).toBeUndefined();
     });
@@ -27,7 +41,7 @@ describe('Comment Schema', () => {
     it('should fail validation if ticketId is missing', async () => {
       const commentData = {
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -37,8 +51,8 @@ describe('Comment Schema', () => {
 
     it('should fail validation if content is missing', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
-        author: 'Jean Dupont',
+        ticketId: new Types.ObjectId(),
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -46,9 +60,9 @@ describe('Comment Schema', () => {
       await expect(comment.save()).rejects.toThrow();
     });
 
-    it('should fail validation if author is missing', async () => {
+    it('should fail validation if authorId is missing', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment',
       };
 
@@ -57,24 +71,24 @@ describe('Comment Schema', () => {
       await expect(comment.save()).rejects.toThrow();
     });
 
-    it('should automatically trim the author field', async () => {
+    it('should properly store and retrieve authorId', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment',
-        author: '  Jean Dupont  ',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
       const savedComment = await comment.save();
 
-      expect(savedComment.author).toBe('Jean Dupont');
+      expect(savedComment.authorId.toString()).toBe(testUserId.toString());
     });
 
     it('should automatically trim the content field', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: '  Indented content  ',
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -87,9 +101,9 @@ describe('Comment Schema', () => {
   describe('Timestamps', () => {
     it('should have createdAt timestamp', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -101,9 +115,9 @@ describe('Comment Schema', () => {
 
     it('should not have updatedAt timestamp', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -115,17 +129,13 @@ describe('Comment Schema', () => {
 
   describe('TicketId Field', () => {
     it('should accept valid MongoDB ObjectId format', async () => {
-      const validTicketIds = [
-        '507f1f77bcf86cd799439011',
-        '507f191e810c19729de860ea',
-        '5f8d0d55b54764421b7156d9',
-      ];
+      const validTicketIds = [new Types.ObjectId(), new Types.ObjectId(), new Types.ObjectId()];
 
       for (const ticketId of validTicketIds) {
         const commentData = {
           ticketId,
           content: 'Test comment',
-          author: 'Jean Dupont',
+          authorId: testUserId,
         };
 
         const comment = new CommentModel(commentData);
@@ -134,28 +144,15 @@ describe('Comment Schema', () => {
         expect(savedComment.ticketId).toBe(ticketId);
       }
     });
-
-    it('should accept any string value as ticketId', async () => {
-      const commentData = {
-        ticketId: 'any-string-value',
-        content: 'Test comment',
-        author: 'Jean Dupont',
-      };
-
-      const comment = new CommentModel(commentData);
-      const savedComment = await comment.save();
-
-      expect(savedComment.ticketId).toBe('any-string-value');
-    });
   });
 
   describe('Content Field', () => {
     it('should accept long content', async () => {
       const longContent = 'A'.repeat(1500);
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: longContent,
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -168,9 +165,9 @@ describe('Comment Schema', () => {
     it('should accept multiline content', async () => {
       const multilineContent = 'Line 1\nLine 2\nLine 3';
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: multilineContent,
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -182,9 +179,9 @@ describe('Comment Schema', () => {
     it('should fail validation if content exceeds 2000 characters', async () => {
       const tooLongContent = 'A'.repeat(2001);
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: tooLongContent,
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -195,9 +192,9 @@ describe('Comment Schema', () => {
     it('should accept content with exactly 2000 characters', async () => {
       const maxContent = 'A'.repeat(2000);
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: maxContent,
-        author: 'Jean Dupont',
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
@@ -208,33 +205,34 @@ describe('Comment Schema', () => {
     });
   });
 
-  describe('Author Field', () => {
-    it('should fail validation if author exceeds 100 characters', async () => {
-      const tooLongAuthor = 'A'.repeat(101);
+  describe('AuthorId Field', () => {
+    it('should accept valid user ObjectId as authorId', async () => {
       const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
+        ticketId: new Types.ObjectId(),
         content: 'Test comment',
-        author: tooLongAuthor,
-      };
-
-      const comment = new CommentModel(commentData);
-
-      await expect(comment.save()).rejects.toThrow();
-    });
-
-    it('should accept author with exactly 100 characters', async () => {
-      const maxAuthor = 'A'.repeat(100);
-      const commentData = {
-        ticketId: '507f1f77bcf86cd799439011',
-        content: 'Test comment',
-        author: maxAuthor,
+        authorId: testUserId,
       };
 
       const comment = new CommentModel(commentData);
       const savedComment = await comment.save();
 
-      expect(savedComment.author).toBe(maxAuthor);
-      expect(savedComment.author.length).toBe(100);
+      expect(savedComment.authorId).toBeDefined();
+      expect(savedComment.authorId.toString()).toBe(testUserId.toString());
+    });
+
+    it('should reference a valid user document', async () => {
+      const commentData = {
+        ticketId: new Types.ObjectId(),
+        content: 'Test comment',
+        authorId: testUserId,
+      };
+
+      const comment = new CommentModel(commentData);
+      const savedComment = await comment.save();
+
+      const populatedComment = await CommentModel.findById(savedComment._id).populate('authorId');
+      expect(populatedComment).toBeDefined();
+      expect(populatedComment?.authorId).toBeDefined();
     });
   });
 });

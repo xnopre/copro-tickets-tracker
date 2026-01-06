@@ -161,7 +161,12 @@ describe('EmailTemplates', () => {
         id: 'comment_123',
         ticketId: 'ticket_123',
         content: 'This is a test comment',
-        author: 'John Doe',
+        author: {
+          id: 'user_123',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+        },
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
@@ -170,10 +175,10 @@ describe('EmailTemplates', () => {
       expect(result.subject).toBe('[CoTiTra] Nouveau commentaire : Test Ticket');
       expect(result.htmlContent).toContain('Nouveau commentaire sur le ticket');
       expect(result.htmlContent).toContain('Test Ticket');
-      expect(result.htmlContent).toContain('John Doe');
+      expect(result.htmlContent).toContain('John');
       expect(result.htmlContent).toContain('This is a test comment');
       expect(result.htmlContent).toContain('http://localhost:3000/tickets/ticket_123');
-      expect(result.textContent).toContain('John Doe');
+      expect(result.textContent).toContain('John');
       expect(result.textContent).toContain('This is a test comment');
     });
 
@@ -193,7 +198,12 @@ describe('EmailTemplates', () => {
         id: 'comment_123',
         ticketId: 'ticket_123',
         content: '<script>alert("XSS")</script>',
-        author: 'John Doe',
+        author: {
+          id: 'user_123',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+        },
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 

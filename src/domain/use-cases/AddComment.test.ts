@@ -73,7 +73,12 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -90,23 +95,28 @@ describe('AddComment', () => {
     const result = await useCase.execute({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
 
     expect(result).toEqual(mockComment);
     expect(mockRepository.create).toHaveBeenCalledWith({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
   });
 
-  it('should trim content and author', async () => {
+  it('should trim content when creating comment', async () => {
     const mockComment = {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -123,13 +133,13 @@ describe('AddComment', () => {
     await useCase.execute({
       ticketId: 'ticket-1',
       content: '  Test comment  ',
-      author: '  Jean Martin  ',
+      authorId: 'user-1',
     });
 
     expect(mockRepository.create).toHaveBeenCalledWith({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
   });
 
@@ -147,7 +157,7 @@ describe('AddComment', () => {
       useCase.execute({
         ticketId: '',
         content: 'Test comment',
-        author: 'Jean Martin',
+        authorId: 'user-1',
       })
     ).rejects.toThrow("L'ID du ticket est requis");
   });
@@ -166,7 +176,7 @@ describe('AddComment', () => {
       useCase.execute({
         ticketId: 'ticket-1',
         content: '',
-        author: 'Jean Martin',
+        authorId: 'user-1',
       })
     ).rejects.toThrow('Le contenu du commentaire est requis');
   });
@@ -185,12 +195,12 @@ describe('AddComment', () => {
       useCase.execute({
         ticketId: 'ticket-1',
         content: 'A'.repeat(2001),
-        author: 'Jean Martin',
+        authorId: 'user-1',
       })
     ).rejects.toThrow('Le commentaire ne doit pas dépasser 2000 caractères');
   });
 
-  it('should throw error when author is empty', async () => {
+  it('should throw error when authorId is empty', async () => {
     const useCase = new AddComment(
       mockRepository,
       mockTicketRepository,
@@ -204,28 +214,9 @@ describe('AddComment', () => {
       useCase.execute({
         ticketId: 'ticket-1',
         content: 'Test comment',
-        author: '',
+        authorId: '',
       })
-    ).rejects.toThrow("L'auteur du commentaire est requis");
-  });
-
-  it('should throw error when author exceeds 100 characters', async () => {
-    const useCase = new AddComment(
-      mockRepository,
-      mockTicketRepository,
-      mockUserRepository,
-      mockEmailService,
-      mockEmailTemplateService,
-      mockLogger
-    );
-
-    await expect(
-      useCase.execute({
-        ticketId: 'ticket-1',
-        content: 'Test comment',
-        author: 'A'.repeat(101),
-      })
-    ).rejects.toThrow("L'auteur ne doit pas dépasser 100 caractères");
+    ).rejects.toThrow("L'ID de l'auteur est requis");
   });
 
   it('should send email notification when comment is added', async () => {
@@ -233,7 +224,12 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -273,7 +269,7 @@ describe('AddComment', () => {
     await useCase.execute({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
 
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
@@ -286,7 +282,12 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -304,7 +305,7 @@ describe('AddComment', () => {
     await useCase.execute({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
 
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
@@ -316,7 +317,12 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -346,7 +352,7 @@ describe('AddComment', () => {
     await useCase.execute({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
 
     expect(mockUserRepository.findAll).toHaveBeenCalled();
@@ -358,7 +364,12 @@ describe('AddComment', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      author: {
+        id: 'user-1',
+        firstName: 'Jean',
+        lastName: 'Martin',
+        email: 'jean@example.com',
+      },
       createdAt: new Date(),
     };
 
@@ -377,7 +388,7 @@ describe('AddComment', () => {
     const result = await useCase.execute({
       ticketId: 'ticket-1',
       content: 'Test comment',
-      author: 'Jean Martin',
+      authorId: 'user-1',
     });
 
     expect(result).toEqual(mockComment);

@@ -29,7 +29,7 @@ const ticketSchema = new Schema<TicketDocument>(
       required: true,
     },
     assignedTo: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: 'User',
       default: null,
     },

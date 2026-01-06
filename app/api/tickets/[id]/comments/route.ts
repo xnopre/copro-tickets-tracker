@@ -34,7 +34,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
-  if (!session) {
+  if (!session || !session.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -42,13 +42,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   try {
     const body = await request.json();
-    const { content, author } = body;
+    const { content } = body;
 
     const commentService = ServiceFactory.getCommentService();
     const comment = await commentService.addComment({
       ticketId: id,
       content,
-      author,
+      authorId: session.user.id,
     });
 
     return NextResponse.json(comment, { status: 201 });

@@ -52,7 +52,9 @@ describe('MongoCommentRepository', () => {
     it('should return empty array when no comments exist for ticket', async () => {
       const validTicketId = '507f1f77bcf86cd799439011';
       const mockFind = vi.fn().mockReturnValue({
-        sort: vi.fn().mockResolvedValue([]),
+        populate: vi.fn().mockReturnValue({
+          sort: vi.fn().mockResolvedValue([]),
+        }),
       });
       vi.mocked(CommentModel.find).mockImplementation(mockFind);
 
@@ -69,20 +71,30 @@ describe('MongoCommentRepository', () => {
           _id: '507f1f77bcf86cd799439021',
           ticketId: validTicketId,
           content: 'First comment',
-          author: 'Jean Dupont',
+          authorId: {
+            _id: 'user-1',
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
           createdAt: new Date('2025-01-15T10:00:00.000Z'),
         },
         {
           _id: '507f1f77bcf86cd799439022',
           ticketId: validTicketId,
           content: 'Second comment',
-          author: 'Marie Martin',
+          authorId: {
+            _id: 'user-2',
+            firstName: 'Marie',
+            lastName: 'Dupont',
+          },
           createdAt: new Date('2025-01-15T11:00:00.000Z'),
         },
       ];
 
       const mockFind = vi.fn().mockReturnValue({
-        sort: vi.fn().mockResolvedValue(mockDocuments),
+        populate: vi.fn().mockReturnValue({
+          sort: vi.fn().mockResolvedValue(mockDocuments),
+        }),
       });
       vi.mocked(CommentModel.find).mockImplementation(mockFind);
 
@@ -93,14 +105,24 @@ describe('MongoCommentRepository', () => {
         id: '507f1f77bcf86cd799439021',
         ticketId: validTicketId,
         content: 'First comment',
-        author: 'Jean Dupont',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Martin',
+          email: '',
+        },
         createdAt: mockDocuments[0].createdAt,
       });
       expect(result[1]).toEqual({
         id: '507f1f77bcf86cd799439022',
         ticketId: validTicketId,
         content: 'Second comment',
-        author: 'Marie Martin',
+        author: {
+          id: 'user-2',
+          firstName: 'Marie',
+          lastName: 'Dupont',
+          email: '',
+        },
         createdAt: mockDocuments[1].createdAt,
       });
       expect(CommentModel.find).toHaveBeenCalledWith({ ticketId: validTicketId });
@@ -110,7 +132,9 @@ describe('MongoCommentRepository', () => {
       const validTicketId = '507f1f77bcf86cd799439011';
       const mockSort = vi.fn().mockResolvedValue([]);
       const mockFind = vi.fn().mockReturnValue({
-        sort: mockSort,
+        populate: vi.fn().mockReturnValue({
+          sort: mockSort,
+        }),
       });
       vi.mocked(CommentModel.find).mockImplementation(mockFind);
 
@@ -126,27 +150,41 @@ describe('MongoCommentRepository', () => {
           _id: '507f1f77bcf86cd799439031',
           ticketId: validTicketId,
           content: 'Comment A',
-          author: 'User A',
+          authorId: {
+            _id: 'user-1',
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
           createdAt: new Date('2025-01-15T09:00:00.000Z'),
         },
         {
           _id: '507f1f77bcf86cd799439032',
           ticketId: validTicketId,
           content: 'Comment B',
-          author: 'User B',
+          authorId: {
+            _id: 'user-2',
+            firstName: 'Marie',
+            lastName: 'Dupont',
+          },
           createdAt: new Date('2025-01-15T10:00:00.000Z'),
         },
         {
           _id: '507f1f77bcf86cd799439033',
           ticketId: validTicketId,
           content: 'Comment C',
-          author: 'User C',
+          authorId: {
+            _id: 'user-3',
+            firstName: 'Pierre',
+            lastName: 'Bernard',
+          },
           createdAt: new Date('2025-01-15T11:00:00.000Z'),
         },
       ];
 
       const mockFind = vi.fn().mockReturnValue({
-        sort: vi.fn().mockResolvedValue(mockDocuments),
+        populate: vi.fn().mockReturnValue({
+          sort: vi.fn().mockResolvedValue(mockDocuments),
+        }),
       });
       vi.mocked(CommentModel.find).mockImplementation(mockFind);
 
@@ -164,7 +202,7 @@ describe('MongoCommentRepository', () => {
       const createData = {
         ticketId: 'abc',
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(repository.create(createData)).rejects.toThrow(InvalidIdError);
@@ -175,7 +213,7 @@ describe('MongoCommentRepository', () => {
       const createData = {
         ticketId: '123',
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(repository.create(createData)).rejects.toThrow(InvalidIdError);
@@ -186,7 +224,7 @@ describe('MongoCommentRepository', () => {
       const createData = {
         ticketId: '',
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(repository.create(createData)).rejects.toThrow(InvalidIdError);
@@ -197,7 +235,7 @@ describe('MongoCommentRepository', () => {
       const createData = {
         ticketId: 'not-a-valid-objectid-format',
         content: 'Test comment',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(repository.create(createData)).rejects.toThrow(InvalidIdError);
@@ -208,18 +246,34 @@ describe('MongoCommentRepository', () => {
 
     it('should create a new comment with valid data', async () => {
       const validTicketId = '507f1f77bcf86cd799439011';
+      const validAuthorId = '507f1f77bcf86cd799439099';
       const createData = {
         ticketId: validTicketId,
         content: 'New comment',
-        author: 'Jean Dupont',
+        authorId: validAuthorId,
       };
 
       const mockDocument = {
         _id: '507f1f77bcf86cd799439041',
         ticketId: validTicketId,
         content: 'New comment',
-        author: 'Jean Dupont',
+        authorId: {
+          _id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+        },
         createdAt: new Date('2025-01-15T12:00:00.000Z'),
+        populate: vi.fn().mockResolvedValue({
+          _id: '507f1f77bcf86cd799439041',
+          ticketId: validTicketId,
+          content: 'New comment',
+          authorId: {
+            _id: validAuthorId,
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
+          createdAt: new Date('2025-01-15T12:00:00.000Z'),
+        }),
       };
 
       vi.mocked(CommentModel.create).mockResolvedValue(mockDocument as any);
@@ -230,30 +284,51 @@ describe('MongoCommentRepository', () => {
         id: '507f1f77bcf86cd799439041',
         ticketId: validTicketId,
         content: 'New comment',
-        author: 'Jean Dupont',
+        author: {
+          id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+          email: '',
+        },
         createdAt: mockDocument.createdAt,
       });
       expect(CommentModel.create).toHaveBeenCalledWith({
         ticketId: validTicketId,
         content: 'New comment',
-        author: 'Jean Dupont',
+        authorId: validAuthorId,
       });
     });
 
     it('should return comment with generated ID', async () => {
       const validTicketId = '507f1f77bcf86cd799439011';
+      const validAuthorId = '507f1f77bcf86cd799439099';
       const createData = {
         ticketId: validTicketId,
         content: 'ID Test Comment',
-        author: 'Test User',
+        authorId: validAuthorId,
       };
 
       const mockDocument = {
         _id: '507f1f77bcf86cd799439042',
         ticketId: validTicketId,
         content: 'ID Test Comment',
-        author: 'Test User',
+        authorId: {
+          _id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+        },
         createdAt: new Date('2025-01-15T13:00:00.000Z'),
+        populate: vi.fn().mockResolvedValue({
+          _id: '507f1f77bcf86cd799439042',
+          ticketId: validTicketId,
+          content: 'ID Test Comment',
+          authorId: {
+            _id: validAuthorId,
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
+          createdAt: new Date('2025-01-15T13:00:00.000Z'),
+        }),
       };
 
       vi.mocked(CommentModel.create).mockResolvedValue(mockDocument as any);
@@ -266,10 +341,11 @@ describe('MongoCommentRepository', () => {
 
     it('should map document fields correctly', async () => {
       const validTicketId = '507f1f77bcf86cd799439011';
+      const validAuthorId = '507f1f77bcf86cd799439099';
       const createData = {
         ticketId: validTicketId,
         content: 'Detailed comment content',
-        author: 'Marie Martin',
+        authorId: validAuthorId,
       };
 
       const createdDate = new Date('2025-01-15T14:30:00.000Z');
@@ -278,8 +354,23 @@ describe('MongoCommentRepository', () => {
         _id: '507f1f77bcf86cd799439043',
         ticketId: validTicketId,
         content: 'Detailed comment content',
-        author: 'Marie Martin',
+        authorId: {
+          _id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+        },
         createdAt: createdDate,
+        populate: vi.fn().mockResolvedValue({
+          _id: '507f1f77bcf86cd799439043',
+          ticketId: validTicketId,
+          content: 'Detailed comment content',
+          authorId: {
+            _id: validAuthorId,
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
+          createdAt: createdDate,
+        }),
       };
 
       vi.mocked(CommentModel.create).mockResolvedValue(mockDocument as any);
@@ -290,26 +381,47 @@ describe('MongoCommentRepository', () => {
         id: '507f1f77bcf86cd799439043',
         ticketId: validTicketId,
         content: 'Detailed comment content',
-        author: 'Marie Martin',
+        author: {
+          id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+          email: '',
+        },
         createdAt: createdDate,
       });
     });
 
     it('should preserve long content', async () => {
       const validTicketId = '507f1f77bcf86cd799439011';
+      const validAuthorId = '507f1f77bcf86cd799439099';
       const longContent = 'A'.repeat(1500);
       const createData = {
         ticketId: validTicketId,
         content: longContent,
-        author: 'Test User',
+        authorId: validAuthorId,
       };
 
       const mockDocument = {
         _id: '507f1f77bcf86cd799439044',
         ticketId: validTicketId,
         content: longContent,
-        author: 'Test User',
+        authorId: {
+          _id: validAuthorId,
+          firstName: 'Jean',
+          lastName: 'Martin',
+        },
         createdAt: new Date('2025-01-15T15:00:00.000Z'),
+        populate: vi.fn().mockResolvedValue({
+          _id: '507f1f77bcf86cd799439044',
+          ticketId: validTicketId,
+          content: longContent,
+          authorId: {
+            _id: validAuthorId,
+            firstName: 'Jean',
+            lastName: 'Martin',
+          },
+          createdAt: new Date('2025-01-15T15:00:00.000Z'),
+        }),
       };
 
       vi.mocked(CommentModel.create).mockResolvedValue(mockDocument as any);

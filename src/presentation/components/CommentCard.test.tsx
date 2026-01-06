@@ -8,11 +8,16 @@ describe('CommentCard', () => {
     id: '1',
     ticketId: 'ticket-1',
     content: 'Ceci est un commentaire de test',
-    author: 'Jean Martin',
+    author: {
+      id: 'user-1',
+      firstName: 'Jean',
+      lastName: 'Martin',
+      email: 'jean@example.com',
+    },
     createdAt: new Date('2025-01-15T10:30:00'),
   };
 
-  it('should render comment author', () => {
+  it('should render comment author full name', () => {
     render(<CommentCard comment={mockComment} />);
     expect(screen.getByText('Jean Martin')).toBeInTheDocument();
   });

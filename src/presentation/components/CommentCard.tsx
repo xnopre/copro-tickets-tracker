@@ -7,14 +7,16 @@ interface CommentCardProps {
 }
 
 export default function CommentCard({ comment }: CommentCardProps) {
+  const authorName = `${comment.author.firstName} ${comment.author.lastName}`;
+
   return (
     <article
       data-testid="comment-card"
-      aria-label={`Commentaire de ${comment.author} le ${formatTicketDateTime(comment.createdAt)}`}
+      aria-label={`Commentaire de ${authorName} le ${formatTicketDateTime(comment.createdAt)}`}
     >
       <Card variant="bordered" shadow="sm" padding="sm">
         <header className="mb-2 flex items-start justify-between">
-          <p className="font-semibold text-gray-900">{comment.author}</p>
+          <p className="font-semibold text-gray-900">{authorName}</p>
           <time dateTime={comment.createdAt.toISOString()} className="text-sm text-gray-500">
             {formatTicketDateTime(comment.createdAt)}
           </time>
