@@ -41,7 +41,7 @@ export const CreateCommentSchema = z
     content: z
       .string({ message: 'Le contenu est requis' })
       .refine(val => val.trim().length > 0, 'Le contenu est requis')
-      .max(5000, 'Le contenu ne doit pas dépasser 5000 caractères'),
+      .max(2000, 'Le contenu ne doit pas dépasser 2000 caractères'),
   })
   .strict();
 

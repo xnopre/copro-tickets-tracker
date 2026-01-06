@@ -186,7 +186,7 @@ describe('Comment API Routes', () => {
       expect(data.error).toBe('Données invalides');
       expect(data.details).toHaveLength(1);
       expect(data.details[0].field).toBe('content');
-      expect(data.details[0].message).toBe('Le contenu ne doit pas dépasser 5000 caractères');
+      expect(data.details[0].message).toBe('Le contenu ne doit pas dépasser 2000 caractères');
     });
 
     it('should return 400 when missing content field', async () => {
