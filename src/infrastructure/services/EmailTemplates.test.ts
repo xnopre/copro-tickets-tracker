@@ -165,7 +165,6 @@ describe('EmailTemplates', () => {
           id: 'user_123',
           firstName: 'John',
           lastName: 'Doe',
-          email: 'john@example.com',
         },
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
@@ -202,7 +201,6 @@ describe('EmailTemplates', () => {
           id: 'user_123',
           firstName: 'John',
           lastName: 'Doe',
-          email: 'john@example.com',
         },
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };

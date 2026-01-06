@@ -12,7 +12,6 @@ describe('CommentCard', () => {
       id: 'user-1',
       firstName: 'Jean',
       lastName: 'Martin',
-      email: 'jean@example.com',
     },
     createdAt: new Date('2025-01-15T10:30:00'),
   };

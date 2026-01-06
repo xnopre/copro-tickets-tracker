@@ -87,7 +87,6 @@ describe('CommentService', () => {
             id: 'user-1',
             firstName: 'Jean',
             lastName: 'Dupont',
-            email: 'jean@example.com',
           },
           createdAt: new Date('2025-01-15T10:00:00'),
         },
@@ -99,7 +98,6 @@ describe('CommentService', () => {
             id: 'user-2',
             firstName: 'Marie',
             lastName: 'Martin',
-            email: 'marie@example.com',
           },
           createdAt: new Date('2025-01-15T11:00:00'),
         },
@@ -141,7 +139,6 @@ describe('CommentService', () => {
           id: 'user-1',
           firstName: 'Jean',
           lastName: 'Dupont',
-          email: 'jean@example.com',
         },
         createdAt: new Date('2025-01-15T12:00:00'),
       };
@@ -226,7 +223,6 @@ describe('CommentService', () => {
           id: 'user-1',
           firstName: 'Jean',
           lastName: 'Dupont',
-          email: 'jean@example.com',
         },
         createdAt: new Date('2025-01-15T12:00:00'),
       };

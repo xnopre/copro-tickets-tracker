@@ -109,7 +109,6 @@ describe('MongoCommentRepository', () => {
           id: 'user-1',
           firstName: 'Jean',
           lastName: 'Martin',
-          email: '',
         },
         createdAt: mockDocuments[0].createdAt,
       });
@@ -121,7 +120,6 @@ describe('MongoCommentRepository', () => {
           id: 'user-2',
           firstName: 'Marie',
           lastName: 'Dupont',
-          email: '',
         },
         createdAt: mockDocuments[1].createdAt,
       });
@@ -288,7 +286,6 @@ describe('MongoCommentRepository', () => {
           id: validAuthorId,
           firstName: 'Jean',
           lastName: 'Martin',
-          email: '',
         },
         createdAt: mockDocument.createdAt,
       });
@@ -385,7 +382,6 @@ describe('MongoCommentRepository', () => {
           id: validAuthorId,
           firstName: 'Jean',
           lastName: 'Martin',
-          email: '',
         },
         createdAt: createdDate,
       });

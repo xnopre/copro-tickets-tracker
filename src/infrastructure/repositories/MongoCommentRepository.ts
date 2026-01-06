@@ -48,17 +48,20 @@ export class MongoCommentRepository implements ICommentRepository {
   }
 
   private mapToEntity(document: CommentDocument): Comment {
-    const authorPopulated = document.authorId as unknown as { firstName: string; lastName: string };
+    const authorPopulated = document.authorId as unknown as {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
 
     return {
       id: document._id.toString(),
       ticketId: String(document.ticketId),
       content: document.content,
       author: {
-        id: document.authorId._id.toString(),
-        firstName: String(authorPopulated.firstName),
-        lastName: String(authorPopulated.lastName),
-        email: '',
+        id: authorPopulated._id,
+        firstName: authorPopulated.firstName,
+        lastName: authorPopulated.lastName,
       },
       createdAt: document.createdAt,
     };

@@ -1,10 +1,10 @@
-import { User } from './User';
+import { UserPublic } from './User';
 
 export interface Comment {
   id: string;
   ticketId: string;
   content: string;
-  author: User;
+  author: UserPublic;
   createdAt: Date;
 }
 

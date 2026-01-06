@@ -37,7 +37,6 @@ vi.mock('./AddCommentForm', () => ({
               id: 'user-1',
               firstName: 'Test',
               lastName: 'User',
-              email: 'test@example.com',
             },
             createdAt: new Date('2025-01-15T12:00:00.000Z'),
           })
