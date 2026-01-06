@@ -3,6 +3,7 @@ import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { logger } from '@/infrastructure/services/logger';
 import { auth } from '@/auth';
+import { IdParamSchema } from '@/infrastructure/api/schemas/ticket.schemas';
 
 export async function PATCH(
   _request: NextRequest,
@@ -15,9 +16,14 @@ export async function PATCH(
 
   const { id } = await params;
 
+  const validation = IdParamSchema.safeParse({ id });
+  if (!validation.success) {
+    return NextResponse.json({ error: 'ID de ticket invalide' }, { status: 400 });
+  }
+
   try {
     const ticketService = ServiceFactory.getTicketService();
-    const ticket = await ticketService.archiveTicket(id);
+    const ticket = await ticketService.archiveTicket(validation.data.id);
 
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trouvé' }, { status: 404 });

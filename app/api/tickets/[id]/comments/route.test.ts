@@ -155,9 +155,9 @@ describe('Comment API Routes', () => {
       expect(data.content).toBe('Commentaire avec espaces');
     });
 
-    it('should return 400 when content is empty', async () => {
+    it('should return 400 when content is only whitespace', async () => {
       const request = createPostRequest(testTicketId, {
-        content: '',
+        content: '   ',
       });
 
       const response = await POST(request, {
@@ -166,12 +166,15 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le contenu du commentaire est requis');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
+      expect(data.details[0].message).toBe('Le contenu est requis');
     });
 
-    it('should return 400 when content exceeds 2000 characters', async () => {
+    it('should return 400 when content exceeds 5000 characters', async () => {
       const request = createPostRequest(testTicketId, {
-        content: 'A'.repeat(2001),
+        content: 'A'.repeat(5001),
       });
 
       const response = await POST(request, {
@@ -180,7 +183,24 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le commentaire ne doit pas dépasser 2000 caractères');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
+      expect(data.details[0].message).toBe('Le contenu ne doit pas dépasser 5000 caractères');
+    });
+
+    it('should return 400 when missing content field', async () => {
+      const request = createPostRequest(testTicketId, {});
+
+      const response = await POST(request, {
+        params: Promise.resolve({ id: testTicketId }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
     });
 
     it('should return 400 for invalid ticket ID', async () => {

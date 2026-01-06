@@ -185,10 +185,6 @@ describe('PATCH /api/tickets/[id]', () => {
     });
 
     it('should return 400 when status is invalid', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('Statut invalide')
-      );
-
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -201,7 +197,10 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'Statut invalide' });
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('status');
+      expect(data.details[0].message).toBe('Le statut est invalide');
     });
 
     it('should return 400 when assignedTo is empty string or only whitespace', async () => {
@@ -266,31 +265,7 @@ describe('PATCH /api/tickets/[id]', () => {
       });
     });
 
-    it('should return 400 when title is empty', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('Le titre est requis')
-      );
-
-      const request = new NextRequest('http://localhost/api/tickets/123', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          title: '',
-        }),
-      });
-      const params = Promise.resolve({ id: '123' });
-
-      const response = await PATCH(request, { params });
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'Le titre est requis' });
-    });
-
     it('should return 400 when title is only whitespace', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('Le titre est requis')
-      );
-
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -303,14 +278,13 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'Le titre est requis' });
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
+      expect(data.details[0].message).toBe('Le titre est requis');
     });
 
     it('should return 400 when title exceeds 200 characters', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('Le titre ne doit pas dépasser 200 caractères')
-      );
-
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -323,34 +297,13 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'Le titre ne doit pas dépasser 200 caractères' });
-    });
-
-    it('should return 400 when description is empty', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('La description est requise')
-      );
-
-      const request = new NextRequest('http://localhost/api/tickets/123', {
-        method: 'PATCH',
-        body: JSON.stringify({
-          description: '',
-        }),
-      });
-      const params = Promise.resolve({ id: '123' });
-
-      const response = await PATCH(request, { params });
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'La description est requise' });
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
+      expect(data.details[0].message).toBe('Le titre ne doit pas dépasser 200 caractères');
     });
 
     it('should return 400 when description is only whitespace', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('La description est requise')
-      );
-
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -363,14 +316,13 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'La description est requise' });
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description est requise');
     });
 
     it('should return 400 when description exceeds 5000 characters', async () => {
-      vi.mocked(mockTicketService.updateTicket).mockRejectedValue(
-        new ValidationError('La description ne doit pas dépasser 5000 caractères')
-      );
-
       const request = new NextRequest('http://localhost/api/tickets/123', {
         method: 'PATCH',
         body: JSON.stringify({
@@ -383,7 +335,10 @@ describe('PATCH /api/tickets/[id]', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data).toEqual({ error: 'La description ne doit pas dépasser 5000 caractères' });
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description ne doit pas dépasser 5000 caractères');
     });
   });
 

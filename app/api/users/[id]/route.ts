@@ -4,6 +4,7 @@ import connectDB from '@/infrastructure/database/mongodb';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { logger } from '@/infrastructure/services/logger';
 import { auth } from '@/auth';
+import { IdParamSchema } from '@/infrastructure/api/schemas/ticket.schemas';
 
 /**
  * GET /api/users/[id]
@@ -17,8 +18,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   try {
     await connectDB();
     const { id } = await params;
+
+    const validation = IdParamSchema.safeParse({ id });
+    if (!validation.success) {
+      return NextResponse.json({ error: 'ID utilisateur invalide' }, { status: 400 });
+    }
+
     const userService = ServiceFactory.getUserService();
-    const user = await userService.getUserById(id);
+    const user = await userService.getUserById(validation.data.id);
 
     if (!user) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
