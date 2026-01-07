@@ -35,8 +35,9 @@ describe('PATCH /api/tickets/[id]/archive', () => {
   });
 
   it('should archive a ticket successfully', async () => {
+    const validId = '507f1f77bcf86cd799439016';
     const mockTicket = {
-      id: '123',
+      id: validId,
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
@@ -48,10 +49,10 @@ describe('PATCH /api/tickets/[id]/archive', () => {
 
     vi.mocked(mockTicketService.archiveTicket).mockResolvedValue(mockTicket);
 
-    const request = new NextRequest('http://localhost/api/tickets/123/archive', {
+    const request = new NextRequest(`http://localhost/api/tickets/${validId}/archive`, {
       method: 'PATCH',
     });
-    const params = Promise.resolve({ id: '123' });
+    const params = Promise.resolve({ id: validId });
 
     const response = await PATCH(request, { params });
     const data = await response.json();
@@ -62,28 +63,27 @@ describe('PATCH /api/tickets/[id]/archive', () => {
       createdAt: mockTicket.createdAt.toISOString(),
       updatedAt: mockTicket.updatedAt.toISOString(),
     });
-    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith('123');
+    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith(validId);
   });
 
   it('should return 404 when ticket not found', async () => {
+    const validId = '507f191e810c19729de860ea';
     vi.mocked(mockTicketService.archiveTicket).mockResolvedValue(null);
 
-    const request = new NextRequest('http://localhost/api/tickets/999/archive', {
+    const request = new NextRequest(`http://localhost/api/tickets/${validId}/archive`, {
       method: 'PATCH',
     });
-    const params = Promise.resolve({ id: '999' });
+    const params = Promise.resolve({ id: validId });
 
     const response = await PATCH(request, { params });
     const data = await response.json();
 
     expect(response.status).toBe(404);
     expect(data).toEqual({ error: 'Ticket non trouvé' });
-    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith('999');
+    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith(validId);
   });
 
   it('should return 400 for invalid ObjectId format', async () => {
-    vi.mocked(mockTicketService.archiveTicket).mockRejectedValue(new InvalidIdError('invalid-id'));
-
     const request = new NextRequest('http://localhost/api/tickets/invalid-id/archive', {
       method: 'PATCH',
     });
@@ -93,23 +93,24 @@ describe('PATCH /api/tickets/[id]/archive', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data).toEqual({ error: 'ID invalide' });
-    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith('invalid-id');
+    expect(data).toEqual({ error: 'ID de ticket invalide' });
+    expect(mockTicketService.archiveTicket).not.toHaveBeenCalled();
   });
 
   it('should return 500 for server errors', async () => {
+    const validId = '507f1f77bcf86cd799439016';
     vi.mocked(mockTicketService.archiveTicket).mockRejectedValue(new Error('Database error'));
 
-    const request = new NextRequest('http://localhost/api/tickets/123/archive', {
+    const request = new NextRequest(`http://localhost/api/tickets/${validId}/archive`, {
       method: 'PATCH',
     });
-    const params = Promise.resolve({ id: '123' });
+    const params = Promise.resolve({ id: validId });
 
     const response = await PATCH(request, { params });
     const data = await response.json();
 
     expect(response.status).toBe(500);
     expect(data).toEqual({ error: "Erreur lors de l'archivage du ticket" });
-    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith('123');
+    expect(mockTicketService.archiveTicket).toHaveBeenCalledWith(validId);
   });
 });

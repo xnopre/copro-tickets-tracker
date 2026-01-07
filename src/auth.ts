@@ -1,8 +1,14 @@
 import { type NextAuthOptions, getServerSession } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { z } from 'zod';
 import { ServiceFactory } from './application/services/ServiceFactory';
 import connectDB from './infrastructure/database/mongodb';
 import { logger } from '@/infrastructure/services/logger';
+
+const credentialsSchema = z.object({
+  email: z.string().email('Format email invalide'),
+  password: z.string().min(1, 'Le mot de passe est requis'),
+});
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,7 +19,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        const validation = credentialsSchema.safeParse(credentials);
+        if (!validation.success) {
+          logger.warn('Invalid credentials format', {
+            errors: validation.error.issues.map(issue => ({
+              field: issue.path.join('.'),
+              message: issue.message,
+            })),
+          });
           return null;
         }
 
@@ -21,8 +34,8 @@ export const authOptions: NextAuthOptions = {
           await connectDB();
           const authService = ServiceFactory.getAuthService();
           const user = await authService.validateCredentials(
-            credentials.email as string,
-            credentials.password as string
+            validation.data.email,
+            validation.data.password
           );
 
           if (!user) {

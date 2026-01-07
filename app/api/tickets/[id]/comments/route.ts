@@ -4,7 +4,10 @@ import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
 import { logger } from '@/infrastructure/services/logger';
 import { auth } from '@/auth';
-import { CreateCommentSchema } from '@/infrastructure/api/schemas/ticket.schemas';
+import {
+  IdParamSchema,
+  AddCommentRequestSchema,
+} from '@/infrastructure/api/schemas/ticket.schemas';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -14,9 +17,24 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
   const { id } = await params;
 
+  const idValidation = IdParamSchema.safeParse({ id });
+  if (!idValidation.success) {
+    const details = idValidation.error.issues.map(issue => ({
+      field: issue.path.join('.'),
+      message: issue.message,
+    }));
+    return NextResponse.json(
+      {
+        error: 'Données invalides',
+        details,
+      },
+      { status: 400 }
+    );
+  }
+
   try {
     const commentService = ServiceFactory.getCommentService();
-    const comments = await commentService.getCommentsByTicketId(id);
+    const comments = await commentService.getCommentsByTicketId(idValidation.data.id);
 
     return NextResponse.json(comments);
   } catch (error) {
@@ -44,7 +62,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   try {
     const body = await request.json();
 
-    const validation = CreateCommentSchema.safeParse(body);
+    const validation = AddCommentRequestSchema.safeParse({ id, ...body });
     if (!validation.success) {
       const details = validation.error.issues.map(issue => ({
         field: issue.path.join('.'),
@@ -61,7 +79,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const commentService = ServiceFactory.getCommentService();
     const comment = await commentService.addComment({
-      ticketId: id,
+      ticketId: validation.data.id,
       content: validation.data.content,
       authorId: session.user.id,
     });

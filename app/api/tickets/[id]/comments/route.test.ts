@@ -101,7 +101,10 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('ID de ticket invalide');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toBeDefined();
+      expect(data.details[0].field).toBe('id');
+      expect(data.details[0].message).toContain('ObjectId');
     });
   });
 
@@ -172,9 +175,9 @@ describe('Comment API Routes', () => {
       expect(data.details[0].message).toBe('Le contenu est requis');
     });
 
-    it('should return 400 when content exceeds 5000 characters', async () => {
+    it('should return 400 when content exceeds 2000 characters', async () => {
       const request = createPostRequest(testTicketId, {
-        content: 'A'.repeat(5001),
+        content: 'A'.repeat(2001),
       });
 
       const response = await POST(request, {
@@ -214,7 +217,10 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('ID de ticket invalide');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toBeDefined();
+      expect(data.details[0].field).toBe('id');
+      expect(data.details[0].message).toContain('ObjectId');
     });
 
     it('should return 401 when not authenticated', async () => {
