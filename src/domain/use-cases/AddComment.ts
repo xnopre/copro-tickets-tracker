@@ -18,12 +18,12 @@ export class AddComment {
   ) {}
 
   async execute(data: CreateCommentData): Promise<Comment> {
-    this.validateData(data);
+    await this.validateData(data);
 
     const comment = await this.commentRepository.create({
       ticketId: data.ticketId,
       content: data.content.trim(),
-      author: data.author.trim(),
+      authorId: data.authorId,
     });
 
     await this.notifyCommentAdded(comment);
@@ -63,12 +63,12 @@ export class AddComment {
     }
   }
 
-  private validateData(data: CreateCommentData): void {
-    if (!data.ticketId || typeof data.ticketId !== 'string') {
+  private async validateData(data: CreateCommentData): Promise<void> {
+    if (!data.ticketId) {
       throw new ValidationError("L'ID du ticket est requis");
     }
 
-    if (!data.content || typeof data.content !== 'string' || data.content.trim().length === 0) {
+    if (!data.content || data.content.trim().length === 0) {
       throw new ValidationError('Le contenu du commentaire est requis');
     }
 
@@ -76,12 +76,12 @@ export class AddComment {
       throw new ValidationError('Le commentaire ne doit pas dépasser 2000 caractères');
     }
 
-    if (!data.author || typeof data.author !== 'string' || data.author.trim().length === 0) {
-      throw new ValidationError("L'auteur du commentaire est requis");
+    if (!data.authorId) {
+      throw new ValidationError("L'ID de l'auteur est requis");
     }
-
-    if (data.author.trim().length > 100) {
-      throw new ValidationError("L'auteur ne doit pas dépasser 100 caractères");
+    const user = await this.userRepository.findById(data.authorId);
+    if (!user) {
+      throw new ValidationError("L'utilisateur spécifié n'existe pas");
     }
   }
 }

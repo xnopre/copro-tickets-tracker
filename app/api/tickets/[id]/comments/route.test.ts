@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server';
 import { GET, POST } from './route';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { CommentModel } from '@/infrastructure/database/schemas/CommentSchema';
+import UserModel from '@/infrastructure/database/schemas/UserSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { useTestDB } from '../../../../../tests/helpers/useTestDB';
 
@@ -18,9 +19,19 @@ describe('Comment API Routes', () => {
   useTestDB();
 
   let testTicketId: string;
+  let testUserId: string;
 
   beforeEach(async () => {
-    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
+    const user = await UserModel.create({
+      firstName: 'Jean',
+      lastName: 'Martin',
+      email: 'jean@example.com',
+      password: 'password123',
+    });
+    testUserId = user._id.toString();
+    mockAuth.mockResolvedValue({
+      user: { id: testUserId, email: 'jean@example.com', firstName: 'Jean', lastName: 'Martin' },
+    } as any);
     const ticket = await TicketModel.create({
       title: 'Test Ticket',
       description: 'Test Description',
@@ -36,16 +47,23 @@ describe('Comment API Routes', () => {
       });
     };
 
-    it('should get all comments for a ticket', async () => {
+    it('should get all comments for a ticket with populated author', async () => {
+      const user2 = await UserModel.create({
+        firstName: 'Marie',
+        lastName: 'Dubois',
+        email: 'marie@example.com',
+        password: 'password123',
+      });
+
       await CommentModel.create({
         ticketId: testTicketId,
         content: 'Premier commentaire',
-        author: 'Jean Martin',
+        authorId: testUserId,
       });
       await CommentModel.create({
         ticketId: testTicketId,
         content: 'Deuxième commentaire',
-        author: 'Marie Dubois',
+        authorId: user2._id,
       });
 
       const request = createGetRequest(testTicketId);
@@ -57,9 +75,11 @@ describe('Comment API Routes', () => {
       expect(response.status).toBe(200);
       expect(data).toHaveLength(2);
       expect(data[0].content).toBe('Premier commentaire');
-      expect(data[0].author).toBe('Jean Martin');
+      expect(data[0].author.firstName).toBe('Jean');
+      expect(data[0].author.lastName).toBe('Martin');
       expect(data[1].content).toBe('Deuxième commentaire');
-      expect(data[1].author).toBe('Marie Dubois');
+      expect(data[1].author.firstName).toBe('Marie');
+      expect(data[1].author.lastName).toBe('Dubois');
     });
 
     it('should return empty array when no comments', async () => {
@@ -81,7 +101,10 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('ID de ticket invalide');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toBeDefined();
+      expect(data.details[0].field).toBe('id');
+      expect(data.details[0].message).toContain('ObjectId');
     });
   });
 
@@ -96,10 +119,9 @@ describe('Comment API Routes', () => {
       });
     };
 
-    it('should create a comment successfully', async () => {
+    it('should create a comment successfully with authorId from session', async () => {
       const request = createPostRequest(testTicketId, {
         content: 'Nouveau commentaire',
-        author: 'Jean Martin',
       });
 
       const response = await POST(request, {
@@ -111,18 +133,20 @@ describe('Comment API Routes', () => {
       expect(data.id).toBeDefined();
       expect(data.ticketId).toBe(testTicketId);
       expect(data.content).toBe('Nouveau commentaire');
-      expect(data.author).toBe('Jean Martin');
+      expect(data.author).toBeDefined();
+      expect(data.author.firstName).toBe('Jean');
+      expect(data.author.lastName).toBe('Martin');
       expect(data.createdAt).toBeDefined();
 
       const commentsInDb = await CommentModel.find({ ticketId: testTicketId });
       expect(commentsInDb).toHaveLength(1);
       expect(commentsInDb[0].content).toBe('Nouveau commentaire');
+      expect(commentsInDb[0].authorId.toString()).toBe(testUserId);
     });
 
-    it('should trim content and author', async () => {
+    it('should trim content', async () => {
       const request = createPostRequest(testTicketId, {
         content: '  Commentaire avec espaces  ',
-        author: '  Jean Martin  ',
       });
 
       const response = await POST(request, {
@@ -132,13 +156,11 @@ describe('Comment API Routes', () => {
 
       expect(response.status).toBe(201);
       expect(data.content).toBe('Commentaire avec espaces');
-      expect(data.author).toBe('Jean Martin');
     });
 
-    it('should return 400 when content is empty', async () => {
+    it('should return 400 when content is only whitespace', async () => {
       const request = createPostRequest(testTicketId, {
-        content: '',
-        author: 'Jean Martin',
+        content: '   ',
       });
 
       const response = await POST(request, {
@@ -147,28 +169,15 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le contenu du commentaire est requis');
-    });
-
-    it('should return 400 when author is empty', async () => {
-      const request = createPostRequest(testTicketId, {
-        content: 'Test comment',
-        author: '',
-      });
-
-      const response = await POST(request, {
-        params: Promise.resolve({ id: testTicketId }),
-      });
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data.error).toBe("L'auteur du commentaire est requis");
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
+      expect(data.details[0].message).toBe('Le contenu est requis');
     });
 
     it('should return 400 when content exceeds 2000 characters', async () => {
       const request = createPostRequest(testTicketId, {
         content: 'A'.repeat(2001),
-        author: 'Jean Martin',
       });
 
       const response = await POST(request, {
@@ -177,14 +186,14 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le commentaire ne doit pas dépasser 2000 caractères');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
+      expect(data.details[0].message).toBe('Le contenu ne doit pas dépasser 2000 caractères');
     });
 
-    it('should return 400 when author exceeds 100 characters', async () => {
-      const request = createPostRequest(testTicketId, {
-        content: 'Test comment',
-        author: 'A'.repeat(101),
-      });
+    it('should return 400 when missing content field', async () => {
+      const request = createPostRequest(testTicketId, {});
 
       const response = await POST(request, {
         params: Promise.resolve({ id: testTicketId }),
@@ -192,13 +201,14 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe("L'auteur ne doit pas dépasser 100 caractères");
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('content');
     });
 
     it('should return 400 for invalid ticket ID', async () => {
       const request = createPostRequest('invalid-id', {
         content: 'Test comment',
-        author: 'Jean Martin',
       });
 
       const response = await POST(request, {
@@ -207,7 +217,26 @@ describe('Comment API Routes', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('ID de ticket invalide');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toBeDefined();
+      expect(data.details[0].field).toBe('id');
+      expect(data.details[0].message).toContain('ObjectId');
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      mockAuth.mockResolvedValueOnce(null);
+
+      const request = createPostRequest(testTicketId, {
+        content: 'Test comment',
+      });
+
+      const response = await POST(request, {
+        params: Promise.resolve({ id: testTicketId }),
+      });
+      const data = await response.json();
+
+      expect(response.status).toBe(401);
+      expect(data.error).toBe('Unauthorized');
     });
   });
 });

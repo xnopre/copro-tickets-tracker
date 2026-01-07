@@ -109,10 +109,12 @@ Voir le ticket : ${ticketUrl}
     const subject = `[${this.APP_NAME}] Nouveau commentaire : ${ticket.title}`;
     const ticketUrl = `${this.APP_URL}/tickets/${ticket.id}`;
 
+    const authorName = `${comment.author.firstName} ${comment.author.lastName}`;
+
     const htmlContent = `
       <h2>Nouveau commentaire sur le ticket</h2>
       <p><strong>Ticket :</strong> ${this.escapeHtml(ticket.title)}</p>
-      <p><strong>Auteur :</strong> ${this.escapeHtml(comment.author)}</p>
+      <p><strong>Auteur :</strong> ${this.escapeHtml(authorName)}</p>
       <p><strong>Commentaire :</strong></p>
       <p>${this.escapeHtml(comment.content)}</p>
       <p><a href="${ticketUrl}">Voir le ticket</a></p>
@@ -122,7 +124,7 @@ Voir le ticket : ${ticketUrl}
 Nouveau commentaire sur le ticket
 
 Ticket : ${ticket.title}
-Auteur : ${comment.author}
+Auteur : ${authorName}
 Commentaire : ${comment.content}
 
 Voir le ticket : ${ticketUrl}

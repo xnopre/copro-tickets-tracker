@@ -101,7 +101,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le titre est requis');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
+      expect(data.details[0].message).toBe('Le titre est requis');
 
       const ticketsInDb = await TicketModel.find();
       expect(ticketsInDb).toHaveLength(0);
@@ -114,17 +117,9 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le titre est requis');
-    });
-
-    it('should return 400 when title is empty string', async () => {
-      const request = createRequest({ title: '', description: 'Test description' });
-
-      const response = await POST(request);
-      const data = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(data.error).toBe('Le titre est requis');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
     });
 
     it('should return 400 when title is only whitespace', async () => {
@@ -134,7 +129,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le titre est requis');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
+      expect(data.details[0].message).toBe('Le titre est requis');
     });
 
     it('should return 400 when title exceeds 200 characters', async () => {
@@ -145,7 +143,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('Le titre ne doit pas dépasser 200 caractères');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('title');
+      expect(data.details[0].message).toBe('Le titre ne doit pas dépasser 200 caractères');
 
       const ticketsInDb = await TicketModel.find();
       expect(ticketsInDb).toHaveLength(0);
@@ -160,7 +161,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('La description est requise');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description est requise');
 
       const ticketsInDb = await TicketModel.find();
       expect(ticketsInDb).toHaveLength(0);
@@ -173,7 +177,9 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('La description est requise');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
     });
 
     it('should return 400 when description is empty string', async () => {
@@ -183,7 +189,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('La description est requise');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description est requise');
     });
 
     it('should return 400 when description is only whitespace', async () => {
@@ -193,7 +202,10 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('La description est requise');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description est requise');
     });
 
     it('should return 400 when description exceeds 5000 characters', async () => {
@@ -204,10 +216,24 @@ describe('POST /api/tickets', () => {
       const data = await response.json();
 
       expect(response.status).toBe(400);
-      expect(data.error).toBe('La description ne doit pas dépasser 5000 caractères');
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(1);
+      expect(data.details[0].field).toBe('description');
+      expect(data.details[0].message).toBe('La description ne doit pas dépasser 5000 caractères');
 
       const ticketsInDb = await TicketModel.find();
       expect(ticketsInDb).toHaveLength(0);
+    });
+
+    it('should return 400 when both title and description are invalid', async () => {
+      const request = createRequest({ title: '', description: '' });
+
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe('Données invalides');
+      expect(data.details).toHaveLength(2);
     });
   });
 });

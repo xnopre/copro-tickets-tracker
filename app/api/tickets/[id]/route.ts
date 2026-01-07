@@ -4,6 +4,7 @@ import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
 import { logger } from '@/infrastructure/services/logger';
 import { auth } from '@/auth';
+import { IdParamSchema, UpdateTicketSchema } from '@/infrastructure/api/schemas/ticket.schemas';
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
@@ -13,9 +14,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
   const { id } = await params;
 
+  const validation = IdParamSchema.safeParse({ id });
+  if (!validation.success) {
+    return NextResponse.json({ error: 'ID de ticket invalide' }, { status: 400 });
+  }
+
   try {
     const ticketService = ServiceFactory.getTicketService();
-    const ticket = await ticketService.getTicketById(id);
+    const ticket = await ticketService.getTicketById(validation.data.id);
 
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trouvé' }, { status: 404 });
@@ -44,17 +50,31 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   const { id } = await params;
 
+  const idValidation = IdParamSchema.safeParse({ id });
+  if (!idValidation.success) {
+    return NextResponse.json({ error: 'ID de ticket invalide' }, { status: 400 });
+  }
+
   try {
     const body = await request.json();
-    const { title, description, status, assignedTo } = body;
+
+    const validation = UpdateTicketSchema.safeParse(body);
+    if (!validation.success) {
+      const details = validation.error.issues.map(issue => ({
+        field: issue.path.join('.'),
+        message: issue.message,
+      }));
+      return NextResponse.json(
+        {
+          error: 'Données invalides',
+          details,
+        },
+        { status: 400 }
+      );
+    }
 
     const ticketService = ServiceFactory.getTicketService();
-    const ticket = await ticketService.updateTicket(id, {
-      title,
-      description,
-      status,
-      assignedTo,
-    });
+    const ticket = await ticketService.updateTicket(idValidation.data.id, validation.data);
 
     if (!ticket) {
       return NextResponse.json({ error: 'Ticket non trouvé' }, { status: 404 });

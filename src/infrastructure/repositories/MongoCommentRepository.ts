@@ -14,9 +14,11 @@ export class MongoCommentRepository implements ICommentRepository {
       throw new InvalidIdError(ticketId);
     }
 
-    const documents = await CommentModel.find({ ticketId }).sort({
-      createdAt: 1,
-    });
+    const documents = await CommentModel.find({ ticketId })
+      .populate('authorId', 'firstName lastName')
+      .sort({
+        createdAt: 1,
+      });
 
     return documents.map(doc => this.mapToEntity(doc));
   }
@@ -29,21 +31,38 @@ export class MongoCommentRepository implements ICommentRepository {
       throw new InvalidIdError(data.ticketId);
     }
 
+    // Valider que authorId est un ObjectId valide
+    if (!Types.ObjectId.isValid(data.authorId)) {
+      throw new InvalidIdError(data.authorId);
+    }
+
     const document = await CommentModel.create({
       ticketId: data.ticketId,
       content: data.content,
-      author: data.author,
+      authorId: data.authorId,
     });
+
+    await document.populate('authorId', 'firstName lastName');
 
     return this.mapToEntity(document);
   }
 
   private mapToEntity(document: CommentDocument): Comment {
+    const authorPopulated = document.authorId as unknown as {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
+
     return {
       id: document._id.toString(),
-      ticketId: document.ticketId,
+      ticketId: String(document.ticketId),
       content: document.content,
-      author: document.author,
+      author: {
+        id: authorPopulated._id,
+        firstName: authorPopulated.firstName,
+        lastName: authorPopulated.lastName,
+      },
       createdAt: document.createdAt,
     };
   }

@@ -23,8 +23,9 @@ describe('GET /api/users/[id]', () => {
   });
 
   it('should return user when found', async () => {
+    const validId = '507f1f77bcf86cd799439016';
     const mockUser: UserPublic = {
-      id: '1',
+      id: validId,
       firstName: 'Jean',
       lastName: 'Dupont',
     };
@@ -36,19 +37,20 @@ describe('GET /api/users/[id]', () => {
 
     vi.mocked(ServiceFactory.getUserService).mockReturnValue(mockUserService as any);
 
-    const mockRequest = new Request('http://localhost/api/users/1');
-    const mockParams = Promise.resolve({ id: '1' });
+    const mockRequest = new Request(`http://localhost/api/users/${validId}`);
+    const mockParams = Promise.resolve({ id: validId });
 
     const response = await GET(mockRequest, { params: mockParams });
     const data = await response.json();
 
     expect(connectDB).toHaveBeenCalledOnce();
-    expect(mockUserService.getUserById).toHaveBeenCalledWith('1');
+    expect(mockUserService.getUserById).toHaveBeenCalledWith(validId);
     expect(response.status).toBe(200);
     expect(data).toEqual(mockUser);
   });
 
   it('should return 404 when user not found', async () => {
+    const validId = '507f191e810c19729de860ea';
     const mockUserService = {
       getUsers: vi.fn(),
       getUserById: vi.fn().mockResolvedValue(null),
@@ -56,8 +58,8 @@ describe('GET /api/users/[id]', () => {
 
     vi.mocked(ServiceFactory.getUserService).mockReturnValue(mockUserService as any);
 
-    const mockRequest = new Request('http://localhost/api/users/999');
-    const mockParams = Promise.resolve({ id: '999' });
+    const mockRequest = new Request(`http://localhost/api/users/${validId}`);
+    const mockParams = Promise.resolve({ id: validId });
 
     const response = await GET(mockRequest, { params: mockParams });
     const data = await response.json();
@@ -67,13 +69,6 @@ describe('GET /api/users/[id]', () => {
   });
 
   it('should return 400 on invalid ID', async () => {
-    const mockUserService = {
-      getUsers: vi.fn(),
-      getUserById: vi.fn().mockRejectedValue(new InvalidIdError('invalid-id')),
-    };
-
-    vi.mocked(ServiceFactory.getUserService).mockReturnValue(mockUserService as any);
-
     const mockRequest = new Request('http://localhost/api/users/invalid-id');
     const mockParams = Promise.resolve({ id: 'invalid-id' });
 
@@ -81,10 +76,11 @@ describe('GET /api/users/[id]', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toContain('invalid-id');
+    expect(data.error).toBe('ID utilisateur invalide');
   });
 
   it('should return 500 on server error', async () => {
+    const validId = '507f1f77bcf86cd799439016';
     const mockUserService = {
       getUsers: vi.fn(),
       getUserById: vi.fn().mockRejectedValue(new Error('Database error')),
@@ -92,8 +88,8 @@ describe('GET /api/users/[id]', () => {
 
     vi.mocked(ServiceFactory.getUserService).mockReturnValue(mockUserService as any);
 
-    const mockRequest = new Request('http://localhost/api/users/1');
-    const mockParams = Promise.resolve({ id: '1' });
+    const mockRequest = new Request(`http://localhost/api/users/${validId}`);
+    const mockParams = Promise.resolve({ id: validId });
 
     const response = await GET(mockRequest, { params: mockParams });
     const data = await response.json();

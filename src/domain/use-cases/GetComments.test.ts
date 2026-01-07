@@ -14,14 +14,24 @@ describe('GetComments', () => {
         id: '1',
         ticketId: 'ticket-1',
         content: 'Premier commentaire',
-        author: 'Jean Martin',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Martin',
+          email: 'jean@example.com',
+        },
         createdAt: new Date('2025-01-15T10:00:00'),
       },
       {
         id: '2',
         ticketId: 'ticket-1',
         content: 'Deuxième commentaire',
-        author: 'Marie Dubois',
+        author: {
+          id: 'user-2',
+          firstName: 'Marie',
+          lastName: 'Dubois',
+          email: 'marie@example.com',
+        },
         createdAt: new Date('2025-01-15T11:00:00'),
       },
     ];

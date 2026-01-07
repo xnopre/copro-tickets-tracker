@@ -1910,42 +1910,42 @@ app/layout.tsx (+ import Header, + <Header /> dans le layout)
 
 ### Tâches
 
-- [ ] Modifier l'entité Domain `Comment`
-  - [ ] Changer `author: string` en `authorId: string` (ObjectId de User)
-  - [ ] Ajouter interface `CommentWithAuthor` avec `author: User` (pour l'affichage)
-- [ ] Mettre à jour le schéma Mongoose `CommentSchema`
-  - [ ] Changer `author: string` en `authorId: { type: ObjectId, ref: 'User' }`
-  - [ ] Ajouter populate() dans les requêtes pour récupérer les données de l'utilisateur
-- [ ] Modifier l'entité Domain `AddCommentData`
-  - [ ] Supprimer le champ `author: string`
-  - [ ] Remplacer par `authorId: string` (venant de la session)
-- [ ] Modifier l'API route `POST /api/tickets/[id]/comments`
-  - [ ] Récupérer l'utilisateur connecté via la session
-  - [ ] Valider que l'utilisateur est authentifié
-  - [ ] Passer `authorId` au lieu de `author` au use case
-- [ ] Modifier le use case `AddComment`
-  - [ ] Accepter `authorId` au lieu de `author`
-  - [ ] Valider que `authorId` correspond à un utilisateur valide
-- [ ] Modifier le composant `AddCommentForm`
-  - [ ] Supprimer le champ input pour le nom de l'auteur
-  - [ ] Afficher un message "Vous commentez en tant que [Prénom Nom]"
-  - [ ] Garder juste le champ textarea pour le contenu
-  - [ ] Ajouter la session utilisateur via hook (ex: `useSession()`)
-- [ ] Modifier le composant `CommentCard`
-  - [ ] Afficher `author.firstName author.lastName` (au lieu de juste `author`)
-- [ ] Modifier l'API route `GET /api/tickets/[id]/comments`
-  - [ ] S'assurer que le populate('authorId') retourne les données User
-- [ ] Mettre à jour le use case `GetComments`
-  - [ ] Retourner les commentaires avec les données de l'utilisateur
-- [ ] Mettre à jour tous les tests
-  - [ ] Tests use case AddComment avec `authorId`
-  - [ ] Tests composant AddCommentForm sans champ auteur
-  - [ ] Tests composant CommentCard avec affichage du nom complet
-  - [ ] Tests API routes
-  - [ ] Tous les mocks de commentaires avec `authorId`
-- [ ] Mise à jour du composant `TicketComments`
-  - [ ] Passer la session utilisateur aux composants enfants
-- [ ] Type-check et build
+- [x] Modifier l'entité Domain `Comment`
+  - [x] Changer `author: string` en `authorId: string` (ObjectId de User)
+  - [x] Ajouter interface `CommentWithAuthor` avec `author: User` (pour l'affichage)
+- [x] Mettre à jour le schéma Mongoose `CommentSchema`
+  - [x] Changer `author: string` en `authorId: { type: ObjectId, ref: 'User' }`
+  - [x] Ajouter populate() dans les requêtes pour récupérer les données de l'utilisateur
+- [x] Modifier l'entité Domain `AddCommentData`
+  - [x] Supprimer le champ `author: string`
+  - [x] Remplacer par `authorId: string` (venant de la session)
+- [x] Modifier l'API route `POST /api/tickets/[id]/comments`
+  - [x] Récupérer l'utilisateur connecté via la session
+  - [x] Valider que l'utilisateur est authentifié
+  - [x] Passer `authorId` au lieu de `author` au use case
+- [x] Modifier le use case `AddComment`
+  - [x] Accepter `authorId` au lieu de `author`
+  - [x] Valider que `authorId` correspond à un utilisateur valide
+- [x] Modifier le composant `AddCommentForm`
+  - [x] Supprimer le champ input pour le nom de l'auteur
+  - [x] Afficher un message "Vous commentez en tant que [Prénom Nom]"
+  - [x] Garder juste le champ textarea pour le contenu
+  - [x] Ajouter la session utilisateur via hook (ex: `useSession()`)
+- [x] Modifier le composant `CommentCard`
+  - [x] Afficher `author.firstName author.lastName` (au lieu de juste `author`)
+- [x] Modifier l'API route `GET /api/tickets/[id]/comments`
+  - [x] S'assurer que le populate('authorId') retourne les données User
+- [x] Mettre à jour le use case `GetComments`
+  - [x] Retourner les commentaires avec les données de l'utilisateur
+- [x] Mettre à jour tous les tests
+  - [x] Tests use case AddComment avec `authorId`
+  - [x] Tests composant AddCommentForm sans champ auteur
+  - [x] Tests composant CommentCard avec affichage du nom complet
+  - [x] Tests API routes
+  - [x] Tous les mocks de commentaires avec `authorId`
+- [x] Mise à jour du composant `TicketComments`
+  - [x] Passer la session utilisateur aux composants enfants
+- [x] Type-check et build
 - [ ] Déployer
 
 ### Validation
@@ -1956,8 +1956,10 @@ app/layout.tsx (+ import Header, + <Header /> dans le layout)
 - ✅ Le nom complet de l'auteur s'affiche dans les commentaires (Prénom Nom)
 - ✅ L'API est protégée (erreur si non authentifié)
 - ✅ Architecture hexagonale respectée
-- ✅ Tous les tests passent
-- ✅ Type-check et build réussis
+- ✅ Tous les tests passent (595/595 tests)
+- ✅ Type-check sans erreur
+- ✅ Lint sans erreur
+- ✅ Build Next.js réussi
 - ⏳ Déployé en production (en attente)
 
 ### Notes techniques
@@ -2028,6 +2030,29 @@ src/presentation/components/CommentCard.tsx (affichage firstName + lastName)
 - Tests des API routes : vérifier que le populate marche
 
 **Tests** : +10-15 nouveaux tests pour couvrir la nouvelle logique avec utilisateurs
+
+**Fichiers créés** : Aucun
+
+**Fichiers modifiés** (10 fichiers) :
+
+- `src/domain/entities/Comment.ts` (+ authorId, interface CommentWithAuthor)
+- `src/infrastructure/database/schemas/CommentSchema.ts` (authorId ObjectId ref)
+- `src/domain/use-cases/AddComment.ts` (validation authorId)
+- `src/infrastructure/repositories/MongoCommentRepository.ts` (populate + mapToEntity)
+- `app/api/tickets/[id]/comments/route.ts` (récupération authorId de session)
+- `src/presentation/components/AddCommentForm.tsx` (suppression champ auteur)
+- `src/presentation/components/CommentCard.tsx` (affichage firstName + lastName)
+- `src/presentation/components/AddCommentForm.test.tsx` (mock useSession)
+- `app/api/tickets/[id]/comments/route.test.ts` (création utilisateur test)
+- `src/infrastructure/database/schemas/CommentSchema.test.ts` (authorId ObjectId)
+
+**Résultats des tests** :
+
+- ✅ 595 tests passent (595/595)
+- ✅ 62 suites de tests
+- ✅ Type-check : 0 erreur
+- ✅ Lint : 0 erreur
+- ✅ Build Next.js : réussi
 
 ---
 

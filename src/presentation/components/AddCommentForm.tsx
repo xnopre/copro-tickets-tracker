@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Comment } from '@/domain/entities/Comment';
 import Button from '@/presentation/components/ui/Button';
-import Input from '@/presentation/components/ui/Input';
 import Textarea from '@/presentation/components/ui/Textarea';
 import Alert from '@/presentation/components/ui/Alert';
 import Card from '@/presentation/components/ui/Card';
@@ -15,7 +14,6 @@ interface AddCommentFormProps {
 
 export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentFormProps) {
   const [content, setContent] = useState('');
-  const [author, setAuthor] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -41,11 +39,6 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
       return;
     }
 
-    if (!author.trim()) {
-      setError("L'auteur du commentaire est requis");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
@@ -54,7 +47,7 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content, author }),
+        body: JSON.stringify({ content }),
       });
 
       const data = await response.json();
@@ -71,7 +64,6 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
 
       setSuccess(true);
       setContent('');
-      setAuthor('');
 
       // Ajouter le commentaire immédiatement (pas de race condition)
       onCommentAdded(comment);
@@ -86,19 +78,6 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
     <Card variant="bordered" shadow="sm">
       <h3 className="mb-4 text-lg font-semibold text-gray-900">Ajouter un commentaire</h3>
       <form onSubmit={handleSubmit} aria-label="Formulaire d'ajout de commentaire">
-        <div className="mb-4">
-          <Input
-            type="text"
-            id="author"
-            label="Votre nom"
-            value={author}
-            onChange={e => setAuthor(e.target.value)}
-            disabled={isSubmitting}
-            required
-            autoComplete="name"
-          />
-        </div>
-
         <div className="mb-4">
           <Textarea
             id="content"

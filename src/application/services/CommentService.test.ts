@@ -7,6 +7,7 @@ import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
+import { User } from '@/domain/entities/User';
 
 describe('CommentService', () => {
   let mockRepository: ICommentRepository;
@@ -16,6 +17,13 @@ describe('CommentService', () => {
   let mockEmailTemplateService: IEmailTemplateService;
   let mockLogger: ILogger;
   let commentService: CommentService;
+
+  const mockUser1: User = {
+    id: 'user-1',
+    firstName: 'Jean',
+    lastName: 'Martin',
+    email: 'jean@example.com',
+  };
 
   beforeEach(() => {
     mockRepository = {
@@ -31,7 +39,10 @@ describe('CommentService', () => {
     };
     mockUserRepository = {
       findAll: vi.fn().mockResolvedValue([]),
-      findById: vi.fn().mockResolvedValue(null),
+      findById: vi.fn((id: string) => {
+        const user = id === 'user-1' ? mockUser1 : null;
+        return Promise.resolve(user);
+      }),
       findByEmail: vi.fn().mockResolvedValue(null),
     };
     mockEmailService = {
@@ -83,14 +94,22 @@ describe('CommentService', () => {
           id: '1',
           ticketId: 'ticket-123',
           content: 'Premier commentaire',
-          author: 'Jean Dupont',
+          author: {
+            id: 'user-1',
+            firstName: 'Jean',
+            lastName: 'Dupont',
+          },
           createdAt: new Date('2025-01-15T10:00:00'),
         },
         {
           id: '2',
           ticketId: 'ticket-123',
           content: 'Deuxième commentaire',
-          author: 'Marie Martin',
+          author: {
+            id: 'user-2',
+            firstName: 'Marie',
+            lastName: 'Martin',
+          },
           createdAt: new Date('2025-01-15T11:00:00'),
         },
       ];
@@ -120,14 +139,18 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: 'Nouveau commentaire',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       const mockCreatedComment: Comment = {
         id: 'comment-1',
         ticketId: 'ticket-123',
         content: 'Nouveau commentaire',
-        author: 'Jean Dupont',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Dupont',
+        },
         createdAt: new Date('2025-01-15T12:00:00'),
       };
 
@@ -139,7 +162,7 @@ describe('CommentService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         ticketId: 'ticket-123',
         content: 'Nouveau commentaire',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       });
       expect(mockRepository.create).toHaveBeenCalledTimes(1);
     });
@@ -148,7 +171,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: '',
         content: 'Commentaire',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -161,7 +184,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -170,15 +193,15 @@ describe('CommentService', () => {
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw error when author is empty', async () => {
+    it('should throw error when authorId is empty', async () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: 'Commentaire',
-        author: '',
+        authorId: '',
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
-        "L'auteur du commentaire est requis"
+        "L'ID de l'auteur est requis"
       );
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
@@ -187,7 +210,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: 'A'.repeat(2001),
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -196,31 +219,22 @@ describe('CommentService', () => {
       expect(mockRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw error when author exceeds 100 characters', async () => {
-      const createData: CreateCommentData = {
-        ticketId: 'ticket-123',
-        content: 'Commentaire',
-        author: 'A'.repeat(101),
-      };
-
-      await expect(commentService.addComment(createData)).rejects.toThrow(
-        "L'auteur ne doit pas dépasser 100 caractères"
-      );
-      expect(mockRepository.create).not.toHaveBeenCalled();
-    });
-
-    it('should trim content and author before creating', async () => {
+    it('should trim content before creating', async () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '  Commentaire avec espaces  ',
-        author: '  Jean Dupont  ',
+        authorId: 'user-1',
       };
 
       const mockCreatedComment: Comment = {
         id: 'comment-1',
         ticketId: 'ticket-123',
         content: 'Commentaire avec espaces',
-        author: 'Jean Dupont',
+        author: {
+          id: 'user-1',
+          firstName: 'Jean',
+          lastName: 'Dupont',
+        },
         createdAt: new Date('2025-01-15T12:00:00'),
       };
 
@@ -231,7 +245,7 @@ describe('CommentService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         ticketId: 'ticket-123',
         content: 'Commentaire avec espaces',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       });
       expect(mockRepository.create).toHaveBeenCalledTimes(1);
     });
@@ -240,24 +254,11 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '   ',
-        author: 'Jean Dupont',
+        authorId: 'user-1',
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
         'Le contenu du commentaire est requis'
-      );
-      expect(mockRepository.create).not.toHaveBeenCalled();
-    });
-
-    it('should throw error when author is only whitespace', async () => {
-      const createData: CreateCommentData = {
-        ticketId: 'ticket-123',
-        content: 'Commentaire',
-        author: '   ',
-      };
-
-      await expect(commentService.addComment(createData)).rejects.toThrow(
-        "L'auteur du commentaire est requis"
       );
       expect(mockRepository.create).not.toHaveBeenCalled();
     });

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { TicketModel } from './TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { useTestDB } from '../../../../tests/helpers/useTestDB';
@@ -122,7 +122,7 @@ describe('Ticket Schema', () => {
     });
 
     it('should create a ticket with assignedTo', async () => {
-      const validUserId = new mongoose.Types.ObjectId();
+      const validUserId = new Types.ObjectId();
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
@@ -147,7 +147,7 @@ describe('Ticket Schema', () => {
 
       expect(savedTicket.assignedTo).toBeNull();
 
-      const newUserId = new mongoose.Types.ObjectId();
+      const newUserId = new Types.ObjectId();
       savedTicket.assignedTo = newUserId;
       const updatedTicket = await savedTicket.save();
 

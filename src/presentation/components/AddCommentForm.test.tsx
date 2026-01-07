@@ -12,10 +12,9 @@ describe('AddCommentForm', () => {
     vi.clearAllMocks();
   });
 
-  it('should render form with author and content fields', () => {
+  it('should render form with content field', () => {
     render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-    expect(screen.getByLabelText(/Votre nom/)).toBeInTheDocument();
     expect(screen.getByLabelText(/Commentaire/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Ajouter le commentaire' })).toBeInTheDocument();
   });
@@ -33,22 +32,6 @@ describe('AddCommentForm', () => {
         expect(screen.getByText('Le contenu du commentaire est requis')).toBeInTheDocument();
       });
     });
-
-    it('should show error when author is empty', async () => {
-      render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
-
-      const contentInput = screen.getByLabelText(/Commentaire/);
-      fireEvent.change(contentInput, { target: { value: 'Test comment' } });
-
-      const submitButton = screen.getByRole('button', {
-        name: 'Ajouter le commentaire',
-      });
-      fireEvent.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText("L'auteur du commentaire est requis")).toBeInTheDocument();
-      });
-    });
   });
 
   describe('Form submission', () => {
@@ -61,7 +44,13 @@ describe('AddCommentForm', () => {
             id: 'comment-1',
             ticketId: ticketId,
             content: 'Test comment',
-            author: 'Jean Martin',
+            authorId: 'user-1',
+            author: {
+              id: 'user-1',
+              firstName: 'Jean',
+              lastName: 'Martin',
+              email: 'jean@example.com',
+            },
             createdAt: mockCreatedAt.toISOString(),
           });
         })
@@ -69,13 +58,11 @@ describe('AddCommentForm', () => {
 
       render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
       const contentInput = screen.getByLabelText(/Commentaire/);
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
@@ -84,13 +71,14 @@ describe('AddCommentForm', () => {
       });
 
       expect(mockOnCommentAdded).toHaveBeenCalledTimes(1);
-      expect(mockOnCommentAdded).toHaveBeenCalledWith({
-        id: 'comment-1',
-        ticketId: ticketId,
-        content: 'Test comment',
-        author: 'Jean Martin',
-        createdAt: mockCreatedAt,
-      });
+      expect(mockOnCommentAdded).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'comment-1',
+          ticketId: ticketId,
+          content: 'Test comment',
+          authorId: 'user-1',
+        })
+      );
     });
 
     it('should clear form after successful submission', async () => {
@@ -100,7 +88,13 @@ describe('AddCommentForm', () => {
             id: 'comment-1',
             ticketId: ticketId,
             content: 'Test comment',
-            author: 'Jean Martin',
+            authorId: 'user-1',
+            author: {
+              id: 'user-1',
+              firstName: 'Jean',
+              lastName: 'Martin',
+              email: 'jean@example.com',
+            },
             createdAt: new Date().toISOString(),
           });
         })
@@ -108,13 +102,11 @@ describe('AddCommentForm', () => {
 
       render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-      const authorInput = screen.getByLabelText(/Votre nom/) as HTMLInputElement;
       const contentInput = screen.getByLabelText(/Commentaire/) as HTMLTextAreaElement;
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
@@ -122,7 +114,6 @@ describe('AddCommentForm', () => {
         expect(screen.getByText('Commentaire ajouté avec succès !')).toBeInTheDocument();
       });
 
-      expect(authorInput.value).toBe('');
       expect(contentInput.value).toBe('');
     });
 
@@ -135,13 +126,11 @@ describe('AddCommentForm', () => {
 
       render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
       const contentInput = screen.getByLabelText(/Commentaire/);
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
@@ -159,7 +148,13 @@ describe('AddCommentForm', () => {
             id: 'comment-1',
             ticketId: ticketId,
             content: 'Test comment',
-            author: 'Jean Martin',
+            authorId: 'user-1',
+            author: {
+              id: 'user-1',
+              firstName: 'Jean',
+              lastName: 'Martin',
+              email: 'jean@example.com',
+            },
             createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
           });
         })
@@ -169,13 +164,11 @@ describe('AddCommentForm', () => {
         <AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />
       );
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
       const contentInput = screen.getByLabelText(/Commentaire/);
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
@@ -197,7 +190,13 @@ describe('AddCommentForm', () => {
             id: 'comment-1',
             ticketId: ticketId,
             content: 'Test comment',
-            author: 'Jean Martin',
+            authorId: 'user-1',
+            author: {
+              id: 'user-1',
+              firstName: 'Jean',
+              lastName: 'Martin',
+              email: 'jean@example.com',
+            },
             createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
           });
         })
@@ -205,13 +204,11 @@ describe('AddCommentForm', () => {
 
       render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
       const contentInput = screen.getByLabelText(/Commentaire/);
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
@@ -239,9 +236,6 @@ describe('AddCommentForm', () => {
       const form = container.querySelector('form');
       expect(form).toHaveAttribute('aria-label', "Formulaire d'ajout de commentaire");
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
-      expect(authorInput).toHaveAttribute('aria-required', 'true');
-
       const contentInput = screen.getByLabelText(/Commentaire/);
       expect(contentInput).toHaveAttribute('aria-required', 'true');
     });
@@ -267,7 +261,13 @@ describe('AddCommentForm', () => {
             id: 'comment-1',
             ticketId: ticketId,
             content: 'Test comment',
-            author: 'Jean Martin',
+            authorId: 'user-1',
+            author: {
+              id: 'user-1',
+              firstName: 'Jean',
+              lastName: 'Martin',
+              email: 'jean@example.com',
+            },
             createdAt: new Date().toISOString(),
           });
         })
@@ -275,13 +275,11 @@ describe('AddCommentForm', () => {
 
       render(<AddCommentForm ticketId={ticketId} onCommentAdded={mockOnCommentAdded} />);
 
-      const authorInput = screen.getByLabelText(/Votre nom/);
       const contentInput = screen.getByLabelText(/Commentaire/);
       const submitButton = screen.getByRole('button', {
         name: 'Ajouter le commentaire',
       });
 
-      fireEvent.change(authorInput, { target: { value: 'Jean Martin' } });
       fireEvent.change(contentInput, { target: { value: 'Test comment' } });
       fireEvent.click(submitButton);
 
