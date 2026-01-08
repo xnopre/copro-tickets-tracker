@@ -1,7 +1,7 @@
 ---
 name: hex-arch-reviewer
 description: Use this agent when you need to verify that code changes respect the hexagonal architecture (Ports & Adapters) pattern. This agent should be called to review recently written code files to ensure they maintain proper layering (Domain → Application → Infrastructure → Presentation) and enforce the dependency rule (dependencies point inward). Examples: (1) After creating a new service, use the hex-arch-reviewer agent to verify it doesn't import infrastructure code; (2) When implementing a new feature across multiple layers, use this agent to validate that domain logic stays pure and doesn't depend on external concerns; (3) After modifying repository implementations, use this agent to confirm the implementation properly adapts the domain interface without leaking infrastructure details into the domain layer.
-tools: Edit, Write, NotebookEdit, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch
+tools: Edit, Write, NotebookEdit, Glob, Grep, Read, TodoWrite
 model: haiku
 color: purple
 ---
