@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MongoUserRepository } from './MongoUserRepository';
 import UserModel from '../database/schemas/UserSchema';
+import { mockUser1, mockUser2 } from '@tests/helpers/mockUsers';
 
 vi.mock('../database/schemas/UserSchema', () => ({
   default: {
@@ -26,16 +27,16 @@ describe('MongoUserRepository', () => {
     it('should return all users sorted by lastName and firstName', async () => {
       const mockUsers = [
         {
-          _id: { toString: () => '1' },
-          firstName: 'Jean',
-          lastName: 'Dupont',
-          email: 'jean.dupont@example.com',
+          _id: { toString: () => mockUser1.id },
+          firstName: mockUser1.firstName,
+          lastName: mockUser1.lastName,
+          email: mockUser1.email,
         },
         {
-          _id: { toString: () => '2' },
-          firstName: 'Marie',
-          lastName: 'Martin',
-          email: 'marie.martin@example.com',
+          _id: { toString: () => mockUser2.id },
+          firstName: mockUser2.firstName,
+          lastName: mockUser2.lastName,
+          email: mockUser2.email,
         },
       ];
 
@@ -53,41 +54,41 @@ describe('MongoUserRepository', () => {
       expect(sortMock).toHaveBeenCalledWith({ lastName: 1, firstName: 1 });
       expect(result).toHaveLength(2);
       expect(result[0]).toEqual({
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
+        id: mockUser1.id,
+        firstName: mockUser1.firstName,
+        lastName: mockUser1.lastName,
+        email: mockUser1.email,
       });
       expect(result[1]).toEqual({
-        id: '2',
-        firstName: 'Marie',
-        lastName: 'Martin',
-        email: 'marie.martin@example.com',
+        id: mockUser2.id,
+        firstName: mockUser2.firstName,
+        lastName: mockUser2.lastName,
+        email: mockUser2.email,
       });
     });
   });
 
   describe('findById', () => {
     it('should return user when found', async () => {
-      const mockUser = {
-        _id: { toString: () => '1' },
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
+      const mockUserDoc = {
+        _id: { toString: () => mockUser1.id },
+        firstName: mockUser1.firstName,
+        lastName: mockUser1.lastName,
+        email: mockUser1.email,
       };
 
       vi.mocked(UserModel.findById).mockReturnValue({
-        lean: vi.fn().mockResolvedValue(mockUser),
+        lean: vi.fn().mockResolvedValue(mockUserDoc),
       } as any);
 
-      const result = await repository.findById('1');
+      const result = await repository.findById(mockUser1.id);
 
-      expect(UserModel.findById).toHaveBeenCalledWith('1');
+      expect(UserModel.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(result).toEqual({
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
+        id: mockUser1.id,
+        firstName: mockUser1.firstName,
+        lastName: mockUser1.lastName,
+        email: mockUser1.email,
       });
     });
 
@@ -104,34 +105,34 @@ describe('MongoUserRepository', () => {
 
   describe('findByEmail', () => {
     it('should return user with password when found', async () => {
-      const mockUser = {
-        _id: { toString: () => '1' },
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
-        password: '$2a$10$hashedpassword123',
+      const mockUserDoc = {
+        _id: { toString: () => mockUser1.id },
+        firstName: mockUser1.firstName,
+        lastName: mockUser1.lastName,
+        email: mockUser1.email,
+        password: mockUser1.password,
       };
 
       const selectMock = vi.fn().mockReturnValue({
-        lean: vi.fn().mockResolvedValue(mockUser),
+        lean: vi.fn().mockResolvedValue(mockUserDoc),
       });
 
       vi.mocked(UserModel.findOne).mockReturnValue({
         select: selectMock,
       } as any);
 
-      const result = await repository.findByEmail('jean.dupont@example.com');
+      const result = await repository.findByEmail(mockUser1.email!);
 
       expect(UserModel.findOne).toHaveBeenCalledWith({
-        email: 'jean.dupont@example.com',
+        email: mockUser1.email,
       });
       expect(selectMock).toHaveBeenCalledWith('+password');
       expect(result).toEqual({
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
-        password: '$2a$10$hashedpassword123',
+        id: mockUser1.id,
+        firstName: mockUser1.firstName,
+        lastName: mockUser1.lastName,
+        email: mockUser1.email,
+        password: mockUser1.password,
       });
     });
 

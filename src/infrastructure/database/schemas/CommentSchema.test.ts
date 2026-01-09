@@ -3,6 +3,7 @@ import { CommentModel } from './CommentSchema';
 import UserModel from './UserSchema';
 import { useTestDB } from '../../../../tests/helpers/useTestDB';
 import { Types } from 'mongoose';
+import { mockUser1 } from '../../../../tests/helpers/mockUsers';
 
 describe('Comment Schema', () => {
   useTestDB();
@@ -11,10 +12,10 @@ describe('Comment Schema', () => {
 
   beforeEach(async () => {
     const user = await UserModel.create({
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      email: 'jean.dupont@example.com',
-      password: 'password123',
+      firstName: mockUser1.firstName,
+      lastName: mockUser1.lastName,
+      email: mockUser1.email,
+      password: mockUser1.password,
     });
     testUserId = user._id;
   });

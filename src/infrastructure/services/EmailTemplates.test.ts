@@ -4,6 +4,7 @@ import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket } from '@/domain/entities/Ticket';
 import { Comment } from '@/domain/entities/Comment';
 import { User } from '@/domain/entities/User';
+import { mockUser1, mockUser3, mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 describe('EmailTemplates', () => {
   let emailTemplates: EmailTemplates;
@@ -71,21 +72,14 @@ describe('EmailTemplates', () => {
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       };
 
-      const assignee: User = {
-        id: 'user_123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@test.com',
-      };
-
-      const result = emailTemplates.ticketAssigned(ticket, assignee);
+      const result = emailTemplates.ticketAssigned(ticket, mockUser3);
 
       expect(result.subject).toBe('[CoTiTra] Ticket assigné : Test Ticket');
       expect(result.htmlContent).toContain('Un ticket vous a été assigné');
-      expect(result.htmlContent).toContain('Bonjour John');
+      expect(result.htmlContent).toContain('Bonjour Pierre');
       expect(result.htmlContent).toContain('Test Ticket');
       expect(result.htmlContent).toContain('http://localhost:3000/tickets/ticket_123');
-      expect(result.textContent).toContain('John');
+      expect(result.textContent).toContain('Pierre');
     });
 
     it('should escape HTML in assignee name', () => {
@@ -101,10 +95,8 @@ describe('EmailTemplates', () => {
       };
 
       const assignee: User = {
-        id: 'user_123',
+        ...mockUser1,
         firstName: '<script>alert("XSS")</script>',
-        lastName: 'Doe',
-        email: 'john@test.com',
       };
 
       const result = emailTemplates.ticketAssigned(ticket, assignee);
@@ -161,11 +153,7 @@ describe('EmailTemplates', () => {
         id: 'comment_123',
         ticketId: 'ticket_123',
         content: 'This is a test comment',
-        author: {
-          id: 'user_123',
-          firstName: 'John',
-          lastName: 'Doe',
-        },
+        author: mockUserPublic1,
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
@@ -174,10 +162,9 @@ describe('EmailTemplates', () => {
       expect(result.subject).toBe('[CoTiTra] Nouveau commentaire : Test Ticket');
       expect(result.htmlContent).toContain('Nouveau commentaire sur le ticket');
       expect(result.htmlContent).toContain('Test Ticket');
-      expect(result.htmlContent).toContain('John');
+      expect(result.htmlContent).toContain('Jean Dupont');
       expect(result.htmlContent).toContain('This is a test comment');
       expect(result.htmlContent).toContain('http://localhost:3000/tickets/ticket_123');
-      expect(result.textContent).toContain('John');
       expect(result.textContent).toContain('This is a test comment');
     });
 
@@ -197,11 +184,7 @@ describe('EmailTemplates', () => {
         id: 'comment_123',
         ticketId: 'ticket_123',
         content: '<script>alert("XSS")</script>',
-        author: {
-          id: 'user_123',
-          firstName: 'John',
-          lastName: 'Doe',
-        },
+        author: mockUserPublic1,
         createdAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 

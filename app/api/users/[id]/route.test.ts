@@ -2,8 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
-import { InvalidIdError } from '@/domain/errors/InvalidIdError';
-import { UserPublic } from '@/domain/entities/User';
+import { mockUserPublic1 } from '../../../../tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -24,11 +23,7 @@ describe('GET /api/users/[id]', () => {
 
   it('should return user when found', async () => {
     const validId = '507f1f77bcf86cd799439016';
-    const mockUser: UserPublic = {
-      id: validId,
-      firstName: 'Jean',
-      lastName: 'Dupont',
-    };
+    const mockUser = { ...mockUserPublic1, id: validId };
 
     const mockUserService = {
       getUsers: vi.fn(),

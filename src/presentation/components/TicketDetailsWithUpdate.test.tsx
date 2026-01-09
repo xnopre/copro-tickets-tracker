@@ -4,12 +4,7 @@ import TicketDetailsWithUpdate from './TicketDetailsWithUpdate';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { UserPublic } from '@/domain/entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'John',
-  lastName: 'Doe',
-};
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 // Mock TicketDetail
 vi.mock('./TicketDetail', () => ({
@@ -61,7 +56,7 @@ vi.mock('./EditTicketForm', () => ({
             title: 'Updated Title',
             description: 'Updated Description',
             status: TicketStatus.IN_PROGRESS,
-            assignedTo: mockUser,
+            assignedTo: mockUserPublic1,
             archived: false,
             createdAt: new Date('2025-01-10T10:00:00.000Z'),
             updatedAt: new Date('2025-01-15T14:00:00.000Z'),
@@ -156,7 +151,7 @@ describe('TicketDetailsWithUpdate', () => {
         expect(screen.getByText('Updated Title')).toBeInTheDocument();
         expect(screen.getByText('Updated Description')).toBeInTheDocument();
         expect(screen.getByTestId('ticket-status')).toHaveTextContent(TicketStatus.IN_PROGRESS);
-        expect(screen.getByTestId('ticket-assigned-to')).toHaveTextContent('John Doe');
+        expect(screen.getByTestId('ticket-assigned-to')).toHaveTextContent('Jean Dupont');
         expect(screen.queryByTestId('edit-form')).not.toBeInTheDocument();
       });
     });
@@ -167,7 +162,7 @@ describe('TicketDetailsWithUpdate', () => {
         title: 'Original Title',
         description: 'Original Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-10T10:00:00.000Z'),
         updatedAt: new Date('2025-01-10T10:00:00.000Z'),
@@ -181,7 +176,7 @@ describe('TicketDetailsWithUpdate', () => {
       expect(screen.getByText('Editing Title: Original Title')).toBeInTheDocument();
       expect(screen.getByText('Editing Description: Original Description')).toBeInTheDocument();
       expect(screen.getByText('Editing Status: IN_PROGRESS')).toBeInTheDocument();
-      expect(screen.getByText('Editing Assigned To: 507f1f77bcf86cd799439017')).toBeInTheDocument();
+      expect(screen.getByText('Editing Assigned To: 1')).toBeInTheDocument();
       expect(screen.getByTestId('edit-form')).toHaveAttribute('data-ticket-id', '456');
     });
   });

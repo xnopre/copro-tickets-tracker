@@ -2,32 +2,21 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import CommentCard from './CommentCard';
 import { Comment } from '@/domain/entities/Comment';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 describe('CommentCard', () => {
   const mockComment: Comment = {
     id: '1',
     ticketId: 'ticket-1',
     content: 'Ceci est un commentaire de test',
-    author: {
-      id: 'user-1',
-      firstName: 'Jean',
-      lastName: 'Martin',
-    },
+    author: mockUserPublic1,
     createdAt: new Date('2025-01-15T10:30:00'),
   };
 
-  it('should render comment author full name', () => {
-    render(<CommentCard comment={mockComment} />);
-    expect(screen.getByText('Jean Martin')).toBeInTheDocument();
-  });
-
-  it('should render comment content', () => {
-    render(<CommentCard comment={mockComment} />);
-    expect(screen.getByText('Ceci est un commentaire de test')).toBeInTheDocument();
-  });
-
-  it('should render comment date with time element', () => {
+  it('should render comment author full name, comment and date', () => {
     const { container } = render(<CommentCard comment={mockComment} />);
+    expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
+    expect(screen.getByText('Ceci est un commentaire de test')).toBeInTheDocument();
     const timeElement = container.querySelector('time');
     expect(timeElement).toBeInTheDocument();
     const dateTimeAttr = timeElement?.getAttribute('dateTime');

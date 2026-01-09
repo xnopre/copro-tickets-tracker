@@ -7,25 +7,7 @@ import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket, CreateTicketData } from '@/domain/entities/Ticket';
-import { UserPublic } from '@/domain/entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Martin',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Dupont',
-};
-
-const mockUser3: UserPublic = {
-  id: '507f1f77bcf86cd799439018',
-  firstName: 'Admin',
-  lastName: 'User',
-};
+import { mockUser1, mockUser2, mockUser3 } from '@tests/helpers/mockUsers';
 
 describe('TicketService', () => {
   let mockRepository: ITicketRepository;
@@ -107,7 +89,7 @@ describe('TicketService', () => {
           title: 'Ticket 2',
           description: 'Description 2',
           status: TicketStatus.IN_PROGRESS,
-          assignedTo: mockUser,
+          assignedTo: mockUser1,
           archived: false,
           createdAt: new Date('2025-01-16'),
           updatedAt: new Date('2025-01-16'),
@@ -291,7 +273,7 @@ describe('TicketService', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
+        assignedTo: mockUser1,
         archived: false,
         createdAt: new Date('2025-01-15'),
         updatedAt: new Date('2025-01-16'),

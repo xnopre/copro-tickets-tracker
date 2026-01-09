@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { GetComments } from './GetComments';
 import { ICommentRepository } from '../repositories/ICommentRepository';
+import { mockUser1, mockUser2 } from '@tests/helpers/mockUsers';
 
 describe('GetComments', () => {
   const mockRepository: ICommentRepository = {
@@ -14,24 +15,14 @@ describe('GetComments', () => {
         id: '1',
         ticketId: 'ticket-1',
         content: 'Premier commentaire',
-        author: {
-          id: 'user-1',
-          firstName: 'Jean',
-          lastName: 'Martin',
-          email: 'jean@example.com',
-        },
+        author: mockUser1,
         createdAt: new Date('2025-01-15T10:00:00'),
       },
       {
         id: '2',
         ticketId: 'ticket-1',
         content: 'Deuxième commentaire',
-        author: {
-          id: 'user-2',
-          firstName: 'Marie',
-          lastName: 'Dubois',
-          email: 'marie@example.com',
-        },
+        author: mockUser2,
         createdAt: new Date('2025-01-15T11:00:00'),
       },
     ];

@@ -2,7 +2,7 @@
 
 ## Absolute Principle
 
-**NO code without tests.** Period.
+**NO code without tests.** Except for helpers.
 
 ## Which Files Need Tests
 

@@ -1,22 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import TicketListWithArchiveToggle from './TicketListWithArchiveToggle';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { UserPublic } from '@/domain/entities/User';
-
-const mockUser1: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Martin',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Dubois',
-};
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 describe('TicketListWithArchiveToggle', () => {
   const mockTickets: Ticket[] = [
@@ -35,7 +23,7 @@ describe('TicketListWithArchiveToggle', () => {
       title: 'Archived Ticket 1',
       description: 'Archived description',
       status: TicketStatus.CLOSED,
-      assignedTo: mockUser1,
+      assignedTo: mockUserPublic1,
       archived: true,
       createdAt: new Date('2025-01-10T10:00:00.000Z'),
       updatedAt: new Date('2025-01-14T10:00:00.000Z'),
@@ -45,7 +33,7 @@ describe('TicketListWithArchiveToggle', () => {
       title: 'Active Ticket 2',
       description: 'Active description 2',
       status: TicketStatus.IN_PROGRESS,
-      assignedTo: mockUser2,
+      assignedTo: mockUserPublic2,
       archived: false,
       createdAt: new Date('2025-01-16T10:00:00.000Z'),
       updatedAt: new Date('2025-01-16T10:00:00.000Z'),

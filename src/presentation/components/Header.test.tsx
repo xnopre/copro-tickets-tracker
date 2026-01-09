@@ -3,6 +3,7 @@ import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Header } from './Header';
+import { mockUser1, mockUser2 } from '@tests/helpers/mockUsers';
 
 vi.mock('next-auth/react');
 vi.mock('./LogoutButton', () => ({
@@ -30,11 +31,8 @@ describe('Header', () => {
   it('should render header with user info when authenticated', () => {
     const session: Session = {
       user: {
-        id: 'user-123',
-        email: 'jean@example.com',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        name: 'Jean Dupont',
+        ...mockUser1,
+        name: `${mockUser1.firstName} ${mockUser1.lastName}`,
       },
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
@@ -49,18 +47,15 @@ describe('Header', () => {
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('CoTiTra');
     expect(screen.getByText(/Connecté en tant que/)).toBeInTheDocument();
-    expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
+    expect(screen.getByText(`${mockUser1.firstName} ${mockUser1.lastName}`)).toBeInTheDocument();
     expect(screen.getByTestId('logout-button')).toBeInTheDocument();
   });
 
   it('should display first and last name in the header', () => {
     const session: Session = {
       user: {
-        id: 'user-456',
-        email: 'marie@example.com',
-        firstName: 'Marie',
-        lastName: 'Martin',
-        name: 'Marie Martin',
+        ...mockUser2,
+        name: `${mockUser2.firstName} ${mockUser2.lastName}`,
       },
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
@@ -73,7 +68,7 @@ describe('Header', () => {
 
     render(<Header />);
 
-    expect(screen.getByText('Marie Martin')).toBeInTheDocument();
+    expect(screen.getByText(`${mockUser2.firstName} ${mockUser2.lastName}`)).toBeInTheDocument();
   });
 
   it('should have proper semantic structure', () => {
@@ -105,11 +100,8 @@ describe('Header', () => {
   it('should call LogoutButton component', () => {
     const session: Session = {
       user: {
-        id: 'user-123',
-        email: 'jean@example.com',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        name: 'Jean Dupont',
+        ...mockUser1,
+        name: `${mockUser1.firstName} ${mockUser1.lastName}`,
       },
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };

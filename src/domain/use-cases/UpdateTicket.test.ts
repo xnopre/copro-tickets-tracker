@@ -6,33 +6,9 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { User, UserPublic } from '../entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'John',
-  lastName: 'Doe',
-};
-
-const mockUserFull: User = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@test.com',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Jane',
-  lastName: 'Smith',
-};
-
-const mockUser2Full: User = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Jane',
-  lastName: 'Smith',
-  email: 'jane@test.com',
-};
+import { User } from '../entities/User';
+import { Ticket, UpdateTicketData } from '../entities/Ticket';
+import { mockUser1, mockUser2, mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 describe('UpdateTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -90,7 +66,7 @@ describe('UpdateTicket', () => {
 
   describe('Update status and assignedTo', () => {
     it('should update status and assignedTo successfully', async () => {
-      const existingTicket = {
+      const existingTicket: Ticket = {
         id: '1',
         title: 'Test Ticket',
         description: 'Test Description',
@@ -101,12 +77,12 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       };
 
-      const mockTicket = {
+      const mockTicket: Ticket = {
         id: '1',
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -122,16 +98,17 @@ describe('UpdateTicket', () => {
         mockEmailTemplateService,
         mockLogger
       );
-      const result = await useCase.execute('1', {
+      const updateTicketData: UpdateTicketData = {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
-      });
+        assignedTo: mockUser1.id,
+      };
+      const result = await useCase.execute('1', updateTicketData);
 
       expect(result).toEqual(mockTicket);
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
     });
 
@@ -152,7 +129,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -170,12 +147,12 @@ describe('UpdateTicket', () => {
       );
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: `  ${mockUser.id}  `,
+        assignedTo: `  ${mockUser1.id}  `,
       });
 
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
     });
   });
@@ -498,7 +475,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
@@ -540,7 +517,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T10:00:00.000Z'),
@@ -682,7 +659,7 @@ describe('UpdateTicket', () => {
 
       await expect(
         useCase.execute('1', {
-          assignedTo: mockUser.id,
+          assignedTo: mockUser1.id,
         })
       ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
     });
@@ -706,7 +683,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -714,7 +691,7 @@ describe('UpdateTicket', () => {
 
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUserFull);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
       vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
 
       const useCase = new UpdateTicket(
@@ -725,10 +702,10 @@ describe('UpdateTicket', () => {
         mockLogger
       );
       await useCase.execute('1', {
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
 
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).toHaveBeenCalled();
     });
 
@@ -755,7 +732,7 @@ describe('UpdateTicket', () => {
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
       };
 
-      const mockUsers: User[] = [mockUserFull, mockUser2Full];
+      const mockUsers: User[] = [mockUser1, mockUser2];
 
       vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
@@ -877,7 +854,7 @@ describe('UpdateTicket', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
         updatedAt: new Date('2025-01-15T11:00:00.000Z'),
@@ -895,10 +872,10 @@ describe('UpdateTicket', () => {
         mockLogger
       );
       await useCase.execute('1', {
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
 
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
     });
   });

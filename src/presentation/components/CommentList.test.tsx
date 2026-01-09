@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import CommentList from './CommentList';
 import { Comment } from '@/domain/entities/Comment';
+import { mockUserPublic1, mockUserPublic2, mockUserPublic3 } from '@tests/helpers/mockUsers';
 
 describe('CommentList', () => {
   const mockComments: Comment[] = [
@@ -9,33 +10,21 @@ describe('CommentList', () => {
       id: '1',
       ticketId: 'ticket-1',
       content: 'Premier commentaire',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-      },
+      author: mockUserPublic1,
       createdAt: new Date('2025-01-15T10:30:00'),
     },
     {
       id: '2',
       ticketId: 'ticket-1',
       content: 'Deuxième commentaire',
-      author: {
-        id: 'user-2',
-        firstName: 'Marie',
-        lastName: 'Dubois',
-      },
+      author: mockUserPublic2,
       createdAt: new Date('2025-01-15T11:00:00'),
     },
     {
       id: '3',
       ticketId: 'ticket-1',
       content: 'Troisième commentaire',
-      author: {
-        id: 'user-3',
-        firstName: 'Pierre',
-        lastName: 'Durand',
-      },
+      author: mockUserPublic3,
       createdAt: new Date('2025-01-15T12:00:00'),
     },
   ];

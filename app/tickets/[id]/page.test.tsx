@@ -2,19 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { Ticket } from '@/domain/entities/Ticket';
-import { UserPublic } from '@/domain/entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Dupont',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Martin',
-};
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 // Mock ServiceFactory
 const mockGetTicketById = vi.fn();
@@ -55,7 +43,7 @@ describe('TicketPage', () => {
     title: "Réparer l'ascenseur",
     description: "L'ascenseur est en panne depuis hier",
     status: TicketStatus.IN_PROGRESS,
-    assignedTo: mockUser,
+    assignedTo: mockUserPublic1,
     archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),
     updatedAt: new Date('2025-01-20T14:45:00'),
@@ -84,7 +72,9 @@ describe('TicketPage', () => {
     expect(statusBadge).toHaveTextContent('En cours');
 
     expect(screen.getByText(/Assigné à :/)).toBeInTheDocument();
-    expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
+    expect(
+      screen.getByText(`${mockUserPublic1.firstName} ${mockUserPublic1.lastName}`)
+    ).toBeInTheDocument();
   });
 
   it('should call notFound when ticket does not exist', async () => {
@@ -132,7 +122,7 @@ describe('TicketPage', () => {
       ...mockTicket,
       id: '789',
       status: TicketStatus.RESOLVED,
-      assignedTo: mockUser2,
+      assignedTo: mockUserPublic2,
     };
 
     mockGetTicketById.mockResolvedValue(resolvedTicket);
@@ -146,7 +136,9 @@ describe('TicketPage', () => {
     expect(statusBadge).toHaveTextContent('Résolu');
 
     expect(screen.getByText(/Assigné à :/)).toBeInTheDocument();
-    expect(screen.getByText('Marie Martin')).toBeInTheDocument();
+    expect(
+      screen.getByText(`${mockUserPublic2.firstName} ${mockUserPublic2.lastName}`)
+    ).toBeInTheDocument();
   });
 
   it('should have proper accessibility attributes', async () => {
