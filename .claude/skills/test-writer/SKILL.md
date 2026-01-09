@@ -30,3 +30,7 @@ See [examples.md](./examples.md) for:
 - [ ] AAA structure respected
 
 See [examples.md](./examples.md) for test execution commands.
+
+## See Also
+
+- **[e2e-writer](../e2e-writer/SKILL.md)** — Complementary approach for end-to-end integration tests with user scenarios. Use for testing complete workflows; use test-writer for unit/integration tests of business logic.

@@ -34,3 +34,9 @@ After verification, generate a structured report. See [examples.md](./examples.m
 - [ ] Application services inject dependencies
 - [ ] TypeScript strict (no `any`)
 - [ ] Layers semantically distinct
+
+## See Also
+
+- **[test-writer](../test-writer/SKILL.md)** — Write tests that respect architecture boundaries. Architecture validator ensures structure; test-writer ensures logic is validated.
+- **[e2e-writer](../e2e-writer/SKILL.md)** — E2E tests depend on proper architectural layers (presentation calls application, application calls infrastructure). Use architecture-validator to verify this structure.
+- **[accessibility-checker](../accessibility-checker/SKILL.md)** — Accessible components are properly structured in presentation layer. Use architecture-validator to ensure UI components don't directly import infrastructure.

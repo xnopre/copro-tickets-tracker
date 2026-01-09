@@ -36,3 +36,7 @@ See [examples.md](./examples.md) for detailed best practices (dynamic waiting, t
 - [ ] No `waitForTimeout()` → wait for specific elements
 - [ ] Structure : Navigate → Interact → Verify
 - [ ] Tests cover nominal + error cases
+
+## See Also
+
+- **[test-writer](../test-writer/SKILL.md)** — Complementary approach for unit and integration tests of business logic. Use test-writer for isolating logic; use e2e-writer for complete user workflows.
