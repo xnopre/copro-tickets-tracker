@@ -8,6 +8,7 @@ import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
 import { User } from '@/domain/entities/User';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 describe('AddComment', () => {
   const mockRepository: ICommentRepository = {
@@ -21,13 +22,6 @@ describe('AddComment', () => {
     create: vi.fn(),
     update: vi.fn(),
     archive: vi.fn(),
-  };
-
-  const mockUser1: User = {
-    id: 'user-1',
-    firstName: 'Jean',
-    lastName: 'Martin',
-    email: 'jean@example.com',
   };
 
   const mockUserRepository: IUserRepository = {
@@ -239,14 +233,7 @@ describe('AddComment', () => {
       updatedAt: new Date(),
     };
 
-    const mockUsers: User[] = [
-      {
-        id: 'user_1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@test.com',
-      },
-    ];
+    const mockUsers: User[] = [mockUser1];
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockComment);
     vi.mocked(mockTicketRepository.findById).mockResolvedValue(mockTicket);

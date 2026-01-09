@@ -1,45 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import CommentList from './CommentList';
-import { Comment } from '@/domain/entities/Comment';
+import { mockComments } from '@tests/helpers/mockComments';
 
 describe('CommentList', () => {
-  const mockComments: Comment[] = [
-    {
-      id: '1',
-      ticketId: 'ticket-1',
-      content: 'Premier commentaire',
-      author: {
-        id: 'user-1',
-        firstName: 'Jean',
-        lastName: 'Martin',
-      },
-      createdAt: new Date('2025-01-15T10:30:00'),
-    },
-    {
-      id: '2',
-      ticketId: 'ticket-1',
-      content: 'Deuxième commentaire',
-      author: {
-        id: 'user-2',
-        firstName: 'Marie',
-        lastName: 'Dubois',
-      },
-      createdAt: new Date('2025-01-15T11:00:00'),
-    },
-    {
-      id: '3',
-      ticketId: 'ticket-1',
-      content: 'Troisième commentaire',
-      author: {
-        id: 'user-3',
-        firstName: 'Pierre',
-        lastName: 'Durand',
-      },
-      createdAt: new Date('2025-01-15T12:00:00'),
-    },
-  ];
-
   it('should render all comments', () => {
     render(<CommentList comments={mockComments} />);
     expect(screen.queryByText('Aucun commentaire pour le moment')).not.toBeInTheDocument();

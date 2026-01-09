@@ -49,7 +49,6 @@ describe('AddCommentForm', () => {
               id: 'user-1',
               firstName: 'Jean',
               lastName: 'Martin',
-              email: 'jean@example.com',
             },
             createdAt: mockCreatedAt.toISOString(),
           });
@@ -93,7 +92,6 @@ describe('AddCommentForm', () => {
               id: 'user-1',
               firstName: 'Jean',
               lastName: 'Martin',
-              email: 'jean@example.com',
             },
             createdAt: new Date().toISOString(),
           });
@@ -153,7 +151,6 @@ describe('AddCommentForm', () => {
               id: 'user-1',
               firstName: 'Jean',
               lastName: 'Martin',
-              email: 'jean@example.com',
             },
             createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
           });
@@ -195,7 +192,6 @@ describe('AddCommentForm', () => {
               id: 'user-1',
               firstName: 'Jean',
               lastName: 'Martin',
-              email: 'jean@example.com',
             },
             createdAt: new Date('2025-01-15T10:30:00.000Z').toISOString(),
           });
@@ -266,7 +262,6 @@ describe('AddCommentForm', () => {
               id: 'user-1',
               firstName: 'Jean',
               lastName: 'Martin',
-              email: 'jean@example.com',
             },
             createdAt: new Date().toISOString(),
           });

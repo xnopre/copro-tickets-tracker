@@ -1,14 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { GetTickets } from './GetTickets';
 import { ITicketRepository } from '../repositories/ITicketRepository';
-import { TicketStatus } from '../value-objects/TicketStatus';
-import { UserPublic } from '../entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Martin',
-};
+import { mockTicketNew, mockTicketInProgress, mockTickets } from '@tests/helpers/mockTickets';
 
 describe('GetTickets', () => {
   const mockRepository: ITicketRepository = {
@@ -20,35 +13,14 @@ describe('GetTickets', () => {
   };
 
   it('should return all tickets', async () => {
-    const mockTickets = [
-      {
-        id: '1',
-        title: 'Ticket 1',
-        description: 'Description 1',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '2',
-        title: 'Ticket 2',
-        description: 'Description 2',
-        status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+    const testTickets = [mockTicketNew, mockTicketInProgress];
 
-    vi.mocked(mockRepository.findAll).mockResolvedValue(mockTickets);
+    vi.mocked(mockRepository.findAll).mockResolvedValue(testTickets);
 
     const useCase = new GetTickets(mockRepository);
     const result = await useCase.execute();
 
-    expect(result).toEqual(mockTickets);
+    expect(result).toEqual(testTickets);
     expect(mockRepository.findAll).toHaveBeenCalled();
   });
 

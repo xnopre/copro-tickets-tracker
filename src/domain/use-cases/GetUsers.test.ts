@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { GetUsers } from './GetUsers';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { User } from '../entities/User';
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 describe('GetUsers', () => {
   let mockRepository: IUserRepository;
@@ -17,19 +17,9 @@ describe('GetUsers', () => {
   });
 
   it('should return all users', async () => {
-    const users: User[] = [
-      {
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-        email: 'jean.dupont@example.com',
-      },
-      {
-        id: '2',
-        firstName: 'Marie',
-        lastName: 'Martin',
-        email: 'marie.martin@example.com',
-      },
+    const users = [
+      { ...mockUserPublic1, email: 'jean.dupont@example.com' },
+      { ...mockUserPublic2, email: 'marie.martin@example.com' },
     ];
 
     vi.mocked(mockRepository.findAll).mockResolvedValue(users);

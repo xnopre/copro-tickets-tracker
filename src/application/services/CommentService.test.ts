@@ -7,7 +7,8 @@ import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
-import { User } from '@/domain/entities/User';
+import { mockUser1, mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
+import { mockComment1, mockComment2 } from '@tests/helpers/mockComments';
 
 describe('CommentService', () => {
   let mockRepository: ICommentRepository;
@@ -17,13 +18,6 @@ describe('CommentService', () => {
   let mockEmailTemplateService: IEmailTemplateService;
   let mockLogger: ILogger;
   let commentService: CommentService;
-
-  const mockUser1: User = {
-    id: 'user-1',
-    firstName: 'Jean',
-    lastName: 'Martin',
-    email: 'jean@example.com',
-  };
 
   beforeEach(() => {
     mockRepository = {
@@ -40,7 +34,7 @@ describe('CommentService', () => {
     mockUserRepository = {
       findAll: vi.fn().mockResolvedValue([]),
       findById: vi.fn((id: string) => {
-        const user = id === 'user-1' ? mockUser1 : null;
+        const user = id === mockUser1.id ? mockUser1 : null;
         return Promise.resolve(user);
       }),
       findByEmail: vi.fn().mockResolvedValue(null),
@@ -89,30 +83,7 @@ describe('CommentService', () => {
 
   describe('getCommentsByTicketId', () => {
     it('should return all comments for a ticket', async () => {
-      const mockComments: Comment[] = [
-        {
-          id: '1',
-          ticketId: 'ticket-123',
-          content: 'Premier commentaire',
-          author: {
-            id: 'user-1',
-            firstName: 'Jean',
-            lastName: 'Dupont',
-          },
-          createdAt: new Date('2025-01-15T10:00:00'),
-        },
-        {
-          id: '2',
-          ticketId: 'ticket-123',
-          content: 'Deuxième commentaire',
-          author: {
-            id: 'user-2',
-            firstName: 'Marie',
-            lastName: 'Martin',
-          },
-          createdAt: new Date('2025-01-15T11:00:00'),
-        },
-      ];
+      const mockComments: Comment[] = [mockComment1, mockComment2];
 
       vi.mocked(mockRepository.findByTicketId).mockResolvedValue(mockComments);
 
@@ -139,30 +110,18 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: 'Nouveau commentaire',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
-      const mockCreatedComment: Comment = {
-        id: 'comment-1',
-        ticketId: 'ticket-123',
-        content: 'Nouveau commentaire',
-        author: {
-          id: 'user-1',
-          firstName: 'Jean',
-          lastName: 'Dupont',
-        },
-        createdAt: new Date('2025-01-15T12:00:00'),
-      };
-
-      vi.mocked(mockRepository.create).mockResolvedValue(mockCreatedComment);
+      vi.mocked(mockRepository.create).mockResolvedValue(mockComment1);
 
       const result = await commentService.addComment(createData);
 
-      expect(result).toEqual(mockCreatedComment);
+      expect(result).toEqual(mockComment1);
       expect(mockRepository.create).toHaveBeenCalledWith({
         ticketId: 'ticket-123',
         content: 'Nouveau commentaire',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       });
       expect(mockRepository.create).toHaveBeenCalledTimes(1);
     });
@@ -171,7 +130,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: '',
         content: 'Commentaire',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -184,7 +143,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -210,7 +169,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: 'A'.repeat(2001),
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
@@ -223,29 +182,17 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '  Commentaire avec espaces  ',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
-      const mockCreatedComment: Comment = {
-        id: 'comment-1',
-        ticketId: 'ticket-123',
-        content: 'Commentaire avec espaces',
-        author: {
-          id: 'user-1',
-          firstName: 'Jean',
-          lastName: 'Dupont',
-        },
-        createdAt: new Date('2025-01-15T12:00:00'),
-      };
-
-      vi.mocked(mockRepository.create).mockResolvedValue(mockCreatedComment);
+      vi.mocked(mockRepository.create).mockResolvedValue(mockComment1);
 
       await commentService.addComment(createData);
 
       expect(mockRepository.create).toHaveBeenCalledWith({
         ticketId: 'ticket-123',
         content: 'Commentaire avec espaces',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       });
       expect(mockRepository.create).toHaveBeenCalledTimes(1);
     });
@@ -254,7 +201,7 @@ describe('CommentService', () => {
       const createData: CreateCommentData = {
         ticketId: 'ticket-123',
         content: '   ',
-        authorId: 'user-1',
+        authorId: mockUser1.id,
       };
 
       await expect(commentService.addComment(createData)).rejects.toThrow(
