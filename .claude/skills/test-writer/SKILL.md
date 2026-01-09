@@ -1,32 +1,32 @@
 ---
 name: test-writer
-description: Écrit des tests unitaires et d'intégration suivant la structure AAA. Utilise quand tu dois écrire des tests, tester un composant React, valider une logique métier, ou quand un fichier n'a pas de tests.
+description: Write unit and integration tests following AAA structure. Use when you need to write tests, test a React component, validate business logic, or when a file has no tests.
 ---
 
 # Test Writer
 
-Vous écrivez des tests avec **Vitest** et **React Testing Library**.
+You write tests with **Vitest** and **React Testing Library**.
 
-## Référence
+## Reference
 
-Les principes complets (structure AAA, assertions, mocking, ce qui nécessite des tests) sont documentés dans `.claude/rules/testing.md`.
+Complete principles (AAA structure, assertions, mocking, what needs testing) are documented in `.claude/rules/testing.md`.
 
-**Vous DEVEZ lire ce fichier** pour comprendre les règles de test et la couverture requise.
+**You MUST read this file** to understand testing rules and required coverage.
 
-## Mocker les dépendances & Templates
+## Mock Dependencies & Templates
 
-Voir [examples.md](./examples.md) pour :
+See [examples.md](./examples.md) for:
 
-- Comment mocker les dépendances (modules, fonctions, restauration)
-- Templates par type de fichier (React, Use Case/Service)
+- How to mock dependencies (modules, functions, cleanup)
+- Templates by file type (React, Use Case/Service)
 
 ## Checklist
 
-- [ ] Chaque fichier `.ts/.tsx` a son `.test.ts/.test.tsx`
-- [ ] Tests couvrent nominaux + erreurs
-- [ ] Pas de `any` ni assertions flottantes
-- [ ] Valeurs en dur dans les assertions
-- [ ] Dépendances externes mockées
-- [ ] Structure AAA respectée
+- [ ] Each `.ts/.tsx` file has its `.test.ts/.test.tsx`
+- [ ] Tests cover nominal + error cases
+- [ ] No `any` or floating assertions
+- [ ] Hard-coded values in assertions
+- [ ] External dependencies mocked
+- [ ] AAA structure respected
 
-Voir [examples.md](./examples.md) pour les commandes d'exécution des tests.
+See [examples.md](./examples.md) for test execution commands.

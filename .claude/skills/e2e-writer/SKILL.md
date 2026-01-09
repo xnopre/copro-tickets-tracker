@@ -1,38 +1,38 @@
 ---
 name: e2e-writer
-description: Écrit des tests E2E avec Playwright en utilisant les bonnes pratiques de sélection. Utilise quand tu dois écrire des tests d'intégration bout-en-bout, des scénarios utilisateur, ou des workflows complets.
+description: Write E2E tests with Playwright using selector best practices. Use when you need to write end-to-end integration tests, user scenarios, or complete workflows.
 ---
 
 # E2E Test Writer (Playwright)
 
-Vous écrivez des tests E2E **robustes** avec Playwright, priorité aux sélecteurs sémantiques.
+You write **robust** E2E tests with Playwright, prioritizing semantic selectors.
 
-## Référence
+## Reference
 
-La hiérarchie complète des sélecteurs (getByRole, getByLabel, getByText, getByTestId, locator) et les bonnes pratiques sont documentées dans `.claude/rules/testing-e2e.md`.
+Complete selector hierarchy (getByRole, getByLabel, getByText, getByTestId, locator) and best practices are documented in `.claude/rules/testing-e2e.md`.
 
-**Vous DEVEZ lire ce fichier** pour comprendre les règles de sélection exactes et les pièges à éviter.
+**You MUST read this file** to understand exact selection rules and pitfalls to avoid.
 
-## Commandes d'exécution
+## Execution Commands
 
 ```bash
 npm run test:e2e        # Headless (CI)
-npm run test:e2e:ui     # Interface graphique
-npm run test:e2e:debug  # Pas à pas
+npm run test:e2e:ui     # UI mode
+npm run test:e2e:debug  # Step by step
 ```
 
-## Pattern de test complet
+## Complete Test Pattern
 
-Voir [examples.md](./examples.md) pour un exemple complet de test E2E.
+See [examples.md](./examples.md) for a complete E2E test example.
 
-## Bonnes pratiques
+## Best Practices
 
-Voir [examples.md](./examples.md) pour les bonnes pratiques détaillées (attendre dynamique, timeouts, nettoyage) et les conventions de nommage.
+See [examples.md](./examples.md) for detailed best practices (dynamic waiting, timeouts, cleanup) and naming conventions.
 
 ## Checklist
 
-- [ ] Uniquement sélecteurs sémantiques (`getByRole`, `getByLabel`)
-- [ ] Pas de CSS classes (`.btn-primary`) ni d'IDs (`#title-input`)
-- [ ] Pas de `waitForTimeout()` → attendre des éléments spécifiques
+- [ ] Only semantic selectors (`getByRole`, `getByLabel`)
+- [ ] No CSS classes (`.btn-primary`) or IDs (`#title-input`)
+- [ ] No `waitForTimeout()` → wait for specific elements
 - [ ] Structure : Navigate → Interact → Verify
-- [ ] Tests couvrent cas nominal + cas d'erreur
+- [ ] Tests cover nominal + error cases

@@ -1,6 +1,6 @@
 # E2E Writer - Examples
 
-## Pattern de test complet
+## Complete Test Pattern
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -12,84 +12,84 @@ test.describe('Create Ticket Workflow', () => {
 
   test('should create a new ticket successfully', async ({ page }) => {
     // Navigate
-    await page.getByRole('link', { name: 'Créer un ticket' }).click();
+    await page.getByRole('link', { name: 'Create ticket' }).click();
 
     // Verify page
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Créer un nouveau ticket');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Create new ticket');
 
     // Fill form using semantic selectors
-    await page.getByLabel('Titre').fill("Réparer l'ascenseur");
-    await page.getByLabel('Description').fill("L'ascenseur ne monte plus");
-    await page.getByLabel('Statut').selectOption('NEW');
+    await page.getByLabel('Title').fill('Repair elevator');
+    await page.getByLabel('Description').fill('Elevator is not working');
+    await page.getByLabel('Status').selectOption('NEW');
 
     // Submit
-    await page.getByRole('button', { name: 'Créer' }).click();
+    await page.getByRole('button', { name: 'Create' }).click();
 
     // Verify success
-    await expect(page.getByText(/ticket créé avec succès/i)).toBeVisible();
-    await expect(page.getByRole('heading', { name: "Réparer l'ascenseur" })).toBeVisible();
+    await expect(page.getByText(/ticket created successfully/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Repair elevator' })).toBeVisible();
   });
 
   test('should show error when required fields are missing', async ({ page }) => {
     // Navigate
-    await page.getByRole('link', { name: 'Créer un ticket' }).click();
+    await page.getByRole('link', { name: 'Create ticket' }).click();
 
     // Submit without filling
-    await page.getByRole('button', { name: 'Créer' }).click();
+    await page.getByRole('button', { name: 'Create' }).click();
 
     // Verify error
-    await expect(page.getByText(/titre est requis/i)).toBeVisible();
+    await expect(page.getByText(/title is required/i)).toBeVisible();
   });
 });
 ```
 
-## Bonnes pratiques
+## Best Practices
 
-### Attendre les éléments dynamiques
+### Wait for Dynamic Elements
 
 ```typescript
-// ✅ BON - Attendre explicitement
-await page.getByText('Chargement...').toBeVisible();
-await page.getByText('Chargement...').toBeHidden();
+// ✅ GOOD - Wait explicitly
+await page.getByText('Loading...').toBeVisible();
+await page.getByText('Loading...').toBeHidden();
 
-// Puis continuer
+// Then continue
 await expect(page.getByRole('heading')).toContainText('Tickets');
 ```
 
-### Éviter les timeouts arbitraires
+### Avoid Arbitrary Timeouts
 
 ```typescript
-// ❌ MAUVAIS
+// ❌ BAD
 await page.waitForTimeout(2000);
 
-// ✅ BON - Attendre un élément spécifique
-await page.getByRole('button', { name: 'Créer' }).waitFor();
+// ✅ GOOD - Wait for specific element
+await page.getByRole('button', { name: 'Create' }).waitFor();
 ```
 
-### Nettoyer après les tests
+### Clean Up After Tests
 
 ```typescript
 test.afterEach(async ({ page }) => {
-  // Nettoyer les données de test si nécessaire
+  // Clean up test data if necessary
   await page.evaluate(() => localStorage.clear());
 });
 ```
 
-## Convention de nommage
+## Naming Convention
 
 ```
-tests/e2e/[nom-du-scenario].spec.ts
+tests/e2e/[scenario-name].spec.ts
 
-Exemples :
+Examples :
 - tests/e2e/create-ticket.spec.ts
 - tests/e2e/edit-ticket.spec.ts
 - tests/e2e/add-comment.spec.ts
 ```
 
-## Exécuter les tests E2E
+## Run E2E Tests
 
 ```bash
-npm run test:e2e        # Mode headless (CI)
-npm run test:e2e:ui     # Interface graphique
-npm run test:e2e:debug  # Mode pas à pas
+npm run test:e2e        # Headless mode (CI)
+npm run test:e2e:ui     # UI mode
+npm run test:e2e:debug  # Step by step mode
 ```

@@ -1,25 +1,25 @@
 # Test Writer - Examples
 
-## Mocker les dépendances
+## Mock Dependencies
 
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock de module
+// Mock a module
 vi.mock('@/infrastructure/database/connection');
 
-// Mock de fonction
+// Mock a function
 const mockSave = vi.fn();
 
-// Restaurer les mocks
+// Clear mocks
 beforeEach(() => {
   vi.clearAllMocks();
 });
 ```
 
-## Templates par type de fichier
+## Templates by File Type
 
-### Composant React
+### React Component
 
 ```typescript
 import { describe, it, expect } from 'vitest';
@@ -60,7 +60,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import MyUseCase from './MyUseCase';
 
 describe('MyUseCase', () => {
-  let mockRepository: any;
+  let mockRepository: IRepository;
 
   beforeEach(() => {
     mockRepository = {
@@ -99,10 +99,10 @@ describe('MyUseCase', () => {
 });
 ```
 
-## Exécuter les tests
+## Run Tests
 
 ```bash
-npm test                    # Tous les tests
-npm test -- MyComponent     # Test spécifique
-npm test -- --coverage      # Avec couverture
+npm test                    # All tests
+npm test -- MyComponent     # Specific test
+npm test -- --coverage      # With coverage
 ```

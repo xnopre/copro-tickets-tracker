@@ -1,42 +1,42 @@
 # Accessibility Checker - Examples
 
-## Rapport d'analyse structuré
+## Structured Analysis Report
 
-Voici le template de rapport à générer après vérification d'un composant :
+Here is the report template to generate after verifying a component:
 
 ```markdown
-# Rapport d'Accessibilité - [Nom du composant]
+# Accessibility Report - [Component Name]
 
-## ✅ Points Positifs
+## ✅ Positive Points
 
-[Liste les bonnes pratiques détectées]
+[List detected good practices]
 
-## ⚠️ Problèmes Détectés
+## ⚠️ Issues Detected
 
-### Critique (P0) - Bloquant
+### Critical (P0) - Blocking
 
-- [ ] Ligne X : [Description du problème]
-      Solution : [Comment corriger]
+- [ ] Line X : [Problem description]
+      Solution : [How to fix]
 
-### Important (P1) - À corriger
+### Important (P1) - To fix
 
-- [ ] Ligne Y : [Description du problème]
-      Solution : [Comment corriger]
+- [ ] Line Y : [Problem description]
+      Solution : [How to fix]
 
-## 📊 Score Global
+## 📊 Overall Score
 
-- Éléments sémantiques : X/5
-- Attributs ARIA : X/5
-- Focus/Clavier : X/5
-- Tests a11y : X/5
+- Semantic elements : X/5
+- ARIA attributes : X/5
+- Focus/Keyboard : X/5
+- a11y tests : X/5
 
-**Score total : X/20**
+**Total score : X/20**
 
 ## ✅ Verdict
 
-[CONFORME / À CORRIGER / NON CONFORME]
+[COMPLIANT / TO FIX / NON-COMPLIANT]
 ```
 
-## Exemple d'usage
+## Usage Example
 
-Vous lisiez un composant React, vérifiez chaque critère défini dans `.claude/rules/accessibility.md`, puis générez un rapport structuré avec ce template en remplaçant les valeurs par vos vérifications.
+Read a React component, verify each criterion defined in `.claude/rules/accessibility.md`, then generate a structured report using this template by replacing values with your findings.

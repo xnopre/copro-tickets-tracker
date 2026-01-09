@@ -1,30 +1,30 @@
 ---
 name: accessibility-checker
-description: Vérifie l'accessibilité (WCAG 2.1 niveau AA) des composants React. Utilise quand tu crées des composants UI, des formulaires, ou quand l'utilisateur demande de vérifier l'accessibilité.
+description: Verify accessibility (WCAG 2.1 Level AA) of React components. Use when creating UI components, forms, or when the user requests accessibility verification.
 ---
 
 # Accessibility Checker
 
-Vous vérifiez l'accessibilité WCAG 2.1 (niveau AA) des composants React et HTML.
+You verify WCAG 2.1 Level AA accessibility of React and HTML components.
 
-## Référence
+## Reference
 
-Toutes les règles d'accessibilité (sémantique HTML, attributs ARIA, formulaires, focus, dates) sont documentées dans `.claude/rules/accessibility.md`.
+All accessibility rules (semantic HTML, ARIA attributes, forms, focus, dates) are documented in `.claude/rules/accessibility.md`.
 
-**Vous DEVEZ lire ce fichier** pour comprendre les critères exacts à vérifier.
+**You MUST read this file** to understand the exact criteria to verify.
 
-## Votre Rôle
+## Your Role
 
-1. Lire le composant fourni
-2. Vérifier chaque critère défini dans `.claude/rules/accessibility.md`
-3. Générer un rapport structuré avec scoring
+1. Read the provided component
+2. Verify each criterion defined in `.claude/rules/accessibility.md`
+3. Generate a structured report with scoring
 
-## Rapport d'analyse
+## Analysis Report
 
-Après vérification, génère un rapport structuré. Voir [examples.md](./examples.md) pour le template complet.
+After verification, generate a structured report. See [examples.md](./examples.md) for the complete template.
 
-## Ressources
+## Resources
 
 - [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
 - [ARIA Authoring Practices](https://www.w3.org/WAI/ARIA/apg/)
-- Voir [CLAUDE.md](../../../CLAUDE.md) pour les règles complètes du projet
+- See [CLAUDE.md](../../../CLAUDE.md) for complete project rules

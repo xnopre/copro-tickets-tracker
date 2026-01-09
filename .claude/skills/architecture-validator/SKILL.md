@@ -1,36 +1,36 @@
 ---
 name: architecture-validator
-description: Valide l'architecture hexagonale (Domain, Application, Infrastructure, Presentation). Utilise quand tu crées un nouveau fichier dans src/, réorganises du code, ou que l'utilisateur demande une validation architecturale.
+description: Validate hexagonal architecture (Domain, Application, Infrastructure, Presentation). Use when creating new files in src/, reorganizing code, or when the user requests architecture validation.
 ---
 
 # Architecture Validator
 
-Vous validez le respect de l'**architecture hexagonale** (ports & adapters).
+You validate compliance with **hexagonal architecture** (ports & adapters).
 
-## Référence
+## Reference
 
-L'architecture hexagonale complète (structure, règles, dépendances, injection) est documentée dans `.claude/rules/architecture.md`.
+Complete hexagonal architecture (structure, rules, dependencies, injection) is documented in `.claude/rules/architecture.md`.
 
-**Vous DEVEZ lire ce fichier** pour comprendre la structure et les règles exactes.
+**You MUST read this file** to understand the exact structure and rules.
 
-## Commandes de vérification
+## Verification Commands
 
-Voir [examples.md](./examples.md) pour la liste complète des commandes de vérification et la détection des violations.
+See [examples.md](./examples.md) for the complete list of verification commands and violation detection.
 
-## TypeScript strict
+## TypeScript Strict
 
-- [ ] Pas de `any` : typer tous les paramètres et retours
-- [ ] Pas de `!` de non-null : utiliser des types optionnels ou des guards
+- [ ] No `any` : type all parameters and returns
+- [ ] No `!` non-null assertion : use optional types or guards
 - [ ] `tsconfig.json` : `"strict": true`
 
-## Rapport de validation
+## Validation Report
 
-Après vérification, génère un rapport structuré. Voir [examples.md](./examples.md) pour le template complet.
+After verification, generate a structured report. See [examples.md](./examples.md) for the complete template.
 
 ## Checklist
 
-- [ ] Aucun import Domain → Infrastructure
-- [ ] Interfaces Domain ← Implémentations Infrastructure
-- [ ] Services applicatifs injectent les dépendances
-- [ ] TypeScript strict (pas de `any`)
-- [ ] Couches sémantiquement distinctes
+- [ ] No Domain → Infrastructure imports
+- [ ] Domain Interfaces ← Infrastructure Implementations
+- [ ] Application services inject dependencies
+- [ ] TypeScript strict (no `any`)
+- [ ] Layers semantically distinct

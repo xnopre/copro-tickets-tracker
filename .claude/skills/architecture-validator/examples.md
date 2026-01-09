@@ -1,8 +1,8 @@
 # Architecture Validator - Examples
 
-## Commandes de vérification
+## Verification Commands
 
-### Détecter les violations Domain → Infrastructure
+### Detect Domain → Infrastructure violations
 
 ```bash
 grep -rn "from '@/infrastructure" src/domain/
@@ -13,72 +13,72 @@ grep -rn "from 'next/" src/domain/
 grep -rn "from 'react'" src/domain/
 ```
 
-Si **AUCUNE ligne** → ✅ Domain est pur
-Si **DES LIGNES** → ❌ VIOLATION CRITIQUE
+If **NO lines** → ✅ Domain is pure
+If **LINES found** → ❌ CRITICAL VIOLATION
 
-### Détecter les violations Application → Infrastructure
+### Detect Application → Infrastructure violations
 
 ```bash
 grep -rn "from '@/infrastructure" src/application/
 grep -rn "from '@/presentation" src/application/
 ```
 
-### Détecter les instanciations directes (pas d'injection)
+### Detect direct instantiation (no injection)
 
 ```bash
 grep -rn "new Mongo" src/domain/use-cases/
 grep -rn "new Mongo" src/application/
 ```
 
-Si **DES LIGNES** → ❌ Violation de l'injection de dépendances
+If **LINES found** → ❌ Dependency injection violation
 
-## Rapport de validation structuré
+## Structured Validation Report
 
 ```markdown
-# Rapport de Validation d'Architecture Hexagonale
+# Hexagonal Architecture Validation Report
 
-## ✅ Règles Respectées
+## ✅ Rules Respected
 
-- ✅ Domain ne dépend de rien
-- ✅ Application dépend uniquement du Domain
-- ✅ Infrastructure implémente les interfaces du Domain
-- ✅ Injection de dépendances respectée
+- ✅ Domain depends on nothing
+- ✅ Application depends only on Domain
+- ✅ Infrastructure implements Domain interfaces
+- ✅ Dependency injection respected
 
-## ❌ Violations Détectées
+## ❌ Violations Detected
 
-### Critique (P0)
+### Critical (P0)
 
-#### Violation 1 : Domain importe Infrastructure
+#### Violation 1 : Domain imports Infrastructure
 
-- **Fichier** : src/domain/use-cases/CreateTicket.ts:15
-- **Import interdit** : `import ... from '@/infrastructure/database'`
-- **Impact** : Le Domain n'est plus indépendant
+- **File** : src/domain/use-cases/CreateTicket.ts:15
+- **Forbidden import** : `import ... from '@/infrastructure/database'`
+- **Impact** : Domain is no longer independent
 - **Solution** :
-  1. Créer une interface dans `src/domain/repositories/`
-  2. Implémenter dans `src/infrastructure/repositories/`
-  3. Injecter via le constructeur
+  1. Create an interface in `src/domain/repositories/`
+  2. Implement in `src/infrastructure/repositories/`
+  3. Inject via constructor
 
-## 📊 Statistiques
+## 📊 Statistics
 
-- Fichiers Domain analysés : X
-- Violations critiques : X
-- Violations importantes : X
+- Domain files analyzed : X
+- Critical violations : X
+- Important violations : X
 
 ## ✅ Verdict
 
-[ARCHITECTURE VALIDE / VIOLATIONS À CORRIGER]
+[ARCHITECTURE VALID / VIOLATIONS TO FIX]
 ```
 
-## TypeScript strict - Checklist
+## TypeScript Strict - Checklist
 
 ```typescript
-// ❌ À ÉVITER
+// ❌ AVOID
 const getValue = (obj: any) => obj.value; // any
 const id = value!; // non-null assertion
 
-// ✅ PRÉFÉRER
-const getValue = (obj: { value: string }) => obj.value; // Typage
-const id = value ?? defaultValue; // Optionnel ou guard
+// ✅ PREFER
+const getValue = (obj: { value: string }) => obj.value; // Typing
+const id = value ?? defaultValue; // Optional or guard
 ```
 
-Vérifiez dans `tsconfig.json` : `"strict": true`
+Check in `tsconfig.json` : `"strict": true`
