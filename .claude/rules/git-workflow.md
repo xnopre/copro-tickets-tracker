@@ -2,9 +2,10 @@
 
 ## Commits
 
-- **NEVER commit code** — User commits themselves
+- **NEVER auto-commit without explicit user request** — User initiates commits themselves
 - Remove unused imports before finalizing
 - Always use meaningful commit messages
+- If user says "commit" or explicitly asks, THEN use git commit with a proper message
 
 ## Pull Requests
 

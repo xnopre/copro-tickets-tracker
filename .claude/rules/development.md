@@ -1,45 +1,4 @@
-# Development Commands
-
-## Installation & Setup
-
-```bash
-npm install
-```
-
-## Development Server
-
-```bash
-npm run dev
-```
-
-## Testing
-
-```bash
-# All tests
-npm test
-
-# Specific test file
-npm test -- <file>
-
-# With coverage
-npm test -- --coverage
-```
-
-## E2E Testing (Playwright)
-
-```bash
-npm run test:e2e        # Headless
-npm run test:e2e:ui     # UI mode
-npm run test:e2e:debug  # Debug mode
-```
-
-## Code Quality
-
-```bash
-npm run type-check      # TypeScript validation
-npm run lint            # ESLint check
-npm run build           # Production build
-```
+# Development Rules & Validation
 
 ## Step Completion Checklist
 

@@ -1,12 +1,4 @@
-# E2E Testing with Playwright
-
-## Commands
-
-```bash
-npm run test:e2e        # Headless
-npm run test:e2e:ui     # UI mode
-npm run test:e2e:debug  # Debug step-by-step
-```
+# E2E Testing Rules (Playwright)
 
 ## Selector Priority (Most Robust → Fragile)
 
