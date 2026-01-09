@@ -4,33 +4,32 @@
 
 ### Detect Domain → Infrastructure violations
 
-```bash
-grep -rn "from '@/infrastructure" src/domain/
-grep -rn "from '@/application" src/domain/
-grep -rn "from '@/presentation" src/domain/
-grep -rn "from 'mongoose'" src/domain/
-grep -rn "from 'next/" src/domain/
-grep -rn "from 'react'" src/domain/
-```
+Use the Grep tool to detect violations:
 
-If **NO lines** → ✅ Domain is pure
-If **LINES found** → ❌ CRITICAL VIOLATION
+**Pattern:** `from '@/infrastructure|from '@/application|from '@/presentation|from 'mongoose'|from 'next/|from 'react'`
+**Path:** `src/domain/`
+**Output mode:** `files_with_matches`
+
+If **NO matches** → ✅ Domain is pure
+If **MATCHES found** → ❌ CRITICAL VIOLATION
 
 ### Detect Application → Infrastructure violations
 
-```bash
-grep -rn "from '@/infrastructure" src/application/
-grep -rn "from '@/presentation" src/application/
-```
+Use the Grep tool to detect violations:
+
+**Pattern:** `from '@/infrastructure|from '@/presentation`
+**Path:** `src/application/`
+**Output mode:** `files_with_matches`
 
 ### Detect direct instantiation (no injection)
 
-```bash
-grep -rn "new Mongo" src/domain/use-cases/
-grep -rn "new Mongo" src/application/
-```
+Use the Grep tool to detect violations:
 
-If **LINES found** → ❌ Dependency injection violation
+**Pattern:** `new Mongo`
+**Path:** `src/domain/use-cases/|src/application/`
+**Output mode:** `files_with_matches`
+
+If **MATCHES found** → ❌ Dependency injection violation
 
 ## Structured Validation Report
 
