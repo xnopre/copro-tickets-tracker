@@ -6,6 +6,7 @@ import { CommentModel } from '@/infrastructure/database/schemas/CommentSchema';
 import UserModel from '@/infrastructure/database/schemas/UserSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { useTestDB } from '../../../../../tests/helpers/useTestDB';
+import { mockUser1, mockUser2 } from '../../../../../tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -22,15 +23,11 @@ describe('Comment API Routes', () => {
   let testUserId: string;
 
   beforeEach(async () => {
-    const user = await UserModel.create({
-      firstName: 'Jean',
-      lastName: 'Martin',
-      email: 'jean@example.com',
-      password: 'password123',
-    });
+    const { id, ...mockUser } = mockUser1;
+    const user = await UserModel.create({ ...mockUser });
     testUserId = user._id.toString();
     mockAuth.mockResolvedValue({
-      user: { id: testUserId, email: 'jean@example.com', firstName: 'Jean', lastName: 'Martin' },
+      user: { ...mockUser1, id: testUserId },
     } as any);
     const ticket = await TicketModel.create({
       title: 'Test Ticket',
@@ -48,12 +45,7 @@ describe('Comment API Routes', () => {
     };
 
     it('should get all comments for a ticket with populated author', async () => {
-      const user2 = await UserModel.create({
-        firstName: 'Marie',
-        lastName: 'Dubois',
-        email: 'marie@example.com',
-        password: 'password123',
-      });
+      const user2 = await UserModel.create(mockUser2);
 
       await CommentModel.create({
         ticketId: testTicketId,
@@ -75,11 +67,11 @@ describe('Comment API Routes', () => {
       expect(response.status).toBe(200);
       expect(data).toHaveLength(2);
       expect(data[0].content).toBe('Premier commentaire');
-      expect(data[0].author.firstName).toBe('Jean');
-      expect(data[0].author.lastName).toBe('Martin');
+      expect(data[0].author.firstName).toBe(mockUser1.firstName);
+      expect(data[0].author.lastName).toBe(mockUser1.lastName);
       expect(data[1].content).toBe('Deuxième commentaire');
-      expect(data[1].author.firstName).toBe('Marie');
-      expect(data[1].author.lastName).toBe('Dubois');
+      expect(data[1].author.firstName).toBe(mockUser2.firstName);
+      expect(data[1].author.lastName).toBe(mockUser2.lastName);
     });
 
     it('should return empty array when no comments', async () => {
@@ -134,8 +126,8 @@ describe('Comment API Routes', () => {
       expect(data.ticketId).toBe(testTicketId);
       expect(data.content).toBe('Nouveau commentaire');
       expect(data.author).toBeDefined();
-      expect(data.author.firstName).toBe('Jean');
-      expect(data.author.lastName).toBe('Martin');
+      expect(data.author.firstName).toBe(mockUser1.firstName);
+      expect(data.author.lastName).toBe(mockUser1.lastName);
       expect(data.createdAt).toBeDefined();
 
       const commentsInDb = await CommentModel.find({ ticketId: testTicketId });
@@ -240,3 +232,15 @@ describe('Comment API Routes', () => {
     });
   });
 });
+
+// [2026-01-09T21:30:35.746Z] [ERROR] Error creating comment {"ticketId":"6961737b53686b48f0b63623","error":"Cast to ObjectId failed for value \"1\" (type string) at path \"_id\" for model \"User\"","stack":"CastError: Cast to ObjectId failed for value \"1\" (type string) at path \"_id\" for model \"User\"" +
+// "    at SchemaObjectId.cast (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/schema/objectId.js:253:11)" +
+// "    at SchemaObjectId.SchemaType.applySetters (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/schemaType.js:1280:12)" +
+// "    at SchemaObjectId.SchemaType.castForQuery (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/schemaType.js:1706:17)" +
+// "    at cast (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/cast.js:386:32)" +
+// "    at model.Query.Query.cast (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/query.js:5025:12)" +
+// "    at model.Query.Query._castConditions (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/query.js:2374:10)" +
+// "    at model.Query._findOne (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/query.js:2704:8)" +
+// "    at model.Query.exec (/Users/xnopre/dev/copro-tickets-tracker/node_modules/mongoose/lib/query.js:4637:80)" +
+// "    at processTicksAndRejections (node:internal/process/task_queues:105:5)" +
+// "    at MongoUserRepository.findById (/Users/xnopre/dev/copro-tickets-tracker/src/infrastructure/repositories/MongoUserRepository.ts:21:18)"}

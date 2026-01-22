@@ -6,7 +6,8 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { User } from '@/domain/entities/User';
+import { mockUser1 } from '@tests/helpers/mockUsers';
+import { User } from '../entities/User';
 
 describe('CreateTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -74,14 +75,7 @@ describe('CreateTicket', () => {
       updatedAt: new Date(),
     };
 
-    const mockUsers: User[] = [
-      {
-        id: 'user_1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@test.com',
-      },
-    ];
+    const mockUsers: User[] = [mockUser1];
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);

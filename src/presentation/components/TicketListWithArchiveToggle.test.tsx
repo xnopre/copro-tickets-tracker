@@ -1,66 +1,11 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import TicketListWithArchiveToggle from './TicketListWithArchiveToggle';
-import { Ticket } from '@/domain/entities/Ticket';
-import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { UserPublic } from '@/domain/entities/User';
-
-const mockUser1: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Martin',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Dubois',
-};
+import { mockTicketsWithArchived } from '@tests/helpers/mockTickets';
 
 describe('TicketListWithArchiveToggle', () => {
-  const mockTickets: Ticket[] = [
-    {
-      id: '1',
-      title: 'Active Ticket 1',
-      description: 'Active description',
-      status: TicketStatus.NEW,
-      assignedTo: null,
-      archived: false,
-      createdAt: new Date('2025-01-15T10:00:00.000Z'),
-      updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-    },
-    {
-      id: '2',
-      title: 'Archived Ticket 1',
-      description: 'Archived description',
-      status: TicketStatus.CLOSED,
-      assignedTo: mockUser1,
-      archived: true,
-      createdAt: new Date('2025-01-10T10:00:00.000Z'),
-      updatedAt: new Date('2025-01-14T10:00:00.000Z'),
-    },
-    {
-      id: '3',
-      title: 'Active Ticket 2',
-      description: 'Active description 2',
-      status: TicketStatus.IN_PROGRESS,
-      assignedTo: mockUser2,
-      archived: false,
-      createdAt: new Date('2025-01-16T10:00:00.000Z'),
-      updatedAt: new Date('2025-01-16T10:00:00.000Z'),
-    },
-    {
-      id: '4',
-      title: 'Archived Ticket 2',
-      description: 'Archived description 2',
-      status: TicketStatus.RESOLVED,
-      assignedTo: null,
-      archived: true,
-      createdAt: new Date('2025-01-12T10:00:00.000Z'),
-      updatedAt: new Date('2025-01-13T10:00:00.000Z'),
-    },
-  ];
+  const mockTickets = mockTicketsWithArchived;
 
   describe('Initial state', () => {
     it('should display only active tickets by default', () => {

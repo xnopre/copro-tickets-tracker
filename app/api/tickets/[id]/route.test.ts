@@ -9,7 +9,7 @@ import { GetTickets } from '@/domain/use-cases/GetTickets';
 import { GetTicketById } from '@/domain/use-cases/GetTicketById';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
-import { UserPublic } from '@/domain/entities/User';
+import { mockUserPublic1, mockUserPublic2 } from '../../../../tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -20,18 +20,6 @@ vi.mock('@/auth', () => ({
 }));
 
 vi.mock('@/application/services/ServiceFactory');
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Dupont',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Martin',
-};
 
 describe('GET /api/tickets/[id]', () => {
   const mockTicketService = {
@@ -152,7 +140,7 @@ describe('PATCH /api/tickets/[id]', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
+        assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
         updatedAt: new Date('2025-01-15T11:00:00Z'),
@@ -359,7 +347,7 @@ describe('PATCH /api/tickets/[id]', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.RESOLVED,
-        assignedTo: mockUser2,
+        assignedTo: mockUserPublic2,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
         updatedAt: new Date('2025-01-15T12:00:00Z'),

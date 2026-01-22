@@ -1,55 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import TicketList from './TicketList';
-import { Ticket } from '@/domain/entities/Ticket';
-import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { UserPublic } from '@/domain/entities/User';
-
-const mockUser1: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'Jean',
-  lastName: 'Martin',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Marie',
-  lastName: 'Dubois',
-};
+import { mockTicketsList } from '@tests/helpers/mockTickets';
 
 describe('TicketList', () => {
-  const mockTickets: Ticket[] = [
-    {
-      id: '1',
-      title: 'First Ticket',
-      description: 'First description',
-      status: TicketStatus.NEW,
-      assignedTo: null,
-      archived: false,
-      createdAt: new Date('2025-01-15'),
-      updatedAt: new Date('2025-01-15'),
-    },
-    {
-      id: '2',
-      title: 'Second Ticket',
-      description: 'Second description',
-      status: TicketStatus.IN_PROGRESS,
-      assignedTo: mockUser1,
-      archived: false,
-      createdAt: new Date('2025-01-16'),
-      updatedAt: new Date('2025-01-16'),
-    },
-    {
-      id: '3',
-      title: 'Third Ticket',
-      description: 'Third description',
-      status: TicketStatus.RESOLVED,
-      assignedTo: mockUser2,
-      archived: false,
-      createdAt: new Date('2025-01-17'),
-      updatedAt: new Date('2025-01-17'),
-    },
-  ];
+  const mockTickets = mockTicketsList;
 
   it('should render all tickets', () => {
     render(<TicketList tickets={mockTickets} />);

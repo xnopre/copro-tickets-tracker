@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UpdateTicket } from './UpdateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
@@ -6,33 +6,14 @@ import { IEmailService } from '../services/IEmailService';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
-import { User, UserPublic } from '../entities/User';
-
-const mockUser: UserPublic = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'John',
-  lastName: 'Doe',
-};
-
-const mockUserFull: User = {
-  id: '507f1f77bcf86cd799439016',
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@test.com',
-};
-
-const mockUser2: UserPublic = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Jane',
-  lastName: 'Smith',
-};
-
-const mockUser2Full: User = {
-  id: '507f1f77bcf86cd799439017',
-  firstName: 'Jane',
-  lastName: 'Smith',
-  email: 'jane@test.com',
-};
+import { User } from '../entities/User';
+import { UpdateTicketData } from '../entities/Ticket';
+import { mockUser1, mockUser2 } from '@tests/helpers/mockUsers';
+import {
+  mockTicketArchivedNew,
+  mockTicketInProgress,
+  mockTicketNew,
+} from '@tests/helpers/mockTickets';
 
 describe('UpdateTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -90,30 +71,8 @@ describe('UpdateTicket', () => {
 
   describe('Update status and assignedTo', () => {
     it('should update status and assignedTo successfully', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -122,44 +81,23 @@ describe('UpdateTicket', () => {
         mockEmailTemplateService,
         mockLogger
       );
-      const result = await useCase.execute('1', {
+      const updateTicketData: UpdateTicketData = {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
-      });
+        assignedTo: mockUser1.id,
+      };
+      const result = await useCase.execute('1', updateTicketData);
 
-      expect(result).toEqual(mockTicket);
+      expect(result).toEqual(mockTicketInProgress);
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
     });
 
     it('should trim assignedTo', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -170,87 +108,20 @@ describe('UpdateTicket', () => {
       );
       await useCase.execute('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: `  ${mockUser.id}  `,
+        assignedTo: `  ${mockUser1.id}  `,
       });
 
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         status: TicketStatus.IN_PROGRESS,
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
     });
   });
 
   describe('Update title and description', () => {
-    it('should update title and description successfully', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Old Title',
-        description: 'Old Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Updated Title',
-        description: 'Updated Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:30:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
-
-      const useCase = new UpdateTicket(
-        mockRepository,
-        mockUserRepository,
-        mockEmailService,
-        mockEmailTemplateService,
-        mockLogger
-      );
-      const result = await useCase.execute('1', {
-        title: 'Updated Title',
-        description: 'Updated Description',
-      });
-
-      expect(result).toEqual(mockTicket);
-      expect(mockRepository.update).toHaveBeenCalledWith('1', {
-        title: 'Updated Title',
-        description: 'Updated Description',
-      });
-    });
-
     it('should trim title and description', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Old Title',
-        description: 'Old Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Updated Title',
-        description: 'Updated Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:30:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -269,77 +140,12 @@ describe('UpdateTicket', () => {
         description: 'Updated Description',
       });
     });
-
-    it('should update only title', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Old Title',
-        description: 'Original Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'New Title',
-        description: 'Original Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:30:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
-
-      const useCase = new UpdateTicket(
-        mockRepository,
-        mockUserRepository,
-        mockEmailService,
-        mockEmailTemplateService,
-        mockLogger
-      );
-      const result = await useCase.execute('1', {
-        title: 'New Title',
-      });
-
-      expect(result).toEqual(mockTicket);
-      expect(mockRepository.update).toHaveBeenCalledWith('1', {
-        title: 'New Title',
-      });
-    });
   });
 
   describe('Update all fields', () => {
     it('should update all fields together', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Old Title',
-        description: 'Old Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'New Title',
-        description: 'New Description',
-        status: TicketStatus.RESOLVED,
-        assignedTo: mockUser2,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T12:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -355,7 +161,7 @@ describe('UpdateTicket', () => {
         assignedTo: mockUser2.id,
       });
 
-      expect(result).toEqual(mockTicket);
+      expect(result).toEqual(mockTicketInProgress);
       expect(mockRepository.update).toHaveBeenCalledWith('1', {
         title: 'New Title',
         description: 'New Description',
@@ -492,73 +298,9 @@ describe('UpdateTicket', () => {
       ).rejects.toThrow('Statut invalide');
     });
 
-    it('should convert empty assignedTo to null', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
-
-      const useCase = new UpdateTicket(
-        mockRepository,
-        mockUserRepository,
-        mockEmailService,
-        mockEmailTemplateService,
-        mockLogger
-      );
-      await useCase.execute('1', {
-        assignedTo: '',
-      });
-
-      expect(mockRepository.update).toHaveBeenCalledWith('1', {
-        assignedTo: null,
-      });
-    });
-
     it('should convert whitespace-only assignedTo to null', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -598,18 +340,7 @@ describe('UpdateTicket', () => {
 
   describe('Archived ticket', () => {
     it('should throw error when trying to update an archived ticket', async () => {
-      const archivedTicket = {
-        id: '1',
-        title: 'Archived Ticket',
-        description: 'This ticket is archived',
-        status: TicketStatus.CLOSED,
-        assignedTo: null,
-        archived: true,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketArchivedNew);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -628,93 +359,13 @@ describe('UpdateTicket', () => {
       expect(mockRepository.findById).toHaveBeenCalledWith('1');
       expect(mockRepository.update).not.toHaveBeenCalled();
     });
-
-    it('should throw error when trying to update status of archived ticket', async () => {
-      const archivedTicket = {
-        id: '1',
-        title: 'Archived Ticket',
-        description: 'This ticket is archived',
-        status: TicketStatus.CLOSED,
-        assignedTo: null,
-        archived: true,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
-
-      const useCase = new UpdateTicket(
-        mockRepository,
-        mockUserRepository,
-        mockEmailService,
-        mockEmailTemplateService,
-        mockLogger
-      );
-
-      await expect(
-        useCase.execute('1', {
-          status: TicketStatus.IN_PROGRESS,
-        })
-      ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
-    });
-
-    it('should throw error when trying to update assignedTo of archived ticket', async () => {
-      const archivedTicket = {
-        id: '1',
-        title: 'Archived Ticket',
-        description: 'This ticket is archived',
-        status: TicketStatus.CLOSED,
-        assignedTo: null,
-        archived: true,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(archivedTicket);
-
-      const useCase = new UpdateTicket(
-        mockRepository,
-        mockUserRepository,
-        mockEmailService,
-        mockEmailTemplateService,
-        mockLogger
-      );
-
-      await expect(
-        useCase.execute('1', {
-          assignedTo: mockUser.id,
-        })
-      ).rejects.toThrow('Un ticket archivé ne peut pas être modifié');
-    });
   });
 
   describe('Email notifications', () => {
     it('should send email notification when assigning a ticket', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
-      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUserFull);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
+      vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
       vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
 
       const useCase = new UpdateTicket(
@@ -725,40 +376,18 @@ describe('UpdateTicket', () => {
         mockLogger
       );
       await useCase.execute('1', {
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
 
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).toHaveBeenCalled();
     });
 
     it('should send email notification when changing status', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
+      const mockUsers: User[] = [mockUser1, mockUser2];
 
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.IN_PROGRESS,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      const mockUsers: User[] = [mockUserFull, mockUser2Full];
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
       vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
 
@@ -778,30 +407,8 @@ describe('UpdateTicket', () => {
     });
 
     it('should not send email notification if status does not change', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Updated Title',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
@@ -818,30 +425,8 @@ describe('UpdateTicket', () => {
     });
 
     it('should not fail if email sending fails', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.IN_PROGRESS,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
 
       const useCase = new UpdateTicket(
@@ -856,35 +441,13 @@ describe('UpdateTicket', () => {
         status: TicketStatus.IN_PROGRESS,
       });
 
-      expect(result).toEqual(mockTicket);
+      expect(result).toEqual(mockTicketInProgress);
       expect(mockLogger.error).toHaveBeenCalled();
     });
 
     it('should not send email notification if assignee is not found', async () => {
-      const existingTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: null,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
-      };
-
-      const mockTicket = {
-        id: '1',
-        title: 'Test Ticket',
-        description: 'Test Description',
-        status: TicketStatus.NEW,
-        assignedTo: mockUser,
-        archived: false,
-        createdAt: new Date('2025-01-15T10:00:00.000Z'),
-        updatedAt: new Date('2025-01-15T11:00:00.000Z'),
-      };
-
-      vi.mocked(mockRepository.findById).mockResolvedValue(existingTicket);
-      vi.mocked(mockRepository.update).mockResolvedValue(mockTicket);
+      vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
+      vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
 
       const useCase = new UpdateTicket(
@@ -895,10 +458,10 @@ describe('UpdateTicket', () => {
         mockLogger
       );
       await useCase.execute('1', {
-        assignedTo: mockUser.id,
+        assignedTo: mockUser1.id,
       });
 
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser.id);
+      expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
     });
   });

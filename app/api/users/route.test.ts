@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
-import { UserPublic } from '@/domain/entities/User';
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -22,18 +22,7 @@ describe('GET /api/users', () => {
   });
 
   it('should return all users', async () => {
-    const mockUsers: UserPublic[] = [
-      {
-        id: '1',
-        firstName: 'Jean',
-        lastName: 'Dupont',
-      },
-      {
-        id: '2',
-        firstName: 'Marie',
-        lastName: 'Martin',
-      },
-    ];
+    const mockUsers = [mockUserPublic1, mockUserPublic2];
 
     const mockUserService = {
       getUsers: vi.fn().mockResolvedValue(mockUsers),

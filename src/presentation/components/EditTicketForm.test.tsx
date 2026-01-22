@@ -4,23 +4,14 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../../../vitest.setup';
 import EditTicketForm from './EditTicketForm';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { UserPublic } from '@/domain/entities/User';
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 const mockOnTicketUpdated = vi.fn();
 const mockOnCancel = vi.fn();
 
 // Mock users data
-const mockUsers = [
-  {
-    id: '1',
-    firstName: 'John',
-    lastName: 'Doe',
-  },
-  {
-    id: '2',
-    firstName: 'Jane',
-    lastName: 'Smith',
-  },
-];
+const mockUsers: UserPublic[] = [mockUserPublic1, mockUserPublic2];
 
 describe('EditTicketForm', () => {
   const defaultProps = {
