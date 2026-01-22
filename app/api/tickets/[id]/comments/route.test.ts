@@ -111,7 +111,7 @@ describe('Comment API Routes', () => {
       });
     };
 
-    it.only('should create a comment successfully with authorId from session', async () => {
+    it('should create a comment successfully with authorId from session', async () => {
       const request = createPostRequest(testTicketId, {
         content: 'Nouveau commentaire',
       });
