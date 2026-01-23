@@ -43,6 +43,7 @@ describe('TicketPage', () => {
     title: "Réparer l'ascenseur",
     description: "L'ascenseur est en panne depuis hier",
     status: TicketStatus.IN_PROGRESS,
+    createdBy: mockUserPublic1,
     assignedTo: mockUserPublic1,
     archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),
@@ -71,10 +72,14 @@ describe('TicketPage', () => {
     expect(statusBadge).toBeInTheDocument();
     expect(statusBadge).toHaveTextContent('En cours');
 
-    expect(screen.getByText(/Assigné à :/)).toBeInTheDocument();
-    expect(
-      screen.getByText(`${mockUserPublic1.firstName} ${mockUserPublic1.lastName}`)
-    ).toBeInTheDocument();
+    const assignedToLabel = screen.getByText(/Assigné à :/);
+    expect(assignedToLabel).toBeInTheDocument();
+
+    // Get the "Assigné à" section and verify the user name is shown
+    const assignedToSection = assignedToLabel.closest('div');
+    expect(assignedToSection).toHaveTextContent(
+      `${mockUserPublic1.firstName} ${mockUserPublic1.lastName}`
+    );
   });
 
   it('should call notFound when ticket does not exist', async () => {
@@ -100,6 +105,7 @@ describe('TicketPage', () => {
       ...mockTicket,
       id: '456',
       status: TicketStatus.NEW,
+      createdBy: mockUserPublic1,
       assignedTo: null,
       archived: false,
     };
@@ -122,6 +128,7 @@ describe('TicketPage', () => {
       ...mockTicket,
       id: '789',
       status: TicketStatus.RESOLVED,
+      createdBy: mockUserPublic1,
       assignedTo: mockUserPublic2,
     };
 

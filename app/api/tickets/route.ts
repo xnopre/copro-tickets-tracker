@@ -28,8 +28,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userId = session.user?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const ticketService = ServiceFactory.getTicketService();
-    const ticket = await ticketService.createTicket(validation.data);
+    const ticket = await ticketService.createTicket({
+      ...validation.data,
+      createdBy: userId,
+    });
 
     return NextResponse.json(ticket, { status: 201 });
   } catch (error) {

@@ -1,15 +1,25 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../../../vitest.setup';
 import CreateTicketForm from './CreateTicketForm';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 const mockRouterPush = vi.fn();
+const mockSession = {
+  user: mockUser1,
+};
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
   }),
+}));
+
+vi.mock('next-auth/react', () => ({
+  useSession: vi.fn(() => ({
+    data: mockSession,
+  })),
 }));
 
 describe('CreateTicketForm', () => {

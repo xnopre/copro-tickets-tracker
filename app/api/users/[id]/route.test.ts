@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import connectDB from '@/infrastructure/database/mongodb';
-import { mockUserPublic1 } from '../../../../tests/helpers/mockUsers';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),

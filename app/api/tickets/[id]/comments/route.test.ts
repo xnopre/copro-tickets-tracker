@@ -5,8 +5,8 @@ import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { CommentModel } from '@/infrastructure/database/schemas/CommentSchema';
 import UserModel from '@/infrastructure/database/schemas/UserSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { useTestDB } from '../../../../../tests/helpers/useTestDB';
-import { mockUser1, mockUser2 } from '../../../../../tests/helpers/mockUsers';
+import { useTestDB } from '@tests/helpers/useTestDB';
+import { mockUser1, mockUser2 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -23,7 +23,7 @@ describe('Comment API Routes', () => {
   let testUserId: string;
 
   beforeEach(async () => {
-    const { id, ...mockUser } = mockUser1;
+    const { id: _, ...mockUser } = mockUser1;
     const user = await UserModel.create({ ...mockUser });
     testUserId = user._id.toString();
     mockAuth.mockResolvedValue({
@@ -33,6 +33,7 @@ describe('Comment API Routes', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: testUserId,
     });
     testTicketId = ticket._id.toString();
   });

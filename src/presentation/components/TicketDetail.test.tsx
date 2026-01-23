@@ -3,6 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import TicketDetail from './TicketDetail';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 vi.mock('./ArchiveTicketButton', () => ({
   default: ({ ticketId: _ticketId }: { ticketId: string }) => (
@@ -16,6 +17,7 @@ describe('TicketDetail', () => {
     title: 'Test Ticket',
     description: 'This is a detailed test ticket description',
     status: TicketStatus.NEW,
+    createdBy: mockUserPublic1,
     assignedTo: null,
     archived: false,
     createdAt: new Date('2025-01-15T10:30:00'),

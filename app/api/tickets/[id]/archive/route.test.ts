@@ -4,7 +4,7 @@ import { PATCH } from './route';
 import { ServiceFactory } from '@/application/services/ServiceFactory';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { TicketService } from '@/application/services/TicketService';
-import { InvalidIdError } from '@/domain/errors/InvalidIdError';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -41,6 +41,7 @@ describe('PATCH /api/tickets/[id]/archive', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: mockUserPublic1,
       assignedTo: null,
       archived: true,
       createdAt: new Date('2025-01-15T10:00:00Z'),

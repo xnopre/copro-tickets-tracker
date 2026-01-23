@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { GetTickets } from './GetTickets';
 import { ITicketRepository } from '../repositories/ITicketRepository';
-import { mockTicketNew, mockTicketInProgress, mockTickets } from '@tests/helpers/mockTickets';
+import { mockTicketNew, mockTicketInProgress } from '@tests/helpers/mockTickets';
 
 describe('GetTickets', () => {
   const mockRepository: ITicketRepository = {

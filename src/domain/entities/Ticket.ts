@@ -6,6 +6,7 @@ export interface Ticket {
   title: string;
   description: string;
   status: TicketStatus;
+  createdBy: UserPublic;
   assignedTo: UserPublic | null;
   archived: boolean;
   createdAt: Date;
@@ -15,6 +16,7 @@ export interface Ticket {
 export interface CreateTicketData {
   title: string;
   description: string;
+  createdBy: string;
 }
 
 export interface UpdateTicketData {

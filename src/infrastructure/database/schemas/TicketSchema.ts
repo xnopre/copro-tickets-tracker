@@ -5,6 +5,7 @@ export interface TicketDocument extends Document {
   title: string;
   description: string;
   status: TicketStatus;
+  createdBy: Types.ObjectId;
   assignedTo: Types.ObjectId | null;
   archived: boolean;
   createdAt: Date;
@@ -26,6 +27,11 @@ const ticketSchema = new Schema<TicketDocument>(
       type: String,
       enum: Object.values(TicketStatus),
       default: TicketStatus.NEW,
+      required: true,
+    },
+    createdBy: {
+      type: Types.ObjectId,
+      ref: 'User',
       required: true,
     },
     assignedTo: {
