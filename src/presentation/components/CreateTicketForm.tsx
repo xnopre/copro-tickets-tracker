@@ -19,8 +19,7 @@ export default function CreateTicketForm() {
   const router = useRouter();
 
   const currentUserName =
-    session?.user?.name ||
-    `${(session?.user as any)?.firstName} ${(session?.user as any)?.lastName}`;
+    session?.user?.name || `${session?.user?.firstName} ${session?.user?.lastName}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -59,11 +59,10 @@ export class MongoTicketRepository implements ITicketRepository {
     }
 
     // Convertir assignedTo en ObjectId si présent
+    // TODO XN passer par un autre type pour updateData ?
     const updateData = { ...data };
-    if (updateData.assignedTo !== undefined) {
-      if (updateData.assignedTo === null) {
-        (updateData as any).assignedTo = null;
-      } else if (Types.ObjectId.isValid(updateData.assignedTo)) {
+    if (updateData.assignedTo !== undefined && updateData.assignedTo !== null) {
+      if (Types.ObjectId.isValid(updateData.assignedTo)) {
         (updateData as any).assignedTo = new Types.ObjectId(updateData.assignedTo);
       } else {
         throw new InvalidIdError(updateData.assignedTo);
