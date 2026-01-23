@@ -8,6 +8,7 @@ import { ILogger } from '@/domain/services/ILogger';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { CreateTicketData, Ticket } from '@/domain/entities/Ticket';
 import { mockTicketInProgress, mockTicketNew } from '@tests/helpers/mockTickets';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 describe('TicketService', () => {
   let mockRepository: ITicketRepository;
@@ -27,7 +28,12 @@ describe('TicketService', () => {
     };
     mockUserRepository = {
       findAll: vi.fn().mockResolvedValue([]),
-      findById: vi.fn().mockResolvedValue(null),
+      findById: vi.fn((id: string) => {
+        if (id === '1') {
+          return Promise.resolve(mockUser1);
+        }
+        return Promise.resolve(null);
+      }),
       findByEmail: vi.fn().mockResolvedValue(null),
     };
     mockEmailService = {
@@ -98,6 +104,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: 'New Ticket',
         description: 'New Description',
+        createdBy: '1',
       };
 
       vi.mocked(mockRepository.create).mockResolvedValue(mockTicketNew);
@@ -108,6 +115,7 @@ describe('TicketService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         title: 'New Ticket',
         description: 'New Description',
+        createdBy: '1',
       });
     });
 
@@ -115,6 +123,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: '',
         description: 'Description',
+        createdBy: '1',
       };
 
       await expect(ticketService.createTicket(createData)).rejects.toThrow('Le titre est requis');
@@ -125,6 +134,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: 'Title',
         description: '',
+        createdBy: '1',
       };
 
       await expect(ticketService.createTicket(createData)).rejects.toThrow(
@@ -137,6 +147,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: 'A'.repeat(201),
         description: 'Description',
+        createdBy: '1',
       };
 
       await expect(ticketService.createTicket(createData)).rejects.toThrow(
@@ -149,6 +160,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: 'Title',
         description: 'A'.repeat(5001),
+        createdBy: '1',
       };
 
       await expect(ticketService.createTicket(createData)).rejects.toThrow(
@@ -161,6 +173,7 @@ describe('TicketService', () => {
       const createData: CreateTicketData = {
         title: '  Spaced Title  ',
         description: '  Spaced Description  ',
+        createdBy: '1',
       };
 
       vi.mocked(mockRepository.create).mockResolvedValue(mockTicketNew);
@@ -170,6 +183,7 @@ describe('TicketService', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         title: 'Spaced Title',
         description: 'Spaced Description',
+        createdBy: '1',
       });
     });
   });

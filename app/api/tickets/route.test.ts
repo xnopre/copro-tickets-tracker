@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { POST } from './route';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { useTestDB } from '../../../tests/helpers/useTestDB';
+import { useTestDB } from '@tests/helpers/useTestDB';
+import UserModel from '@/infrastructure/database/schemas/UserSchema';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -16,8 +18,13 @@ vi.mock('@/auth', () => ({
 describe('POST /api/tickets', () => {
   useTestDB();
 
-  beforeEach(() => {
-    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
+  beforeEach(async () => {
+    // Create test user
+    const { id: _, ...userWithoutId } = mockUser1;
+    const user = await UserModel.create(userWithoutId);
+    mockAuth.mockResolvedValue({
+      user: { id: user._id.toString(), email: user.email },
+    });
   });
 
   const createRequest = (body: unknown) => {

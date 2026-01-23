@@ -7,9 +7,8 @@ import { TicketService } from '@/application/services/TicketService';
 import { CreateTicket } from '@/domain/use-cases/CreateTicket';
 import { GetTickets } from '@/domain/use-cases/GetTickets';
 import { GetTicketById } from '@/domain/use-cases/GetTicketById';
-import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { ValidationError } from '@/domain/errors/ValidationError';
-import { mockUserPublic1, mockUserPublic2 } from '../../../../tests/helpers/mockUsers';
+import { mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -48,6 +47,7 @@ describe('GET /api/tickets/[id]', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: mockUserPublic1,
       assignedTo: null,
       archived: false,
       createdAt: new Date('2025-01-15T10:00:00Z'),
@@ -140,6 +140,7 @@ describe('PATCH /api/tickets/[id]', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: mockUserPublic1,
         assignedTo: mockUserPublic1,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
@@ -223,6 +224,7 @@ describe('PATCH /api/tickets/[id]', () => {
         title: 'Updated Title',
         description: 'Updated Description',
         status: TicketStatus.NEW,
+        createdBy: mockUserPublic1,
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),
@@ -347,6 +349,7 @@ describe('PATCH /api/tickets/[id]', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.RESOLVED,
+        createdBy: mockUserPublic1,
         assignedTo: mockUserPublic2,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00Z'),

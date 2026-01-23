@@ -2,7 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { TicketModel } from '@/infrastructure/database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { useTestDB } from '../tests/helpers/useTestDB';
+import { useTestDB } from '@tests/helpers/useTestDB';
+import UserModel from '@/infrastructure/database/schemas/UserSchema';
+import { mockUser1 } from '@tests/helpers/mockUsers';
+import { Types } from 'mongoose';
 
 const { mockAuth } = vi.hoisted(() => ({
   mockAuth: vi.fn(),
@@ -15,8 +18,16 @@ vi.mock('@/auth', () => ({
 describe('Home Page', () => {
   useTestDB();
 
-  beforeEach(() => {
-    mockAuth.mockResolvedValue({ user: { id: '1', email: 'test@example.com' } } as any);
+  let testUserId: Types.ObjectId;
+
+  beforeEach(async () => {
+    // Create test user
+    const { id: _, ...userWithoutId } = mockUser1;
+    const user = await UserModel.create(userWithoutId);
+    testUserId = user._id;
+    mockAuth.mockResolvedValue({
+      user: { id: user._id.toString(), email: user.email },
+    } as any);
   });
 
   it('should display the title "CoTiTra"', async () => {
@@ -34,12 +45,14 @@ describe('Home Page', () => {
       title: 'Ticket 1',
       description: 'Description 1',
       status: TicketStatus.NEW,
+      createdBy: testUserId,
     });
 
     await TicketModel.create({
       title: 'Ticket 2',
       description: 'Description 2',
       status: TicketStatus.IN_PROGRESS,
+      createdBy: testUserId,
     });
 
     const Home = (await import('./page')).default;
@@ -73,6 +86,7 @@ describe('Home Page', () => {
       title: 'Old Ticket',
       description: 'Created first',
       status: TicketStatus.NEW,
+      createdBy: testUserId,
     });
 
     await new Promise(resolve => setTimeout(resolve, 10));
@@ -81,6 +95,7 @@ describe('Home Page', () => {
       title: 'New Ticket',
       description: 'Created second',
       status: TicketStatus.NEW,
+      createdBy: testUserId,
     });
 
     const Home = (await import('./page')).default;
@@ -97,6 +112,7 @@ describe('Home Page', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: testUserId,
     });
 
     const Home = (await import('./page')).default;

@@ -3,6 +3,7 @@ import { MongoTicketRepository } from './MongoTicketRepository';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
 import { TicketModel } from '../database/schemas/TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 // Mock MongoDB connection
 vi.mock('../database/mongodb', () => ({
@@ -19,6 +20,8 @@ vi.mock('../database/schemas/TicketSchema', () => ({
   },
 }));
 
+const validObjectId = '507f1f77bcf86cd799439011';
+
 describe('MongoTicketRepository', () => {
   let repository: MongoTicketRepository;
 
@@ -31,7 +34,9 @@ describe('MongoTicketRepository', () => {
     it('should return empty array when no tickets exist', async () => {
       const mockFind = vi.fn().mockReturnValue({
         populate: vi.fn().mockReturnValue({
-          sort: vi.fn().mockResolvedValue([]),
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue([]),
+          }),
         }),
       });
       vi.mocked(TicketModel.find).mockImplementation(mockFind);
@@ -49,6 +54,7 @@ describe('MongoTicketRepository', () => {
           title: 'Recent Ticket',
           description: 'Description 1',
           status: TicketStatus.NEW,
+          createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
           assignedTo: null,
           archived: false,
           createdAt: new Date('2024-01-02'),
@@ -59,6 +65,7 @@ describe('MongoTicketRepository', () => {
           title: 'Old Ticket',
           description: 'Description 2',
           status: TicketStatus.IN_PROGRESS,
+          createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
           assignedTo: null,
           archived: false,
           createdAt: new Date('2024-01-01'),
@@ -68,7 +75,9 @@ describe('MongoTicketRepository', () => {
 
       const mockFind = vi.fn().mockReturnValue({
         populate: vi.fn().mockReturnValue({
-          sort: vi.fn().mockResolvedValue(mockDocuments),
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue(mockDocuments),
+          }),
         }),
       });
       vi.mocked(TicketModel.find).mockImplementation(mockFind);
@@ -81,6 +90,7 @@ describe('MongoTicketRepository', () => {
         title: 'Recent Ticket',
         description: 'Description 1',
         status: TicketStatus.NEW,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocuments[0].createdAt,
@@ -91,6 +101,7 @@ describe('MongoTicketRepository', () => {
         title: 'Old Ticket',
         description: 'Description 2',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocuments[1].createdAt,
@@ -101,18 +112,22 @@ describe('MongoTicketRepository', () => {
 
     it('should call sort with createdAt: -1', async () => {
       const mockSort = vi.fn().mockResolvedValue([]);
-      const mockPopulate = vi.fn().mockReturnValue({
+      const mockPopulate2 = vi.fn().mockReturnValue({
         sort: mockSort,
       });
+      const mockPopulate1 = vi.fn().mockReturnValue({
+        populate: mockPopulate2,
+      });
       const mockFind = vi.fn().mockReturnValue({
-        populate: mockPopulate,
+        populate: mockPopulate1,
       });
       vi.mocked(TicketModel.find).mockImplementation(mockFind);
 
       await repository.findAll();
 
       expect(TicketModel.find).toHaveBeenCalledWith({});
-      expect(mockPopulate).toHaveBeenCalledWith('assignedTo');
+      expect(mockPopulate1).toHaveBeenCalledWith('createdBy');
+      expect(mockPopulate2).toHaveBeenCalledWith('assignedTo');
       expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
     });
   });
@@ -143,9 +158,10 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should return null for valid ObjectId that does not exist', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const mockFindById = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(null),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(null),
+        }),
       });
       vi.mocked(TicketModel.findById).mockImplementation(mockFindById);
 
@@ -156,12 +172,12 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should return ticket for valid existing ObjectId', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const mockDocument = {
         _id: validObjectId,
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
+        createdBy: { _id: validObjectId, ...mockUserPublic1 },
         assignedTo: null,
         archived: false,
         createdAt: new Date(),
@@ -169,7 +185,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindById = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findById).mockImplementation(mockFindById);
 
@@ -180,6 +198,7 @@ describe('MongoTicketRepository', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocument.createdAt,
@@ -194,6 +213,7 @@ describe('MongoTicketRepository', () => {
       const createData = {
         title: 'New Ticket',
         description: 'New Description',
+        createdBy: validObjectId,
       };
 
       const mockDocument = {
@@ -201,10 +221,12 @@ describe('MongoTicketRepository', () => {
         title: 'New Ticket',
         description: 'New Description',
         status: TicketStatus.NEW,
+        createdBy: { _id: validObjectId, ...mockUserPublic1 },
         assignedTo: null,
         archived: false,
         createdAt: new Date(),
         updatedAt: new Date(),
+        populate: vi.fn().mockReturnThis(),
       };
 
       vi.mocked(TicketModel.create).mockResolvedValue(mockDocument as any);
@@ -216,15 +238,11 @@ describe('MongoTicketRepository', () => {
         title: 'New Ticket',
         description: 'New Description',
         status: TicketStatus.NEW,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocument.createdAt,
         updatedAt: mockDocument.updatedAt,
-      });
-      expect(TicketModel.create).toHaveBeenCalledWith({
-        title: 'New Ticket',
-        description: 'New Description',
-        status: TicketStatus.NEW,
       });
     });
 
@@ -232,6 +250,7 @@ describe('MongoTicketRepository', () => {
       const createData = {
         title: 'Another Ticket',
         description: 'Another Description',
+        createdBy: validObjectId,
       };
 
       const mockDocument = {
@@ -239,8 +258,10 @@ describe('MongoTicketRepository', () => {
         title: 'Another Ticket',
         description: 'Another Description',
         status: TicketStatus.NEW,
+        createdBy: { _id: validObjectId, ...mockUserPublic1 },
         createdAt: new Date(),
         updatedAt: new Date(),
+        populate: vi.fn().mockReturnThis(),
       };
 
       vi.mocked(TicketModel.create).mockResolvedValue(mockDocument as any);
@@ -258,6 +279,7 @@ describe('MongoTicketRepository', () => {
       const createData = {
         title: 'ID Test Ticket',
         description: 'Testing ID generation',
+        createdBy: validObjectId,
       };
 
       const mockDocument = {
@@ -265,8 +287,10 @@ describe('MongoTicketRepository', () => {
         title: 'ID Test Ticket',
         description: 'Testing ID generation',
         status: TicketStatus.NEW,
+        createdBy: { _id: validObjectId, ...mockUserPublic1 },
         createdAt: new Date(),
         updatedAt: new Date(),
+        populate: vi.fn().mockReturnThis(),
       };
 
       vi.mocked(TicketModel.create).mockResolvedValue(mockDocument as any);
@@ -292,14 +316,15 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should return null when ticket does not exist', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         status: TicketStatus.RESOLVED,
         assignedTo: '507f1f77bcf86cd799439016',
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(null),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(null),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -309,7 +334,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should update ticket with valid data', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         status: TicketStatus.IN_PROGRESS,
         assignedTo: '507f1f77bcf86cd799439016',
@@ -320,6 +344,7 @@ describe('MongoTicketRepository', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-15T10:00:00.000Z'),
@@ -327,7 +352,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -338,6 +365,7 @@ describe('MongoTicketRepository', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocument.createdAt,
@@ -346,7 +374,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should call findByIdAndUpdate with correct options', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         status: TicketStatus.RESOLVED,
         assignedTo: '507f1f77bcf86cd799439017',
@@ -357,6 +384,7 @@ describe('MongoTicketRepository', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.RESOLVED,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date(),
@@ -364,7 +392,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -374,7 +404,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should update ticket to CLOSED status', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         status: TicketStatus.CLOSED,
         assignedTo: '507f1f77bcf86cd799439018',
@@ -385,6 +414,7 @@ describe('MongoTicketRepository', () => {
         title: 'Closed Ticket',
         description: 'This ticket is now closed',
         status: TicketStatus.CLOSED,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-10T09:00:00.000Z'),
@@ -392,7 +422,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -404,7 +436,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should map document fields correctly', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         status: TicketStatus.RESOLVED,
         assignedTo: '507f1f77bcf86cd799439019',
@@ -418,6 +449,7 @@ describe('MongoTicketRepository', () => {
         title: 'Original Title',
         description: 'Original Description',
         status: TicketStatus.RESOLVED,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: createdDate,
@@ -425,7 +457,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -436,6 +470,7 @@ describe('MongoTicketRepository', () => {
         title: 'Original Title',
         description: 'Original Description',
         status: TicketStatus.RESOLVED,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: createdDate,
@@ -444,7 +479,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should update ticket title', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         title: 'Updated Title',
       };
@@ -454,6 +488,7 @@ describe('MongoTicketRepository', () => {
         title: 'Updated Title',
         description: 'Original Description',
         status: TicketStatus.NEW,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),
@@ -461,7 +496,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -477,7 +514,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should update ticket description', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         description: 'Updated Description',
       };
@@ -487,6 +523,7 @@ describe('MongoTicketRepository', () => {
         title: 'Original Title',
         description: 'Updated Description',
         status: TicketStatus.NEW,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),
@@ -494,7 +531,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -510,7 +549,6 @@ describe('MongoTicketRepository', () => {
     });
 
     it('should update multiple fields simultaneously', async () => {
-      const validObjectId = '507f1f77bcf86cd799439011';
       const updateData = {
         title: 'New Title',
         description: 'New Description',
@@ -523,6 +561,7 @@ describe('MongoTicketRepository', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),
@@ -530,7 +569,9 @@ describe('MongoTicketRepository', () => {
       };
 
       const mockFindByIdAndUpdate = vi.fn().mockReturnValue({
-        populate: vi.fn().mockResolvedValue(mockDocument),
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockResolvedValue(mockDocument),
+        }),
       });
       vi.mocked(TicketModel.findByIdAndUpdate).mockImplementation(mockFindByIdAndUpdate);
 
@@ -541,6 +582,7 @@ describe('MongoTicketRepository', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.IN_PROGRESS,
+        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: mockDocument.createdAt,

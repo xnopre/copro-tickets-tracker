@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CommentModel } from './CommentSchema';
 import UserModel from './UserSchema';
-import { useTestDB } from '../../../../tests/helpers/useTestDB';
+import { useTestDB } from '@tests/helpers/useTestDB';
 import { Types } from 'mongoose';
-import { mockUser1 } from '../../../../tests/helpers/mockUsers';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 describe('Comment Schema', () => {
   useTestDB();

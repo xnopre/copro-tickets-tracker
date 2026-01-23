@@ -18,9 +18,16 @@ export class CreateTicket {
   async execute(data: CreateTicketData): Promise<Ticket> {
     this.validateData(data);
 
+    // Validate that createdBy user exists
+    const user = await this.userRepository.findById(data.createdBy);
+    if (!user) {
+      throw new ValidationError('Utilisateur invalide');
+    }
+
     const ticket = await this.ticketRepository.create({
       title: data.title.trim(),
       description: data.description.trim(),
+      createdBy: data.createdBy,
     });
 
     await this.notifyTicketCreated(ticket);

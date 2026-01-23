@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Button from '@/presentation/components/ui/Button';
 import Input from '@/presentation/components/ui/Input';
 import Textarea from '@/presentation/components/ui/Textarea';
@@ -9,12 +10,16 @@ import Alert from '@/presentation/components/ui/Alert';
 import Card from '@/presentation/components/ui/Card';
 
 export default function CreateTicketForm() {
+  const { data: session } = useSession();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+
+  const currentUserName =
+    session?.user?.name || `${session?.user?.firstName} ${session?.user?.lastName}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +68,14 @@ export default function CreateTicketForm() {
   return (
     <Card>
       <form onSubmit={handleSubmit} aria-label="Formulaire de création de ticket">
+        {session?.user && (
+          <div className="mb-4 text-sm text-gray-600">
+            <span>
+              Vous créez un ticket en tant que <strong>{currentUserName}</strong>
+            </span>
+          </div>
+        )}
+
         <div className="mb-4">
           <Input
             type="text"

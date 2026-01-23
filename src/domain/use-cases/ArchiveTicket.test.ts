@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { ArchiveTicket } from './ArchiveTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { TicketStatus } from '../value-objects/TicketStatus';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 describe('ArchiveTicket', () => {
   const mockRepository: ITicketRepository = {
@@ -18,6 +19,7 @@ describe('ArchiveTicket', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: mockUserPublic1,
       assignedTo: null,
       archived: true,
       createdAt: new Date('2025-01-15T10:00:00.000Z'),

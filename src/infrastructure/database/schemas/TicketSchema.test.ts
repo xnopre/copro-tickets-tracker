@@ -1,11 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import mongoose, { Types } from 'mongoose';
 import { TicketModel } from './TicketSchema';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
-import { useTestDB } from '../../../../tests/helpers/useTestDB';
+import { useTestDB } from '@tests/helpers/useTestDB';
 
 describe('Ticket Schema', () => {
   useTestDB();
+
+  const testUserId = new Types.ObjectId();
 
   describe('Schema Validation', () => {
     it('should create a valid ticket with all required fields', async () => {
@@ -13,6 +15,7 @@ describe('Ticket Schema', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.NEW,
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -30,6 +33,7 @@ describe('Ticket Schema', () => {
     it('should fail validation if title is missing', async () => {
       const ticketData = {
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -40,6 +44,7 @@ describe('Ticket Schema', () => {
     it('should fail validation if description is missing', async () => {
       const ticketData = {
         title: 'Test Ticket',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -51,6 +56,7 @@ describe('Ticket Schema', () => {
       const ticketData = {
         title: '  Test Ticket  ',
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -74,6 +80,7 @@ describe('Ticket Schema', () => {
           title: 'Test Ticket',
           description: 'Test Description',
           status,
+          createdBy: testUserId,
         };
 
         const ticket = new TicketModel(ticketData);
@@ -88,6 +95,7 @@ describe('Ticket Schema', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: 'INVALID_STATUS',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -99,6 +107,7 @@ describe('Ticket Schema', () => {
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -113,6 +122,7 @@ describe('Ticket Schema', () => {
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -127,6 +137,7 @@ describe('Ticket Schema', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         assignedTo: validUserId,
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -140,6 +151,7 @@ describe('Ticket Schema', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         assignedTo: null,
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -160,6 +172,7 @@ describe('Ticket Schema', () => {
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);
@@ -173,6 +186,7 @@ describe('Ticket Schema', () => {
       const ticketData = {
         title: 'Test Ticket',
         description: 'Test Description',
+        createdBy: testUserId,
       };
 
       const ticket = new TicketModel(ticketData);

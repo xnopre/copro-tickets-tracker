@@ -7,7 +7,7 @@ import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
-import { mockUser1, mockUserPublic1, mockUserPublic2 } from '@tests/helpers/mockUsers';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 import { mockComment1, mockComment2 } from '@tests/helpers/mockComments';
 
 describe('CommentService', () => {

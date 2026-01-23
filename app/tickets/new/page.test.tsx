@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import NewTicketPage from './page';
+import { mockUser1 } from '@tests/helpers/mockUsers';
 
 // Mock next/navigation
 const mockPush = vi.fn();
@@ -11,6 +12,17 @@ vi.mock('next/navigation', () => ({
     push: mockPush,
     refresh: mockRefresh,
   }),
+}));
+
+// Mock next-auth/react
+const mockSession = {
+  user: mockUser1,
+};
+
+vi.mock('next-auth/react', () => ({
+  useSession: vi.fn(() => ({
+    data: mockSession,
+  })),
 }));
 
 describe('NewTicketPage', () => {

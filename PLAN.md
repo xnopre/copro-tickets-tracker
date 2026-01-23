@@ -57,7 +57,7 @@ Ce plan suit une approche **incrémentale et fonctionnelle**. Chaque étape livr
 - ✅ [Étape 12b : Ajout Authentification](docs/plan/12.md#étape-12b--ajout-authentification)
 - ✅ [Étape 12c : Afficher l'Utilisateur Connecté](docs/plan/12.md#étape-12c--afficher-lutilisateur-connecté)
 - ✅ [Étape 12d : Utiliser l'Utilisateur Connecté pour les Commentaires](docs/plan/12.md#étape-12d--utiliser-lutilisateur-connecté-pour-les-commentaires)
-- 🔄 [Étape 12e : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket](docs/plan/12.md#étape-12e--ajouter-lutilisateur-courant-comme-créateur-dun-ticket)
+- ✅ [Étape 12e : Ajouter l'Utilisateur Courant comme Créateur d'un Ticket](docs/plan/12.md#étape-12e--ajouter-lutilisateur-courant-comme-créateur-dun-ticket)
 
 ### Filtrage et Recherche
 

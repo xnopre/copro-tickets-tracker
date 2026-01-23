@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import TicketCard from './TicketCard';
 import { Ticket } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
+import { mockUserPublic1 } from '@tests/helpers/mockUsers';
 
 describe('TicketCard', () => {
   const mockTicket: Ticket = {
@@ -10,6 +11,7 @@ describe('TicketCard', () => {
     title: 'Test Ticket',
     description: 'This is a test ticket description',
     status: TicketStatus.NEW,
+    createdBy: mockUserPublic1,
     assignedTo: null,
     archived: false,
     createdAt: new Date('2025-01-15'),

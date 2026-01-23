@@ -75,6 +75,12 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
       </section>
 
       <footer className="border-t pt-4" aria-label="Informations supplémentaires">
+        <div className="mb-4 text-sm">
+          <span className="font-semibold text-gray-700">Créé par :</span>
+          <p className="text-gray-600">
+            {ticket.createdBy.firstName} {ticket.createdBy.lastName}
+          </p>
+        </div>
         {ticket.assignedTo && (
           <div className="mb-4 text-sm">
             <span className="font-semibold text-gray-700">Assigné à :</span>

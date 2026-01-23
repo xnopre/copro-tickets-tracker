@@ -69,6 +69,7 @@ describe('CreateTicket', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: { id: '1', firstName: 'Jean', lastName: 'Dupont' },
       assignedTo: null,
       archived: false,
       createdAt: new Date(),
@@ -78,6 +79,7 @@ describe('CreateTicket', () => {
     const mockUsers: User[] = [mockUser1];
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
     vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
 
@@ -91,12 +93,14 @@ describe('CreateTicket', () => {
     const result = await useCase.execute({
       title: 'Test Ticket',
       description: 'Test Description',
+      createdBy: '1',
     });
 
     expect(result).toEqual(mockTicket);
     expect(mockRepository.create).toHaveBeenCalledWith({
       title: 'Test Ticket',
       description: 'Test Description',
+      createdBy: '1',
     });
     expect(mockEmailService.sendSafe).toHaveBeenCalled();
   });
@@ -107,6 +111,7 @@ describe('CreateTicket', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: { id: '1', firstName: 'Jean', lastName: 'Dupont' },
       assignedTo: null,
       archived: false,
       createdAt: new Date(),
@@ -114,6 +119,7 @@ describe('CreateTicket', () => {
     };
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
 
     const useCase = new CreateTicket(
@@ -126,11 +132,13 @@ describe('CreateTicket', () => {
     await useCase.execute({
       title: '  Test Ticket  ',
       description: '  Test Description  ',
+      createdBy: '1',
     });
 
     expect(mockRepository.create).toHaveBeenCalledWith({
       title: 'Test Ticket',
       description: 'Test Description',
+      createdBy: '1',
     });
   });
 
@@ -147,6 +155,7 @@ describe('CreateTicket', () => {
       useCase.execute({
         title: '',
         description: 'Test Description',
+        createdBy: '1',
       })
     ).rejects.toThrow('Le titre est requis');
   });
@@ -164,6 +173,7 @@ describe('CreateTicket', () => {
       useCase.execute({
         title: 'A'.repeat(201),
         description: 'Test Description',
+        createdBy: '1',
       })
     ).rejects.toThrow('Le titre ne doit pas dépasser 200 caractères');
   });
@@ -181,6 +191,7 @@ describe('CreateTicket', () => {
       useCase.execute({
         title: 'Test Title',
         description: '',
+        createdBy: '1',
       })
     ).rejects.toThrow('La description est requise');
   });
@@ -198,8 +209,29 @@ describe('CreateTicket', () => {
       useCase.execute({
         title: 'Test Title',
         description: 'A'.repeat(5001),
+        createdBy: '1',
       })
     ).rejects.toThrow('La description ne doit pas dépasser 5000 caractères');
+  });
+
+  it('should throw error when createdBy user does not exist', async () => {
+    vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
+
+    const useCase = new CreateTicket(
+      mockRepository,
+      mockUserRepository,
+      mockEmailService,
+      mockEmailTemplateService,
+      mockLogger
+    );
+
+    await expect(
+      useCase.execute({
+        title: 'Test Title',
+        description: 'Test Description',
+        createdBy: 'invalid-user-id',
+      })
+    ).rejects.toThrow('Utilisateur invalide');
   });
 
   it('should not fail if email sending fails', async () => {
@@ -208,6 +240,7 @@ describe('CreateTicket', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: { id: '1', firstName: 'Jean', lastName: 'Dupont' },
       assignedTo: null,
       archived: false,
       createdAt: new Date(),
@@ -215,6 +248,7 @@ describe('CreateTicket', () => {
     };
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
     vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
 
     const useCase = new CreateTicket(
@@ -228,6 +262,7 @@ describe('CreateTicket', () => {
     const result = await useCase.execute({
       title: 'Test Ticket',
       description: 'Test Description',
+      createdBy: '1',
     });
 
     expect(result).toEqual(mockTicket);
@@ -240,6 +275,7 @@ describe('CreateTicket', () => {
       title: 'Test Ticket',
       description: 'Test Description',
       status: TicketStatus.NEW,
+      createdBy: { id: '1', firstName: 'Jean', lastName: 'Dupont' },
       assignedTo: null,
       archived: false,
       createdAt: new Date(),
@@ -247,6 +283,7 @@ describe('CreateTicket', () => {
     };
 
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
+    vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue([]);
 
     const useCase = new CreateTicket(
@@ -260,6 +297,7 @@ describe('CreateTicket', () => {
     await useCase.execute({
       title: 'Test Ticket',
       description: 'Test Description',
+      createdBy: '1',
     });
 
     expect(mockEmailService.sendSafe).not.toHaveBeenCalled();

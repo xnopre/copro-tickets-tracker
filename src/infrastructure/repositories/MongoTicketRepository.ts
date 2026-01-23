@@ -10,7 +10,10 @@ import { UserPublic } from '@/domain/entities/User';
 export class MongoTicketRepository implements ITicketRepository {
   async findAll(): Promise<Ticket[]> {
     await connectDB();
-    const documents = await TicketModel.find({}).populate('assignedTo').sort({ createdAt: -1 });
+    const documents = await TicketModel.find({})
+      .populate('createdBy')
+      .populate('assignedTo')
+      .sort({ createdAt: -1 });
 
     return documents.map(doc => this.mapToEntity(doc));
   }
@@ -23,7 +26,7 @@ export class MongoTicketRepository implements ITicketRepository {
       throw new InvalidIdError(id);
     }
 
-    const document = await TicketModel.findById(id).populate('assignedTo');
+    const document = await TicketModel.findById(id).populate('createdBy').populate('assignedTo');
 
     if (!document) {
       return null;
@@ -37,8 +40,12 @@ export class MongoTicketRepository implements ITicketRepository {
     const document = await TicketModel.create({
       title: data.title,
       description: data.description,
+      createdBy: new Types.ObjectId(data.createdBy),
       status: TicketStatus.NEW,
     });
+
+    await document.populate('createdBy');
+    await document.populate('assignedTo');
 
     return this.mapToEntity(document);
   }
@@ -52,11 +59,10 @@ export class MongoTicketRepository implements ITicketRepository {
     }
 
     // Convertir assignedTo en ObjectId si présent
+    // TODO XN passer par un autre type pour updateData ?
     const updateData = { ...data };
-    if (updateData.assignedTo !== undefined) {
-      if (updateData.assignedTo === null) {
-        (updateData as any).assignedTo = null;
-      } else if (Types.ObjectId.isValid(updateData.assignedTo)) {
+    if (updateData.assignedTo !== undefined && updateData.assignedTo !== null) {
+      if (Types.ObjectId.isValid(updateData.assignedTo)) {
         (updateData as any).assignedTo = new Types.ObjectId(updateData.assignedTo);
       } else {
         throw new InvalidIdError(updateData.assignedTo);
@@ -66,7 +72,9 @@ export class MongoTicketRepository implements ITicketRepository {
     const document = await TicketModel.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    }).populate('assignedTo');
+    })
+      .populate('createdBy')
+      .populate('assignedTo');
 
     if (!document) {
       return null;
@@ -87,7 +95,9 @@ export class MongoTicketRepository implements ITicketRepository {
       id,
       { archived: true },
       { new: true, runValidators: true }
-    ).populate('assignedTo');
+    )
+      .populate('createdBy')
+      .populate('assignedTo');
 
     if (!document) {
       return null;
@@ -97,6 +107,19 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   private mapToEntity(document: TicketDocument): Ticket {
+    let createdBy: UserPublic;
+    const createdByPopulated = document.createdBy as unknown as {
+      _id?: string;
+      id?: string;
+      firstName: string;
+      lastName: string;
+    };
+    createdBy = {
+      id: createdByPopulated._id || createdByPopulated.id || document.createdBy.toString(),
+      firstName: createdByPopulated.firstName,
+      lastName: createdByPopulated.lastName,
+    };
+
     let assignedTo: UserPublic | null = null;
     if (document.assignedTo) {
       const assignedToPopulated = document.assignedTo as unknown as {
@@ -115,6 +138,7 @@ export class MongoTicketRepository implements ITicketRepository {
       title: document.title,
       description: document.description,
       status: document.status,
+      createdBy,
       assignedTo,
       archived: document.archived,
       createdAt: document.createdAt,
