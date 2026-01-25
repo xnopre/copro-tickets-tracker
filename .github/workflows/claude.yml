@@ -47,4 +47,4 @@ jobs:
           # Pour les PRs, Claude modifie la branche existante
           # github.event.issue existe uniquement pour les issues et issue_comment
           # github.event.issue.pull_request existe seulement si l'issue est en fait une PR
-          claude_args: ${{ github.event.issue && !github.event.issue.pull_request && '--create-pr' || '' }}
+          claude_args: ${{ (github.event.issue && !github.event.issue.pull_request) && '--create-pr' || '' }}
