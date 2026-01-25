@@ -1,0 +1,51 @@
+name: Claude in PR
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  claude:
+    # Déclenche seulement si @claude est mentionné ET que c'est dans une PR (non fork)
+    if: |
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Permet de committer sur la branche de la PR
+      pull-requests: write # Permet de commenter sur la PR
+      issues: read
+      id-token: write
+      actions: read        # Permet de lire les résultats de CI
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Claude workflow failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            })
