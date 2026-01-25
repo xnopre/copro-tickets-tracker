@@ -10,11 +10,12 @@ on:
 
 jobs:
   claude:
-    # Déclenche seulement si @claude est mentionné ET que c'est dans une PR
+    # Déclenche seulement si @claude est mentionné ET que c'est dans une PR (non fork)
     if: |
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      ((github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude'))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')))
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Permet de committer sur la branche de la PR
