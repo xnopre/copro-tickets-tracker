@@ -29,7 +29,6 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Récupère tout l'historique pour permettre la création de branches
-          token: ${{ secrets.GITHUB_TOKEN }}  # Utilise le token avec les permissions définies
 
       - name: Run Claude Code
         id: claude
