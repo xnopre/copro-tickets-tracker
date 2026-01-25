@@ -17,9 +17,11 @@ jobs:
     permissions:
       contents: write      # Permet de créer des branches et pousser des commits
       pull-requests: write # Permet de créer des PRs
-      issues: read
+      issues: write        # Permet de créer des commentaires sur les issues
       id-token: write
       actions: read
+      checks: write        # Permet de créer des checks
+      statuses: write      # Permet de mettre à jour les statuses
 
     steps:
       - name: Checkout repository
@@ -41,9 +43,10 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '❌ Claude workflow failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+              body: `❌ Claude workflow failed. Check the [workflow run](${runUrl}) for details.`
             })

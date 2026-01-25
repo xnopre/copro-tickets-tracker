@@ -20,7 +20,7 @@ jobs:
     permissions:
       contents: write      # Permet de committer sur la branche de la PR
       pull-requests: write # Permet de commenter sur la PR
-      issues: read
+      issues: write        # Permet de créer des commentaires
       id-token: write
       actions: read        # Permet de lire les résultats de CI
 
@@ -43,9 +43,10 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '❌ Claude workflow failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+              body: `❌ Claude workflow failed. Check the [workflow run](${runUrl}) for details.`
             })
