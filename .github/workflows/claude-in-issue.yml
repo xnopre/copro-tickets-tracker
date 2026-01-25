@@ -11,7 +11,8 @@ jobs:
     # Déclenche si @claude est mentionné dans la description ou un commentaire d'issue (pas une PR)
     if: |
       !github.event.issue.pull_request &&
-      (contains(github.event.issue.body, '@claude') || contains(github.event.comment.body, '@claude'))
+      ((github.event_name == 'issues' && contains(github.event.issue.body, '@claude')) ||
+       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')))
     runs-on: ubuntu-latest
     permissions:
       contents: write      # Permet de créer des branches et pousser des commits
