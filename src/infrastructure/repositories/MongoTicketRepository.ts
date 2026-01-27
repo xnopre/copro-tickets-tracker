@@ -111,26 +111,50 @@ export class MongoTicketRepository implements ITicketRepository {
     const createdByPopulated = document.createdBy as unknown as {
       _id?: string;
       id?: string;
-      firstName: string;
-      lastName: string;
+      firstName?: string;
+      lastName?: string;
     };
-    createdBy = {
-      id: createdByPopulated._id || createdByPopulated.id || document.createdBy.toString(),
-      firstName: createdByPopulated.firstName,
-      lastName: createdByPopulated.lastName,
-    };
+
+    // Vérifier si le populate a réussi (l'utilisateur existe)
+    if (createdByPopulated && createdByPopulated.firstName && createdByPopulated.lastName) {
+      createdBy = {
+        id: createdByPopulated._id || createdByPopulated.id || document.createdBy.toString(),
+        firstName: createdByPopulated.firstName,
+        lastName: createdByPopulated.lastName,
+      };
+    } else {
+      // Fallback si l'utilisateur a été supprimé
+      createdBy = {
+        id: document.createdBy.toString(),
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      };
+    }
 
     let assignedTo: UserPublic | null = null;
     if (document.assignedTo) {
       const assignedToPopulated = document.assignedTo as unknown as {
-        firstName: string;
-        lastName: string;
+        _id?: string;
+        id?: string;
+        firstName?: string;
+        lastName?: string;
       };
-      assignedTo = {
-        id: document.assignedTo._id.toString(),
-        firstName: assignedToPopulated.firstName,
-        lastName: assignedToPopulated.lastName,
-      };
+
+      // Vérifier si le populate a réussi
+      if (assignedToPopulated && assignedToPopulated.firstName && assignedToPopulated.lastName) {
+        assignedTo = {
+          id: assignedToPopulated._id || assignedToPopulated.id || document.assignedTo.toString(),
+          firstName: assignedToPopulated.firstName,
+          lastName: assignedToPopulated.lastName,
+        };
+      } else {
+        // Fallback si l'utilisateur a été supprimé
+        assignedTo = {
+          id: document.assignedTo.toString(),
+          firstName: 'Utilisateur',
+          lastName: 'introuvable',
+        };
+      }
     }
 
     return {
