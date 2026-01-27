@@ -18,7 +18,9 @@ export function isPopulatedUser(user: any): user is PopulatedUser {
     user !== null &&
     typeof user === 'object' &&
     !(user instanceof Types.ObjectId) &&
-    ('_id' in user || 'firstName' in user || 'lastName' in user)
+    '_id' in user &&
+    'firstName' in user &&
+    'lastName' in user
   );
 }
 
