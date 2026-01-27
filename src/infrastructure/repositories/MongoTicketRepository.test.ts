@@ -130,6 +130,76 @@ describe('MongoTicketRepository', () => {
       expect(mockPopulate2).toHaveBeenCalledWith('assignedTo');
       expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
     });
+
+    it('should handle deleted createdBy user with fallback data', async () => {
+      const deletedUserId = '507f1f77bcf86cd799439099';
+      const mockDocuments = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          title: 'Ticket with deleted user',
+          description: 'Description',
+          status: TicketStatus.NEW,
+          createdBy: deletedUserId, // Populate échoué, ObjectId brut retourné
+          assignedTo: null,
+          archived: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
+      ];
+
+      const mockFind = vi.fn().mockReturnValue({
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue(mockDocuments),
+          }),
+        }),
+      });
+      vi.mocked(TicketModel.find).mockImplementation(mockFind);
+
+      const result = await repository.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].createdBy).toEqual({
+        id: deletedUserId,
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
+    });
+
+    it('should handle deleted assignedTo user with fallback data', async () => {
+      const deletedUserId = '507f1f77bcf86cd799439088';
+      const mockDocuments = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          title: 'Ticket with deleted assigned user',
+          description: 'Description',
+          status: TicketStatus.IN_PROGRESS,
+          createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+          assignedTo: deletedUserId, // Populate échoué, ObjectId brut retourné
+          archived: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
+      ];
+
+      const mockFind = vi.fn().mockReturnValue({
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue(mockDocuments),
+          }),
+        }),
+      });
+      vi.mocked(TicketModel.find).mockImplementation(mockFind);
+
+      const result = await repository.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].assignedTo).toEqual({
+        id: deletedUserId,
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
+    });
   });
 
   describe('findById', () => {
