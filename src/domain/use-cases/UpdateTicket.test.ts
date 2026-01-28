@@ -379,6 +379,9 @@ describe('UpdateTicket', () => {
         assignedTo: mockUser1.id,
       });
 
+      // Wait for async notification to complete
+      await new Promise(resolve => setImmediate(resolve));
+
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).toHaveBeenCalled();
     });
@@ -402,6 +405,9 @@ describe('UpdateTicket', () => {
         status: TicketStatus.IN_PROGRESS,
       });
 
+      // Wait for async notification to complete
+      await new Promise(resolve => setImmediate(resolve));
+
       expect(mockUserRepository.findAll).toHaveBeenCalled();
       expect(mockEmailService.sendSafe).toHaveBeenCalled();
     });
@@ -420,6 +426,9 @@ describe('UpdateTicket', () => {
       await useCase.execute('1', {
         title: 'Updated Title',
       });
+
+      // Wait for async notification to complete
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
     });
@@ -441,6 +450,9 @@ describe('UpdateTicket', () => {
         status: TicketStatus.IN_PROGRESS,
       });
 
+      // Wait for async notification to complete
+      await new Promise(resolve => setImmediate(resolve));
+
       expect(result).toEqual(mockTicketInProgress);
       expect(mockLogger.error).toHaveBeenCalled();
     });
@@ -460,6 +472,9 @@ describe('UpdateTicket', () => {
       await useCase.execute('1', {
         assignedTo: mockUser1.id,
       });
+
+      // Wait for async notification to complete
+      await new Promise(resolve => setImmediate(resolve));
 
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
       expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
