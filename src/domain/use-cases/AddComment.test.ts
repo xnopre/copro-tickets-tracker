@@ -255,6 +255,9 @@ describe('AddComment', () => {
       authorId: 'user-1',
     });
 
+    // Wait for async notification to complete
+    await new Promise(resolve => setImmediate(resolve));
+
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
     expect(mockUserRepository.findAll).toHaveBeenCalled();
     expect(mockEmailService.sendSafe).toHaveBeenCalled();
@@ -285,6 +288,9 @@ describe('AddComment', () => {
       content: 'Test comment',
       authorId: 'user-1',
     });
+
+    // Wait for async notification to complete
+    await new Promise(resolve => setImmediate(resolve));
 
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
     expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
@@ -328,6 +334,9 @@ describe('AddComment', () => {
       content: 'Test comment',
       authorId: 'user-1',
     });
+
+    // Wait for async notification to complete
+    await new Promise(resolve => setImmediate(resolve));
 
     expect(mockUserRepository.findAll).toHaveBeenCalled();
     expect(mockEmailService.sendSafe).not.toHaveBeenCalled();

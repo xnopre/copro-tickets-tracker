@@ -47,7 +47,7 @@ export class UpdateTicket {
       return null;
     }
 
-    await this.notifyTicketUpdated(existingTicket, updatedTicket, trimmedData);
+    void this.notifyTicketUpdated(existingTicket, updatedTicket, trimmedData);
 
     return updatedTicket;
   }

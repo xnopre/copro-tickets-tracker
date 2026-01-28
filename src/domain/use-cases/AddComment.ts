@@ -26,7 +26,7 @@ export class AddComment {
       authorId: data.authorId,
     });
 
-    await this.notifyCommentAdded(comment);
+    void this.notifyCommentAdded(comment);
 
     return comment;
   }

@@ -30,7 +30,7 @@ export class CreateTicket {
       createdBy: data.createdBy,
     });
 
-    await this.notifyTicketCreated(ticket);
+    void this.notifyTicketCreated(ticket);
 
     return ticket;
   }

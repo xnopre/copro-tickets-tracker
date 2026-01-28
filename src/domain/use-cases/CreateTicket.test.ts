@@ -96,6 +96,9 @@ describe('CreateTicket', () => {
       createdBy: '1',
     });
 
+    // Wait for async notification to complete
+    await new Promise(resolve => setImmediate(resolve));
+
     expect(result).toEqual(mockTicket);
     expect(mockRepository.create).toHaveBeenCalledWith({
       title: 'Test Ticket',
@@ -299,6 +302,9 @@ describe('CreateTicket', () => {
       description: 'Test Description',
       createdBy: '1',
     });
+
+    // Wait for async notification to complete
+    await new Promise(resolve => setImmediate(resolve));
 
     expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
   });
