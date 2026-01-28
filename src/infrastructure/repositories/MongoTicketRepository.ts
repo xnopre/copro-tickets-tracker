@@ -160,6 +160,7 @@ export class MongoTicketRepository implements ITicketRepository {
         lastName: populatedUser.lastName,
       };
     }
+    console.warn(`User not found or invalid: ${JSON.stringify(populatedUser)}`);
     return {
       id: typeof populatedUser === 'string' ? populatedUser : populatedUser._id.toString(),
       firstName: 'Utilisateur',
