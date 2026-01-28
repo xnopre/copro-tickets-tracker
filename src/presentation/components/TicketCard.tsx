@@ -49,7 +49,7 @@ export default function TicketCard({ ticket }: TicketCardProps) {
         <p className="mb-4 text-sm text-gray-600">{ticket.description}</p>
         <div className="mb-3 text-sm text-gray-700">
           <span className="font-medium">Créé par :</span>
-          {ticket.createdBy ? ticket.createdBy.firstName + ' ' + ticket.createdBy.lastName : '???'}
+          {ticket.createdBy.firstName + ' ' + ticket.createdBy.lastName}
         </div>
         {ticket.assignedTo && (
           <div className="mb-3 text-sm text-gray-700">

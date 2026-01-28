@@ -228,7 +228,11 @@ describe('MongoTicketRepository', () => {
       const result = await repository.findAll();
 
       expect(result).toHaveLength(1);
-      expect(result[0].createdBy).toBeNull();
+      expect(result[0].createdBy).toEqual({
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
     });
 
     it('should handle undefined createdBy with fallback data', async () => {
@@ -258,7 +262,11 @@ describe('MongoTicketRepository', () => {
       const result = await repository.findAll();
 
       expect(result).toHaveLength(1);
-      expect(result[0].createdBy).toBeNull();
+      expect(result[0].createdBy).toEqual({
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
     });
   });
 

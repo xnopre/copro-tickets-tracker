@@ -13,7 +13,9 @@ export type PopulatedUser = {
   lastName: string;
 };
 
-export function isPopulatedUser(user: any): user is PopulatedUser {
+export function isPopulatedUser(
+  user: string | Types.ObjectId | PopulatedUser
+): user is PopulatedUser {
   return (
     user !== null &&
     typeof user === 'object' &&
@@ -124,7 +126,7 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   private mapToEntity(document: TicketDocument): Ticket {
-    const createdBy = this.populatedUserToUserPublic(
+    const createdBy = this.populatedUserToUserPublicRequired(
       document.createdBy as unknown as PopulatedUser
     );
 
@@ -163,5 +165,19 @@ export class MongoTicketRepository implements ITicketRepository {
       firstName: 'Utilisateur',
       lastName: 'introuvable',
     };
+  }
+
+  private populatedUserToUserPublicRequired(
+    populatedUser: PopulatedUser | Types.ObjectId | string | null
+  ): UserPublic {
+    const userPublic = this.populatedUserToUserPublic(populatedUser);
+    if (userPublic === null) {
+      return {
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      };
+    }
+    return userPublic;
   }
 }

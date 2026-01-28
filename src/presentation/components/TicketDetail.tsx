@@ -78,9 +78,7 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
         <div className="mb-4 text-sm">
           <span className="font-semibold text-gray-700">Créé par :</span>
           <p className="text-gray-600">
-            {ticket.createdBy
-              ? ticket.createdBy.firstName + ' ' + ticket.createdBy.lastName
-              : '???'}
+            {ticket.createdBy.firstName + ' ' + ticket.createdBy.lastName}
           </p>
         </div>
         {ticket.assignedTo && (
