@@ -200,6 +200,74 @@ describe('MongoTicketRepository', () => {
         lastName: 'introuvable',
       });
     });
+
+    it('should handle null createdBy with fallback data', async () => {
+      const mockDocuments = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          title: 'Ticket with null createdBy',
+          description: 'Description',
+          status: TicketStatus.NEW,
+          createdBy: null,
+          assignedTo: null,
+          archived: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
+      ];
+
+      const mockFind = vi.fn().mockReturnValue({
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue(mockDocuments),
+          }),
+        }),
+      });
+      vi.mocked(TicketModel.find).mockImplementation(mockFind);
+
+      const result = await repository.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].createdBy).toEqual({
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
+    });
+
+    it('should handle undefined createdBy with fallback data', async () => {
+      const mockDocuments = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          title: 'Ticket with undefined createdBy',
+          description: 'Description',
+          status: TicketStatus.NEW,
+          createdBy: undefined,
+          assignedTo: null,
+          archived: false,
+          createdAt: new Date('2024-01-02'),
+          updatedAt: new Date('2024-01-02'),
+        },
+      ];
+
+      const mockFind = vi.fn().mockReturnValue({
+        populate: vi.fn().mockReturnValue({
+          populate: vi.fn().mockReturnValue({
+            sort: vi.fn().mockResolvedValue(mockDocuments),
+          }),
+        }),
+      });
+      vi.mocked(TicketModel.find).mockImplementation(mockFind);
+
+      const result = await repository.findAll();
+
+      expect(result).toHaveLength(1);
+      expect(result[0].createdBy).toEqual({
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      });
+    });
   });
 
   describe('findById', () => {
@@ -454,7 +522,7 @@ describe('MongoTicketRepository', () => {
         title: 'Test Ticket',
         description: 'Test Description',
         status: TicketStatus.RESOLVED,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date(),
@@ -484,7 +552,7 @@ describe('MongoTicketRepository', () => {
         title: 'Closed Ticket',
         description: 'This ticket is now closed',
         status: TicketStatus.CLOSED,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-10T09:00:00.000Z'),
@@ -519,7 +587,7 @@ describe('MongoTicketRepository', () => {
         title: 'Original Title',
         description: 'Original Description',
         status: TicketStatus.RESOLVED,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: createdDate,
@@ -558,7 +626,7 @@ describe('MongoTicketRepository', () => {
         title: 'Updated Title',
         description: 'Original Description',
         status: TicketStatus.NEW,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),
@@ -593,7 +661,7 @@ describe('MongoTicketRepository', () => {
         title: 'Original Title',
         description: 'Updated Description',
         status: TicketStatus.NEW,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),
@@ -631,7 +699,7 @@ describe('MongoTicketRepository', () => {
         title: 'New Title',
         description: 'New Description',
         status: TicketStatus.IN_PROGRESS,
-        createdBy: { id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
+        createdBy: { _id: validObjectId, firstName: 'Jean', lastName: 'Dupont' },
         assignedTo: null,
         archived: false,
         createdAt: new Date('2025-01-01T10:00:00.000Z'),

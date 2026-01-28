@@ -1,11 +1,30 @@
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
-import { Ticket, CreateTicketData, UpdateTicketData } from '@/domain/entities/Ticket';
+import { CreateTicketData, Ticket, UpdateTicketData } from '@/domain/entities/Ticket';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
 import { InvalidIdError } from '@/domain/errors/InvalidIdError';
-import { TicketModel, TicketDocument } from '../database/schemas/TicketSchema';
+import { TicketDocument, TicketModel } from '../database/schemas/TicketSchema';
 import connectDB from '../database/mongodb';
 import { Types } from 'mongoose';
 import { UserPublic } from '@/domain/entities/User';
+
+export type PopulatedUser = {
+  _id: Types.ObjectId;
+  firstName: string;
+  lastName: string;
+};
+
+export function isPopulatedUser(
+  user: string | Types.ObjectId | PopulatedUser
+): user is PopulatedUser {
+  return (
+    user !== null &&
+    typeof user === 'object' &&
+    !(user instanceof Types.ObjectId) &&
+    '_id' in user &&
+    'firstName' in user &&
+    'lastName' in user
+  );
+}
 
 export class MongoTicketRepository implements ITicketRepository {
   async findAll(): Promise<Ticket[]> {
@@ -107,55 +126,13 @@ export class MongoTicketRepository implements ITicketRepository {
   }
 
   private mapToEntity(document: TicketDocument): Ticket {
-    let createdBy: UserPublic;
-    const createdByPopulated = document.createdBy as unknown as {
-      _id?: string;
-      id?: string;
-      firstName?: string;
-      lastName?: string;
-    };
+    const createdBy = this.populatedUserToUserPublicRequired(
+      document.createdBy as unknown as PopulatedUser
+    );
 
-    // Vérifier si le populate a réussi (l'utilisateur existe)
-    if (createdByPopulated && createdByPopulated.firstName && createdByPopulated.lastName) {
-      createdBy = {
-        id: createdByPopulated._id || createdByPopulated.id || document.createdBy.toString(),
-        firstName: createdByPopulated.firstName,
-        lastName: createdByPopulated.lastName,
-      };
-    } else {
-      // Fallback si l'utilisateur a été supprimé
-      createdBy = {
-        id: document.createdBy.toString(),
-        firstName: 'Utilisateur',
-        lastName: 'introuvable',
-      };
-    }
-
-    let assignedTo: UserPublic | null = null;
-    if (document.assignedTo) {
-      const assignedToPopulated = document.assignedTo as unknown as {
-        _id?: string;
-        id?: string;
-        firstName?: string;
-        lastName?: string;
-      };
-
-      // Vérifier si le populate a réussi
-      if (assignedToPopulated && assignedToPopulated.firstName && assignedToPopulated.lastName) {
-        assignedTo = {
-          id: assignedToPopulated._id || assignedToPopulated.id || document.assignedTo.toString(),
-          firstName: assignedToPopulated.firstName,
-          lastName: assignedToPopulated.lastName,
-        };
-      } else {
-        // Fallback si l'utilisateur a été supprimé
-        assignedTo = {
-          id: document.assignedTo.toString(),
-          firstName: 'Utilisateur',
-          lastName: 'introuvable',
-        };
-      }
-    }
+    const assignedTo = this.populatedUserToUserPublic(
+      document.assignedTo as unknown as PopulatedUser
+    );
 
     return {
       id: document._id.toString(),
@@ -168,5 +145,40 @@ export class MongoTicketRepository implements ITicketRepository {
       createdAt: document.createdAt,
       updatedAt: document.updatedAt,
     };
+  }
+
+  private populatedUserToUserPublic(
+    populatedUser: PopulatedUser | Types.ObjectId | string | null
+  ): UserPublic | null {
+    if (populatedUser === null || populatedUser === undefined) {
+      return null;
+    }
+    if (isPopulatedUser(populatedUser)) {
+      return {
+        id: populatedUser._id.toString(),
+        firstName: populatedUser.firstName,
+        lastName: populatedUser.lastName,
+      };
+    }
+    console.warn(`User not found or invalid: ${JSON.stringify(populatedUser)}`);
+    return {
+      id: typeof populatedUser === 'string' ? populatedUser : populatedUser._id.toString(),
+      firstName: 'Utilisateur',
+      lastName: 'introuvable',
+    };
+  }
+
+  private populatedUserToUserPublicRequired(
+    populatedUser: PopulatedUser | Types.ObjectId | string | null
+  ): UserPublic {
+    const userPublic = this.populatedUserToUserPublic(populatedUser);
+    if (userPublic === null) {
+      return {
+        id: 'unknown',
+        firstName: 'Utilisateur',
+        lastName: 'introuvable',
+      };
+    }
+    return userPublic;
   }
 }
