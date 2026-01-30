@@ -123,7 +123,9 @@ describe('passwordUtils', () => {
       const hashedPassword = await hashPassword(password);
 
       const [salt, hash] = hashedPassword.split(':');
-      const tamperedHash = salt.replace(/^./, 'f') + ':' + hash;
+      const firstChar = salt[0];
+      const replacementChar = firstChar === 'f' ? '0' : 'f';
+      const tamperedHash = replacementChar + salt.slice(1) + ':' + hash;
 
       const isMatch = await comparePassword(password, tamperedHash);
 
@@ -135,7 +137,9 @@ describe('passwordUtils', () => {
       const hashedPassword = await hashPassword(password);
 
       const [salt, hash] = hashedPassword.split(':');
-      const tamperedHash = salt + ':' + hash.replace(/^./, 'f');
+      const firstChar = hash[0];
+      const replacementChar = firstChar === 'f' ? '0' : 'f';
+      const tamperedHash = salt + ':' + replacementChar + hash.slice(1);
 
       const isMatch = await comparePassword(password, tamperedHash);
 
