@@ -48,13 +48,13 @@ export default function TicketCard({ ticket }: TicketCardProps) {
         </div>
         <p className="mb-4 text-sm text-gray-600">{ticket.description}</p>
         <div className="mb-3 text-sm text-gray-700">
-          <span className="font-medium">Créé par :</span>
-          {ticket.createdBy.firstName} {ticket.createdBy.lastName}
+          <span className="font-medium">Créé par :</span> {ticket.createdBy.firstName}{' '}
+          {ticket.createdBy.lastName}
         </div>
         {ticket.assignedTo && (
           <div className="mb-3 text-sm text-gray-700">
-            <span className="font-medium">Assigné à :</span>
-            {ticket.assignedTo.firstName} {ticket.assignedTo.lastName}
+            <span className="font-medium">Assigné à :</span> {ticket.assignedTo.firstName}{' '}
+            {ticket.assignedTo.lastName}
           </div>
         )}
         <div className="flex justify-between text-xs text-gray-500">

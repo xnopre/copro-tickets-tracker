@@ -78,6 +78,7 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
         <div className="mb-4 text-sm">
           <span className="font-semibold text-gray-700">Créé par :</span>
           <p className="text-gray-600">
+            {' '}
             {ticket.createdBy.firstName} {ticket.createdBy.lastName}
           </p>
         </div>
@@ -85,6 +86,7 @@ export default function TicketDetail({ ticket, onEditClick }: TicketDetailProps)
           <div className="mb-4 text-sm">
             <span className="font-semibold text-gray-700">Assigné à :</span>
             <p className="text-gray-600">
+              {' '}
               {ticket.assignedTo.firstName} {ticket.assignedTo.lastName}
             </p>
           </div>
