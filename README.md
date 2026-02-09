@@ -221,23 +221,77 @@ Une fois configuré, chaque `git push` sur la branche `main` déclenchera automa
 
 ```
 copro-tickets-tracker/
-├── app/                    # Pages Next.js (App Router)
-│   ├── api/               # API Routes (à venir)
-│   ├── tickets/           # Pages des tickets (à venir)
-│   ├── globals.css        # Styles globaux
-│   ├── layout.tsx         # Layout racine
-│   └── page.tsx           # Page d'accueil
-├── components/            # Composants React réutilisables
-├── lib/                   # Utilitaires et configurations
-├── public/                # Assets statiques
-├── .env.local             # Variables d'environnement locales (non versionné)
-├── next.config.ts         # Configuration Next.js
-├── tailwind.config.ts     # Configuration Tailwind CSS
-├── tsconfig.json          # Configuration TypeScript
-├── CLAUDE.md              # Documentation pour Claude Code
-├── PLAN.md                # Plan de développement par étapes
-└── README.md              # Ce fichier
+├── .claude/
+│   └── rules/                     # Règles du projet (architecture, tests, accessibilité)
+├── .github/                       # GitHub Actions
+├── .husky/                        # Git hooks
+├── app/                           # Next.js App Router
+│   ├── api/                       # API Routes
+│   │   ├── auth/
+│   │   ├── tickets/
+│   │   └── users/
+│   ├── login/
+│   └── tickets/
+│       ├── new/
+│       └── [id]/
+├── docs/                          # Documentation
+│   ├── analyzes/
+│   └── plan/
+├── public/                        # Assets statiques
+├── scripts/                       # Scripts (seed, users)
+├── src/                           # Architecture Hexagonale
+│   ├── domain/                    # Logique métier pure
+│   │   ├── entities/
+│   │   ├── errors/
+│   │   ├── repositories/
+│   │   ├── services/
+│   │   ├── use-cases/
+│   │   └── value-objects/
+│   ├── application/               # Orchestration
+│   │   └── services/
+│   ├── infrastructure/            # Adaptateurs techniques
+│   │   ├── crypto/
+│   │   ├── database/
+│   │   │   └── schemas/
+│   │   ├── repositories/
+│   │   └── services/
+│   │       └── __mocks__/
+│   ├── presentation/              # UI React
+│   │   ├── components/
+│   │   │   └── ui/
+│   │   ├── constants/
+│   │   └── utils/
+│   └── types/
+└── tests/                         # Tests E2E et utilitaires
+    ├── e2e/
+    └── helpers/
 ```
+
+### 🏗️ Architecture Hexagonale
+
+```
+    ┌──────────────────────────┐
+    │  PRESENTATION            │
+    │  (React Components)      │
+    └───────────┬──────────────┘
+                │
+    ┌───────────▼──────────────┐
+    │  APPLICATION             │
+    │  (Services)              │
+    └───────────┬──────────────┘
+                │
+    ┌───────────▼──────────────┐
+    │  DOMAIN                  │
+    │  (Use Cases, Entities)   │
+    └───────────▲──────────────┘
+                │
+    ┌───────────┴──────────────┐
+    │  INFRASTRUCTURE          │
+    │  (MongoDB, Email, Auth)  │
+    └──────────────────────────┘
+```
+
+**Principe clé** : Les dépendances pointent vers l'intérieur (Domain au centre)
 
 ## 🗺️ Plan de développement
 
