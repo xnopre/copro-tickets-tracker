@@ -5,20 +5,30 @@
 ```
 src/
 ├── domain/              # Pure business logic (no external deps)
-│   ├── entities/        # Business entities (Ticket, Comment)
+│   ├── entities/        # Business entities (Ticket, Comment, User)
+│   ├── errors/          # Domain errors (ValidationError, InvalidIdError)
 │   ├── repositories/    # Repository interfaces (ports)
-│   └── use-cases/       # Business use cases
+│   ├── services/        # Service interfaces (IAuthService, IEmailService, ILogger)
+│   ├── use-cases/       # Business use cases
+│   └── value-objects/   # Value objects (TicketStatus)
 ├── application/         # Orchestration layer
-│   └── services/        # Application services
+│   └── services/        # Application services (TicketService, CommentService, UserService)
 ├── infrastructure/      # Adapters (technical implementations)
-│   ├── database/        # MongoDB implementation
-│   ├── api/             # Next.js API routes
-│   └── repositories/    # Repository implementations
-└── presentation/        # UI layer
-    ├── components/      # React components
-    ├── pages/           # Next.js App Router pages
-    └── hooks/           # React hooks
+│   ├── crypto/          # Cryptography utilities (passwordUtils)
+│   ├── database/        # MongoDB connection and schemas
+│   │   └── schemas/     # Mongoose schemas (TicketSchema, CommentSchema, UserSchema)
+│   ├── repositories/    # Repository implementations (MongoTicketRepository, etc.)
+│   └── services/        # Service implementations (AuthService, EmailService, etc.)
+│       └── __mocks__/   # Mock implementations for testing
+├── presentation/        # UI layer
+│   ├── components/      # React components
+│   │   └── ui/          # Design system (Button, Input, Card, etc.)
+│   ├── constants/       # UI constants (ticketDisplay)
+│   └── utils/           # UI utilities (statusBadgeVariant, ticketFormatters)
+└── types/               # TypeScript type definitions (next-auth.d.ts)
 ```
+
+**Note**: Next.js API routes are in `app/api/`, not in `src/infrastructure/`
 
 ## Core Principles
 
