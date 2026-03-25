@@ -66,7 +66,7 @@ export class ServiceFactory {
 
   static getEmailJobQueue(): IEmailJobQueue {
     if (!this.emailJobQueue) {
-      if (process.env.NODE_ENV === 'test') {
+      if (process.env.NODE_ENV === 'test' || process.env.IS_PLAYWRIGHT_TEST) {
         this.emailJobQueue = new MockEmailJobQueue();
       } else {
         const redisUrl = process.env.REDIS_URL;
