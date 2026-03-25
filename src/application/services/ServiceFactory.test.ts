@@ -2,9 +2,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ServiceFactory } from './ServiceFactory';
 import { TicketService } from './TicketService';
 import { CommentService } from './CommentService';
-import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
-import { ResendEmailService } from '@/infrastructure/services/ResendEmailService';
-import { MockEmailService } from '@/infrastructure/services/__mocks__/MockEmailService';
+import { BullMQEmailJobQueue } from '@/infrastructure/queue/BullMQEmailJobQueue';
+import { MockEmailJobQueue } from '@/infrastructure/queue/__mocks__/MockEmailJobQueue';
 
 vi.mock('@/infrastructure/repositories/MongoTicketRepository', () => {
   return {
@@ -51,13 +50,18 @@ vi.mock('@/infrastructure/repositories/MongoUserRepository', () => {
   };
 });
 
+vi.mock('@/infrastructure/queue/BullMQEmailJobQueue', () => {
+  return {
+    BullMQEmailJobQueue: vi.fn(),
+  };
+});
+
 describe('ServiceFactory', () => {
   beforeEach(() => {
-    // Reset the singleton instances before each test
     (ServiceFactory as any).ticketService = null;
     (ServiceFactory as any).commentService = null;
     (ServiceFactory as any).authService = null;
-    (ServiceFactory as any).emailService = null;
+    (ServiceFactory as any).emailJobQueue = null;
   });
 
   afterEach(() => {
@@ -129,55 +133,31 @@ describe('ServiceFactory', () => {
     });
   });
 
-  describe('getEmailService', () => {
-    it('should return MockEmailService in test environment', () => {
+  describe('getEmailJobQueue', () => {
+    it('should return MockEmailJobQueue in test environment', () => {
       vi.stubEnv('NODE_ENV', 'test');
 
-      const service = ServiceFactory.getEmailService();
+      const queue = ServiceFactory.getEmailJobQueue();
 
-      expect(service).toBeInstanceOf(MockEmailService);
+      expect(queue).toBeInstanceOf(MockEmailJobQueue);
     });
 
-    it('should return GmailEmailService when EMAIL_PROVIDER is gmail', () => {
+    it('should return BullMQEmailJobQueue when not in test environment', () => {
       vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('EMAIL_PROVIDER', 'gmail');
-      vi.stubEnv('GMAIL_USER', 'test@gmail.com');
-      vi.stubEnv('GMAIL_APP_PASSWORD', 'test_password');
-      vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
+      vi.stubEnv('REDIS_URL', 'redis://localhost:6379');
 
-      const service = ServiceFactory.getEmailService();
+      const queue = ServiceFactory.getEmailJobQueue();
 
-      expect(service).toBeInstanceOf(GmailEmailService);
+      expect(BullMQEmailJobQueue).toHaveBeenCalledWith('redis://localhost:6379');
+      expect(queue).toBeDefined();
     });
 
-    it('should return ResendEmailService when EMAIL_PROVIDER is resend', () => {
+    it('should throw error when REDIS_URL is not set in non-test environment', () => {
       vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('EMAIL_PROVIDER', 'resend');
-      vi.stubEnv('RESEND_API_KEY', 'test_key');
-      vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
+      vi.stubEnv('REDIS_URL', '');
 
-      const service = ServiceFactory.getEmailService();
-
-      expect(service).toBeInstanceOf(ResendEmailService);
-    });
-
-    it('should default to GmailEmailService when EMAIL_PROVIDER is not set', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('GMAIL_USER', 'gmail_user');
-      vi.stubEnv('GMAIL_APP_PASSWORD', 'gmail_app_password');
-      vi.stubEnv('FROM_EMAIL', 'noreply@test.com');
-
-      const service = ServiceFactory.getEmailService();
-
-      expect(service).toBeInstanceOf(GmailEmailService);
-    });
-
-    it('should throw error when EMAIL_PROVIDER is invalid', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('EMAIL_PROVIDER', 'invalid');
-
-      expect(() => ServiceFactory.getEmailService()).toThrow(
-        "EMAIL_PROVIDER invalide: invalid. Valeurs acceptées: 'gmail', 'resend'"
+      expect(() => ServiceFactory.getEmailJobQueue()).toThrow(
+        'REDIS_URL environment variable is not defined'
       );
     });
   });

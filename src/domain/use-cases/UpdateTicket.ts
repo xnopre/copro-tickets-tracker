@@ -1,6 +1,6 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { Ticket, UpdateTicketData } from '../entities/Ticket';
@@ -11,7 +11,7 @@ export class UpdateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService,
+    private emailJobQueue: IEmailJobQueue,
     private emailTemplateService: IEmailTemplateService,
     private logger: ILogger
   ) {}
@@ -47,7 +47,7 @@ export class UpdateTicket {
       return null;
     }
 
-    void this.notifyTicketUpdated(existingTicket, updatedTicket, trimmedData);
+    await this.notifyTicketUpdated(existingTicket, updatedTicket, trimmedData);
 
     return updatedTicket;
   }
@@ -86,7 +86,7 @@ export class UpdateTicket {
       assignee
     );
 
-    await this.emailService.sendSafe({
+    await this.emailJobQueue.enqueue({
       to: [
         {
           email: assignee.email,
@@ -116,7 +116,7 @@ export class UpdateTicket {
       newStatus
     );
 
-    await this.emailService.sendSafe({
+    await this.emailJobQueue.enqueue({
       to: users.map(user => ({
         email: user.email,
         name: `${user.firstName} ${user.lastName}`,

@@ -3,7 +3,7 @@ import { AddComment } from './AddComment';
 import { ICommentRepository } from '../repositories/ICommentRepository';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
@@ -33,9 +33,8 @@ describe('AddComment', () => {
     findByEmail: vi.fn(),
   };
 
-  const mockEmailService: IEmailService = {
-    send: vi.fn(),
-    sendSafe: vi.fn(),
+  const mockEmailJobQueue: IEmailJobQueue = {
+    enqueue: vi.fn(),
   };
 
   const mockEmailTemplateService: IEmailTemplateService = {
@@ -87,7 +86,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -120,7 +119,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -142,7 +141,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -161,7 +160,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -180,7 +179,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -199,7 +198,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -213,7 +212,7 @@ describe('AddComment', () => {
     ).rejects.toThrow("L'ID de l'auteur est requis");
   });
 
-  it('should send email notification when comment is added', async () => {
+  it('should enqueue email notification when comment is added', async () => {
     const mockComment = {
       id: '1',
       ticketId: 'ticket-1',
@@ -239,13 +238,13 @@ describe('AddComment', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockComment);
     vi.mocked(mockTicketRepository.findById).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
-    vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+    vi.mocked(mockEmailJobQueue.enqueue).mockResolvedValue(undefined);
 
     const useCase = new AddComment(
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -255,15 +254,12 @@ describe('AddComment', () => {
       authorId: 'user-1',
     });
 
-    // Wait for async notification to complete
-    await new Promise(resolve => setImmediate(resolve));
-
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
     expect(mockUserRepository.findAll).toHaveBeenCalled();
-    expect(mockEmailService.sendSafe).toHaveBeenCalled();
+    expect(mockEmailJobQueue.enqueue).toHaveBeenCalled();
   });
 
-  it('should not send email if ticket is not found', async () => {
+  it('should not enqueue email if ticket is not found', async () => {
     const mockComment = {
       id: '1',
       ticketId: 'ticket-1',
@@ -279,7 +275,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -289,14 +285,11 @@ describe('AddComment', () => {
       authorId: 'user-1',
     });
 
-    // Wait for async notification to complete
-    await new Promise(resolve => setImmediate(resolve));
-
     expect(mockTicketRepository.findById).toHaveBeenCalledWith('ticket-1');
-    expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+    expect(mockEmailJobQueue.enqueue).not.toHaveBeenCalled();
   });
 
-  it('should not send email if no users exist', async () => {
+  it('should not enqueue email if no users exist', async () => {
     const mockComment = {
       id: '1',
       ticketId: 'ticket-1',
@@ -325,7 +318,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -335,14 +328,11 @@ describe('AddComment', () => {
       authorId: 'user-1',
     });
 
-    // Wait for async notification to complete
-    await new Promise(resolve => setImmediate(resolve));
-
     expect(mockUserRepository.findAll).toHaveBeenCalled();
-    expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+    expect(mockEmailJobQueue.enqueue).not.toHaveBeenCalled();
   });
 
-  it('should not fail if email sending fails', async () => {
+  it('should not fail if email enqueue fails', async () => {
     const mockComment = {
       id: '1',
       ticketId: 'ticket-1',
@@ -358,7 +348,7 @@ describe('AddComment', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CreateTicket } from './CreateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
@@ -24,9 +24,8 @@ describe('CreateTicket', () => {
     findByEmail: vi.fn(),
   };
 
-  const mockEmailService: IEmailService = {
-    send: vi.fn(),
-    sendSafe: vi.fn(),
+  const mockEmailJobQueue: IEmailJobQueue = {
+    enqueue: vi.fn(),
   };
 
   const mockEmailTemplateService: IEmailTemplateService = {
@@ -81,12 +80,12 @@ describe('CreateTicket', () => {
     vi.mocked(mockRepository.create).mockResolvedValue(mockTicket);
     vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
     vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
-    vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+    vi.mocked(mockEmailJobQueue.enqueue).mockResolvedValue(undefined);
 
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -96,16 +95,13 @@ describe('CreateTicket', () => {
       createdBy: '1',
     });
 
-    // Wait for async notification to complete
-    await new Promise(resolve => setImmediate(resolve));
-
     expect(result).toEqual(mockTicket);
     expect(mockRepository.create).toHaveBeenCalledWith({
       title: 'Test Ticket',
       description: 'Test Description',
       createdBy: '1',
     });
-    expect(mockEmailService.sendSafe).toHaveBeenCalled();
+    expect(mockEmailJobQueue.enqueue).toHaveBeenCalled();
   });
 
   it('should trim title and description', async () => {
@@ -128,7 +124,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -149,7 +145,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -167,7 +163,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -185,7 +181,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -203,7 +199,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -223,7 +219,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -237,7 +233,7 @@ describe('CreateTicket', () => {
     ).rejects.toThrow('Utilisateur invalide');
   });
 
-  it('should not fail if email sending fails', async () => {
+  it('should not fail if email enqueue fails', async () => {
     const mockTicket = {
       id: '1',
       title: 'Test Ticket',
@@ -257,7 +253,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -272,7 +268,7 @@ describe('CreateTicket', () => {
     expect(mockLogger.error).toHaveBeenCalled();
   });
 
-  it('should not send email if no users exist', async () => {
+  it('should not enqueue email if no users exist', async () => {
     const mockTicket = {
       id: '1',
       title: 'Test Ticket',
@@ -292,7 +288,7 @@ describe('CreateTicket', () => {
     const useCase = new CreateTicket(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
@@ -303,9 +299,6 @@ describe('CreateTicket', () => {
       createdBy: '1',
     });
 
-    // Wait for async notification to complete
-    await new Promise(resolve => setImmediate(resolve));
-
-    expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+    expect(mockEmailJobQueue.enqueue).not.toHaveBeenCalled();
   });
 });

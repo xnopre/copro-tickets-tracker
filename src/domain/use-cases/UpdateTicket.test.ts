@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UpdateTicket } from './UpdateTicket';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { TicketStatus } from '../value-objects/TicketStatus';
@@ -30,9 +30,8 @@ describe('UpdateTicket', () => {
     findByEmail: vi.fn(),
   };
 
-  const mockEmailService: IEmailService = {
-    send: vi.fn(),
-    sendSafe: vi.fn(),
+  const mockEmailJobQueue: IEmailJobQueue = {
+    enqueue: vi.fn(),
   };
 
   const mockEmailTemplateService: IEmailTemplateService = {
@@ -77,7 +76,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -102,7 +101,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -126,7 +125,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -150,7 +149,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -176,7 +175,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -190,7 +189,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -206,7 +205,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -222,7 +221,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -238,7 +237,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -254,7 +253,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -270,7 +269,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -286,7 +285,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -305,7 +304,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -326,7 +325,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -345,7 +344,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -362,16 +361,16 @@ describe('UpdateTicket', () => {
   });
 
   describe('Email notifications', () => {
-    it('should send email notification when assigning a ticket', async () => {
+    it('should enqueue email notification when assigning a ticket', async () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findById).mockResolvedValue(mockUser1);
-      vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+      vi.mocked(mockEmailJobQueue.enqueue).mockResolvedValue(undefined);
 
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -379,25 +378,22 @@ describe('UpdateTicket', () => {
         assignedTo: mockUser1.id,
       });
 
-      // Wait for async notification to complete
-      await new Promise(resolve => setImmediate(resolve));
-
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
-      expect(mockEmailService.sendSafe).toHaveBeenCalled();
+      expect(mockEmailJobQueue.enqueue).toHaveBeenCalled();
     });
 
-    it('should send email notification when changing status', async () => {
+    it('should enqueue email notification when changing status', async () => {
       const mockUsers: User[] = [mockUser1, mockUser2];
 
       vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findAll).mockResolvedValue(mockUsers);
-      vi.mocked(mockEmailService.sendSafe).mockResolvedValue(true);
+      vi.mocked(mockEmailJobQueue.enqueue).mockResolvedValue(undefined);
 
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -405,21 +401,18 @@ describe('UpdateTicket', () => {
         status: TicketStatus.IN_PROGRESS,
       });
 
-      // Wait for async notification to complete
-      await new Promise(resolve => setImmediate(resolve));
-
       expect(mockUserRepository.findAll).toHaveBeenCalled();
-      expect(mockEmailService.sendSafe).toHaveBeenCalled();
+      expect(mockEmailJobQueue.enqueue).toHaveBeenCalled();
     });
 
-    it('should not send email notification if status does not change', async () => {
+    it('should not enqueue email notification if status does not change', async () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
 
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -427,13 +420,10 @@ describe('UpdateTicket', () => {
         title: 'Updated Title',
       });
 
-      // Wait for async notification to complete
-      await new Promise(resolve => setImmediate(resolve));
-
-      expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+      expect(mockEmailJobQueue.enqueue).not.toHaveBeenCalled();
     });
 
-    it('should not fail if email sending fails', async () => {
+    it('should not fail if email enqueue fails', async () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findAll).mockRejectedValue(new Error('Database error'));
@@ -441,7 +431,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -450,14 +440,11 @@ describe('UpdateTicket', () => {
         status: TicketStatus.IN_PROGRESS,
       });
 
-      // Wait for async notification to complete
-      await new Promise(resolve => setImmediate(resolve));
-
       expect(result).toEqual(mockTicketInProgress);
       expect(mockLogger.error).toHaveBeenCalled();
     });
 
-    it('should not send email notification if assignee is not found', async () => {
+    it('should not enqueue email notification if assignee is not found', async () => {
       vi.mocked(mockRepository.findById).mockResolvedValue(mockTicketNew);
       vi.mocked(mockRepository.update).mockResolvedValue(mockTicketInProgress);
       vi.mocked(mockUserRepository.findById).mockResolvedValue(null);
@@ -465,7 +452,7 @@ describe('UpdateTicket', () => {
       const useCase = new UpdateTicket(
         mockRepository,
         mockUserRepository,
-        mockEmailService,
+        mockEmailJobQueue,
         mockEmailTemplateService,
         mockLogger
       );
@@ -473,11 +460,8 @@ describe('UpdateTicket', () => {
         assignedTo: mockUser1.id,
       });
 
-      // Wait for async notification to complete
-      await new Promise(resolve => setImmediate(resolve));
-
       expect(mockUserRepository.findById).toHaveBeenCalledWith(mockUser1.id);
-      expect(mockEmailService.sendSafe).not.toHaveBeenCalled();
+      expect(mockEmailJobQueue.enqueue).not.toHaveBeenCalled();
     });
   });
 });

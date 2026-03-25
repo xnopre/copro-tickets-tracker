@@ -1,7 +1,7 @@
 import { ICommentRepository } from '../repositories/ICommentRepository';
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { CreateCommentData, Comment } from '../entities/Comment';
@@ -12,7 +12,7 @@ export class AddComment {
     private commentRepository: ICommentRepository,
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService,
+    private emailJobQueue: IEmailJobQueue,
     private emailTemplateService: IEmailTemplateService,
     private logger: ILogger
   ) {}
@@ -26,7 +26,7 @@ export class AddComment {
       authorId: data.authorId,
     });
 
-    void this.notifyCommentAdded(comment);
+    await this.notifyCommentAdded(comment);
 
     return comment;
   }
@@ -49,7 +49,7 @@ export class AddComment {
         comment
       );
 
-      await this.emailService.sendSafe({
+      await this.emailJobQueue.enqueue({
         to: users.map(user => ({
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,

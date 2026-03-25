@@ -1,7 +1,7 @@
 import { ICommentRepository } from '@/domain/repositories/ICommentRepository';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
-import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { GetComments } from '@/domain/use-cases/GetComments';
@@ -16,7 +16,7 @@ export class CommentService {
     commentRepository: ICommentRepository,
     ticketRepository: ITicketRepository,
     userRepository: IUserRepository,
-    emailService: IEmailService,
+    emailJobQueue: IEmailJobQueue,
     emailTemplateService: IEmailTemplateService,
     logger: ILogger
   ) {
@@ -25,7 +25,7 @@ export class CommentService {
       commentRepository,
       ticketRepository,
       userRepository,
-      emailService,
+      emailJobQueue,
       emailTemplateService,
       logger
     );

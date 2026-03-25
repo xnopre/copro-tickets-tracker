@@ -3,7 +3,7 @@ import { CommentService } from './CommentService';
 import { ICommentRepository } from '@/domain/repositories/ICommentRepository';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
-import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { Comment, CreateCommentData } from '@/domain/entities/Comment';
@@ -14,7 +14,7 @@ describe('CommentService', () => {
   let mockRepository: ICommentRepository;
   let mockTicketRepository: ITicketRepository;
   let mockUserRepository: IUserRepository;
-  let mockEmailService: IEmailService;
+  let mockEmailJobQueue: IEmailJobQueue;
   let mockEmailTemplateService: IEmailTemplateService;
   let mockLogger: ILogger;
   let commentService: CommentService;
@@ -39,9 +39,8 @@ describe('CommentService', () => {
       }),
       findByEmail: vi.fn().mockResolvedValue(null),
     };
-    mockEmailService = {
-      send: vi.fn().mockResolvedValue(undefined),
-      sendSafe: vi.fn().mockResolvedValue(true),
+    mockEmailJobQueue = {
+      enqueue: vi.fn().mockResolvedValue(undefined),
     };
     mockEmailTemplateService = {
       ticketCreated: vi.fn().mockReturnValue({
@@ -75,7 +74,7 @@ describe('CommentService', () => {
       mockRepository,
       mockTicketRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );

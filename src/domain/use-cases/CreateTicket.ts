@@ -1,6 +1,6 @@
 import { ITicketRepository } from '../repositories/ITicketRepository';
 import { IUserRepository } from '../repositories/IUserRepository';
-import { IEmailService } from '../services/IEmailService';
+import { IEmailJobQueue } from '../services/IEmailJobQueue';
 import { IEmailTemplateService } from '../services/IEmailTemplateService';
 import { ILogger } from '../services/ILogger';
 import { CreateTicketData, Ticket } from '../entities/Ticket';
@@ -10,7 +10,7 @@ export class CreateTicket {
   constructor(
     private ticketRepository: ITicketRepository,
     private userRepository: IUserRepository,
-    private emailService: IEmailService,
+    private emailJobQueue: IEmailJobQueue,
     private emailTemplateService: IEmailTemplateService,
     private logger: ILogger
   ) {}
@@ -30,7 +30,7 @@ export class CreateTicket {
       createdBy: data.createdBy,
     });
 
-    void this.notifyTicketCreated(ticket);
+    await this.notifyTicketCreated(ticket);
 
     return ticket;
   }
@@ -45,7 +45,7 @@ export class CreateTicket {
 
       const { subject, htmlContent, textContent } = this.emailTemplateService.ticketCreated(ticket);
 
-      await this.emailService.sendSafe({
+      await this.emailJobQueue.enqueue({
         to: users.map(user => ({
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
