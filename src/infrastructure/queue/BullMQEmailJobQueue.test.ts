@@ -3,9 +3,13 @@ import { BullMQEmailJobQueue, EMAIL_QUEUE_NAME } from './BullMQEmailJobQueue';
 import { EmailData } from '@/domain/services/IEmailService';
 
 const mockAdd = vi.hoisted(() => vi.fn());
+const mockQueueConstructor = vi.hoisted(() => vi.fn());
 
 vi.mock('bullmq', () => ({
   Queue: class {
+    constructor(...args: unknown[]) {
+      mockQueueConstructor(...args);
+    }
     add = mockAdd;
   },
 }));
@@ -15,16 +19,12 @@ describe('BullMQEmailJobQueue', () => {
     vi.clearAllMocks();
   });
 
-  it('should create a Queue with the correct name and connection', async () => {
-    const { Queue } = await import('bullmq');
-    const QueueSpy = vi.spyOn({ Queue }, 'Queue');
-
+  it('should create a Queue with the correct name and connection', () => {
     new BullMQEmailJobQueue('redis://localhost:6379');
 
-    // Verify the queue was instantiated (Queue class is mocked, instance has add method)
-    const queue = new BullMQEmailJobQueue('redis://localhost:6379');
-    expect(queue).toBeDefined();
-    void QueueSpy;
+    expect(mockQueueConstructor).toHaveBeenCalledWith(EMAIL_QUEUE_NAME, {
+      connection: { url: 'redis://localhost:6379' },
+    });
   });
 
   it('should use the correct queue name', () => {
