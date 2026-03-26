@@ -6,8 +6,11 @@ import {
 } from '@/infrastructure/queue/pendingEmailProcessor';
 
 export async function POST() {
-  await resetInterruptedEmails();
-  const emailService = ServiceFactory.getEmailService();
-  const result = await processPendingEmails(emailService);
-  return NextResponse.json(result);
+  try {
+    await resetInterruptedEmails();
+    const result = await processPendingEmails(ServiceFactory.getEmailService());
+    return NextResponse.json(result);
+  } catch (error) {
+    return NextResponse.json({ error: 'Email processing failed' }, { status: 500 });
+  }
 }

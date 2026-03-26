@@ -54,4 +54,24 @@ describe('POST /api/process-emails', () => {
 
     expect(mockProcessPendingEmails).toHaveBeenCalledWith(mockEmailService);
   });
+
+  it('should return 500 when resetInterruptedEmails throws', async () => {
+    mockResetInterruptedEmails.mockRejectedValue(new Error('DB error'));
+
+    const response = await POST();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: 'Email processing failed' });
+  });
+
+  it('should return 500 when processPendingEmails throws', async () => {
+    mockProcessPendingEmails.mockRejectedValue(new Error('SMTP error'));
+
+    const response = await POST();
+    const body = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(body).toEqual({ error: 'Email processing failed' });
+  });
 });
