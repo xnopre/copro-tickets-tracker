@@ -22,8 +22,6 @@
     "mongodb:stop": "brew services stop mongodb/brew/mongodb-community",
     "seed": "tsx scripts/seed.ts",
     "seed:users": "tsx scripts/seed_user.ts",
-    "build:worker": "esbuild scripts/email-worker.ts --bundle --platform=node --outfile=dist/email-worker.js",
-    "worker:email": "tsx scripts/email-worker.ts",
     "renovate:trigger": "gh workflow run renovate.yml",
     "worktree": "bash scripts/worktree.sh"
   },
@@ -40,7 +38,6 @@
   "homepage": "https://github.com/xnopre/copro-tickets-tracker#readme",
   "description": "",
   "dependencies": {
-    "bullmq": "^5.71.0",
     "clsx": "^2.1.1",
     "mongoose": "^9.0.0",
     "next": "^16.0.4",
@@ -66,7 +63,6 @@
     "@vitest/coverage-v8": "^4.0.14",
     "@vitest/ui": "^4.0.14",
     "autoprefixer": "^10.4.22",
-    "esbuild": "^0.25.12",
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.0.4",
     "husky": "^9.1.7",

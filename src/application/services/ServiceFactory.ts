@@ -1,12 +1,15 @@
 import { MongoTicketRepository } from '@/infrastructure/repositories/MongoTicketRepository';
 import { MongoCommentRepository } from '@/infrastructure/repositories/MongoCommentRepository';
 import { MongoUserRepository } from '@/infrastructure/repositories/MongoUserRepository';
-import { BullMQEmailJobQueue } from '@/infrastructure/queue/BullMQEmailJobQueue';
+import { MongoEmailJobQueue } from '@/infrastructure/queue/MongoEmailJobQueue';
 import { MockEmailJobQueue } from '@/infrastructure/queue/__mocks__/MockEmailJobQueue';
+import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
+import { ResendEmailService } from '@/infrastructure/services/ResendEmailService';
 import { EmailTemplates } from '@/infrastructure/services/EmailTemplates';
 import { AuthService } from '@/infrastructure/services/AuthService';
 import { logger } from '@/infrastructure/services/logger';
 import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
+import { IEmailService } from '@/domain/services/IEmailService';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { IAuthService } from '@/domain/services/IAuthService';
 import { ILogger } from '@/domain/services/ILogger';
@@ -20,6 +23,7 @@ export class ServiceFactory {
   private static userService: UserService | null = null;
   private static authService: IAuthService | null = null;
   private static emailJobQueue: IEmailJobQueue | null = null;
+  private static emailServiceInstance: IEmailService | null = null;
   private static emailTemplateService: IEmailTemplateService | null = null;
   private static loggerInstance: ILogger | null = null;
 
@@ -69,14 +73,22 @@ export class ServiceFactory {
       if (process.env.NODE_ENV === 'test' || process.env.IS_PLAYWRIGHT_TEST) {
         this.emailJobQueue = new MockEmailJobQueue();
       } else {
-        const redisUrl = process.env.REDIS_URL;
-        if (!redisUrl) {
-          throw new Error('REDIS_URL environment variable is not defined');
-        }
-        this.emailJobQueue = new BullMQEmailJobQueue(redisUrl);
+        this.emailJobQueue = new MongoEmailJobQueue();
       }
     }
     return this.emailJobQueue;
+  }
+
+  static getEmailService(): IEmailService {
+    if (!this.emailServiceInstance) {
+      const logger = this.getLogger();
+      if (process.env.EMAIL_PROVIDER === 'resend') {
+        this.emailServiceInstance = new ResendEmailService(logger);
+      } else {
+        this.emailServiceInstance = new GmailEmailService(logger);
+      }
+    }
+    return this.emailServiceInstance;
   }
 
   static getEmailTemplateService(): IEmailTemplateService {

@@ -119,6 +119,8 @@ export default function EditTicketForm({
         updatedAt: new Date(data.updatedAt),
       };
 
+      fetch('/api/process-emails', { method: 'POST' }).catch(() => {});
+
       setSuccess(true);
       onTicketUpdated(updatedTicket);
     } catch (err) {

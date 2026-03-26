@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ServiceFactory } from './ServiceFactory';
 import { TicketService } from './TicketService';
 import { CommentService } from './CommentService';
-import { BullMQEmailJobQueue } from '@/infrastructure/queue/BullMQEmailJobQueue';
+import { MongoEmailJobQueue } from '@/infrastructure/queue/MongoEmailJobQueue';
 import { MockEmailJobQueue } from '@/infrastructure/queue/__mocks__/MockEmailJobQueue';
 
 vi.mock('@/infrastructure/repositories/MongoTicketRepository', () => {
@@ -50,9 +50,9 @@ vi.mock('@/infrastructure/repositories/MongoUserRepository', () => {
   };
 });
 
-vi.mock('@/infrastructure/queue/BullMQEmailJobQueue', () => {
+vi.mock('@/infrastructure/queue/MongoEmailJobQueue', () => {
   return {
-    BullMQEmailJobQueue: vi.fn(),
+    MongoEmailJobQueue: vi.fn(),
   };
 });
 
@@ -62,6 +62,7 @@ describe('ServiceFactory', () => {
     (ServiceFactory as any).commentService = null;
     (ServiceFactory as any).authService = null;
     (ServiceFactory as any).emailJobQueue = null;
+    (ServiceFactory as any).emailServiceInstance = null;
   });
 
   afterEach(() => {
@@ -142,23 +143,13 @@ describe('ServiceFactory', () => {
       expect(queue).toBeInstanceOf(MockEmailJobQueue);
     });
 
-    it('should return BullMQEmailJobQueue when not in test environment', () => {
+    it('should return MongoEmailJobQueue when not in test environment', () => {
       vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('REDIS_URL', 'redis://localhost:6379');
 
       const queue = ServiceFactory.getEmailJobQueue();
 
-      expect(BullMQEmailJobQueue).toHaveBeenCalledWith('redis://localhost:6379');
+      expect(MongoEmailJobQueue).toHaveBeenCalled();
       expect(queue).toBeDefined();
-    });
-
-    it('should throw error when REDIS_URL is not set in non-test environment', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('REDIS_URL', '');
-
-      expect(() => ServiceFactory.getEmailJobQueue()).toThrow(
-        'REDIS_URL environment variable is not defined'
-      );
     });
   });
 });

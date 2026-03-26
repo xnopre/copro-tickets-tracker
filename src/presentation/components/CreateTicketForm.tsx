@@ -53,6 +53,8 @@ export default function CreateTicketForm() {
         throw new Error(data.error || 'Erreur lors de la création du ticket');
       }
 
+      fetch('/api/process-emails', { method: 'POST' }).catch(() => {});
+
       // Rediriger vers la page de détail du ticket créé (pas de race condition)
       setSuccess(true);
       setTimeout(() => {
