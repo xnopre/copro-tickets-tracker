@@ -37,11 +37,14 @@ async function main() {
 
   logger.info('Email worker started');
 
-  process.on('SIGTERM', async () => {
+  const shutdown = async () => {
     logger.info('Email worker shutting down...');
     await worker.close();
     process.exit(0);
-  });
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 }
 
 main().catch(err => {
