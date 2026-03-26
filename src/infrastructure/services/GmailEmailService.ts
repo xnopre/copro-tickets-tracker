@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
-import { IEmailService, EmailData } from '@/domain/services/IEmailService';
+import { IEmailService } from '@/domain/services/IEmailService';
 import { ILogger } from '@/domain/services/ILogger';
 import { EmailServiceError } from '@/domain/errors/EmailServiceError';
+import { EmailData } from '@/domain/services/EmailData';
 
 export class GmailEmailService implements IEmailService {
   private transporter: nodemailer.Transporter;

@@ -1,5 +1,6 @@
-import { IEmailService, EmailData } from '@/domain/services/IEmailService';
+import { IEmailService } from '@/domain/services/IEmailService';
 import { ILogger } from '@/domain/services/ILogger';
+import { EmailData } from '@/domain/services/EmailData';
 
 /**
  * Mock du service Email pour les tests

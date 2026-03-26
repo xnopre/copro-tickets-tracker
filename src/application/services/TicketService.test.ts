@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TicketService } from './TicketService';
 import { ITicketRepository } from '@/domain/repositories/ITicketRepository';
 import { IUserRepository } from '@/domain/repositories/IUserRepository';
-import { IEmailService } from '@/domain/services/IEmailService';
+import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
 import { IEmailTemplateService } from '@/domain/services/IEmailTemplateService';
 import { ILogger } from '@/domain/services/ILogger';
 import { TicketStatus } from '@/domain/value-objects/TicketStatus';
@@ -13,7 +13,7 @@ import { mockUser1 } from '@tests/helpers/mockUsers';
 describe('TicketService', () => {
   let mockRepository: ITicketRepository;
   let mockUserRepository: IUserRepository;
-  let mockEmailService: IEmailService;
+  let mockEmailJobQueue: IEmailJobQueue;
   let mockEmailTemplateService: IEmailTemplateService;
   let mockLogger: ILogger;
   let ticketService: TicketService;
@@ -36,9 +36,8 @@ describe('TicketService', () => {
       }),
       findByEmail: vi.fn().mockResolvedValue(null),
     };
-    mockEmailService = {
-      send: vi.fn().mockResolvedValue(undefined),
-      sendSafe: vi.fn().mockResolvedValue(true),
+    mockEmailJobQueue = {
+      enqueue: vi.fn().mockResolvedValue(undefined),
     };
     mockEmailTemplateService = {
       ticketCreated: vi.fn().mockReturnValue({
@@ -71,7 +70,7 @@ describe('TicketService', () => {
     ticketService = new TicketService(
       mockRepository,
       mockUserRepository,
-      mockEmailService,
+      mockEmailJobQueue,
       mockEmailTemplateService,
       mockLogger
     );
