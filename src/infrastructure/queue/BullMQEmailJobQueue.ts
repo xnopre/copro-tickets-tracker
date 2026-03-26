@@ -1,6 +1,7 @@
 import { Queue } from 'bullmq';
 import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
-import { EmailData } from '@/domain/services/IEmailService';
+
+import { EmailData } from '@/domain/services/EmailData';
 
 export const EMAIL_QUEUE_NAME = 'email';
 

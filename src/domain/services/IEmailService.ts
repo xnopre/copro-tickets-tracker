@@ -2,17 +2,11 @@
  * Interface du service Email (Port)
  * Définit les opérations d'envoi d'emails selon l'architecture hexagonale
  */
+import { EmailData } from '@/domain/services/EmailData';
 
 export interface EmailRecipient {
   email: string;
   name: string;
-}
-
-export interface EmailData {
-  to: EmailRecipient[];
-  subject: string;
-  htmlContent: string;
-  textContent: string;
 }
 
 export interface IEmailService {

@@ -3,7 +3,8 @@ import { EMAIL_QUEUE_NAME } from '@/infrastructure/queue/BullMQEmailJobQueue';
 import { GmailEmailService } from '@/infrastructure/services/GmailEmailService';
 import { ResendEmailService } from '@/infrastructure/services/ResendEmailService';
 import { logger } from '@/infrastructure/services/logger';
-import { EmailData } from '@/domain/services/IEmailService';
+
+import { EmailData } from '@/domain/services/EmailData';
 
 const REDIS_URL = process.env.REDIS_URL;
 

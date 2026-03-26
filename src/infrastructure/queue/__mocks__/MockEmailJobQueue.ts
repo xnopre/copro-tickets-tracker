@@ -1,5 +1,6 @@
 import { IEmailJobQueue } from '@/domain/services/IEmailJobQueue';
-import { EmailData } from '@/domain/services/IEmailService';
+
+import { EmailData } from '@/domain/services/EmailData';
 
 export class MockEmailJobQueue implements IEmailJobQueue {
   private enqueuedEmails: EmailData[] = [];

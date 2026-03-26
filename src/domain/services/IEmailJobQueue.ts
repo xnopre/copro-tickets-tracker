@@ -1,4 +1,4 @@
-import { EmailData } from './IEmailService';
+import { EmailData } from '@/domain/services/EmailData';
 
 export interface IEmailJobQueue {
   enqueue(data: EmailData): Promise<void>;

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MockEmailJobQueue } from './MockEmailJobQueue';
-import { EmailData } from '@/domain/services/IEmailService';
+
+import { EmailData } from '@/domain/services/EmailData';
 
 describe('MockEmailJobQueue', () => {
   let queue: MockEmailJobQueue;

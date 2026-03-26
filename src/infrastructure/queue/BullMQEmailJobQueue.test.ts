@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BullMQEmailJobQueue, EMAIL_QUEUE_NAME } from './BullMQEmailJobQueue';
-import { EmailData } from '@/domain/services/IEmailService';
+
+import { EmailData } from '@/domain/services/EmailData';
 
 const mockAdd = vi.hoisted(() => vi.fn());
 const mockQueueConstructor = vi.hoisted(() => vi.fn());
