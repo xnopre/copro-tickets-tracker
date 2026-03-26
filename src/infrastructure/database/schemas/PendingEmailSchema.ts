@@ -38,5 +38,7 @@ const pendingEmailSchema = new Schema<PendingEmailDocument>(
   { timestamps: true }
 );
 
+pendingEmailSchema.index({ status: 1 });
+
 export const PendingEmailModel =
   models.PendingEmail || model<PendingEmailDocument>('PendingEmail', pendingEmailSchema);
