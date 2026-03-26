@@ -10,7 +10,7 @@ export async function POST() {
     await resetInterruptedEmails();
     const result = await processPendingEmails(ServiceFactory.getEmailService());
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Email processing failed' }, { status: 500 });
   }
 }
