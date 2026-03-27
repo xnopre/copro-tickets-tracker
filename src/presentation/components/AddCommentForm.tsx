@@ -62,6 +62,8 @@ export default function AddCommentForm({ ticketId, onCommentAdded }: AddCommentF
         createdAt: new Date(data.createdAt),
       };
 
+      fetch('/api/process-emails', { method: 'POST' }).catch(() => {});
+
       setSuccess(true);
       setContent('');
 

@@ -8,6 +8,10 @@ export const server = setupServer(
   // Handler par défaut pour les commentaires
   http.get('/api/tickets/:id/comments', () => {
     return HttpResponse.json([]);
+  }),
+  // Handler par défaut pour le traitement des emails (fire-and-forget)
+  http.post('/api/process-emails', () => {
+    return HttpResponse.json({ sent: 0, failed: 0 });
   })
 );
 
