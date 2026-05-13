@@ -405,7 +405,3 @@ ISC
 ## 👤 Auteur
 
 [@xnopre](https://github.com/xnopre)
-
----
-
-**Status** : 🚧 En développement - Étape 3 en cours (MongoDB local configuré)
